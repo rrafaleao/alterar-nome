@@ -1,6 +1,6 @@
 # 1. Visão Geral do Projeto
 
-O projeto consiste no desenvolvimento de uma plataforma completa de criação e gestão de lojas virtuais, inspirada em soluções como **Nuvemshop**, **Shopify** e **Loja Integrada**.
+O projeto consiste no desenvolvimento de uma plataforma completa de criação e gestão de lojas virtuais.
 
 O sistema permite que lojistas criem suas próprias lojas, personalizem seus catálogos e gerenciem vendas, enquanto clientes podem navegar nas lojas e realizar compras.
 
