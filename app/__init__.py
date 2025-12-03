@@ -1,29 +1,19 @@
 from flask import Flask
-from config.database import db 
-from app.routes import (
-    auth_bp,
-    user_bp,
-    store_bp,
-    product_bp,
-    cart_bp,
-    order_bp
-)
+from flask_sqlalchemy import SQLAlchemy
+from app.routes.init import all_blueprints
+
 
 def create_app():
     app = Flask(__name__)
 
-    # Config
-    app.config.from_object("config.settings")
+    # -----------------------------------------
+    # CONFIGURAÇÕES BÁSICAS DO SISTEMA
+    # -----------------------------------------
+    app.config["SQLALCHEMY_DATABASE_URI"] = "http://localhost/phpmyadmin/index.php?route=/database/structure&db=sem_nome_ainda"
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    app.config["SECRET_KEY"] = "uma-chave-secreta-muito-segura"
 
-    # Extensões
-    db.init_app(app)
-
-    # Blueprints
-    app.register_blueprint(auth_bp, url_prefix="/auth")
-    app.register_blueprint(user_bp, url_prefix="/users")
-    app.register_blueprint(store_bp, url_prefix="/stores")
-    app.register_blueprint(product_bp, url_prefix="/products")
-    app.register_blueprint(cart_bp, url_prefix="/cart")
-    app.register_blueprint(order_bp, url_prefix="/orders")
+    for bp in all_blueprints:
+        app.register_blueprint(bp)
 
     return app

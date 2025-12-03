@@ -1,182 +1,183 @@
-CREATE EXTENSION IF NOT EXISTS "pgcrypto";
-CREATE EXTENSION IF NOT EXISTS "btree_gin";
+-- Habilita o uso de UTF8
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
 
 -- USERS
 CREATE TABLE users (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  email TEXT NOT NULL UNIQUE,
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  email VARCHAR(255) NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
-  full_name TEXT,
-  is_active BOOLEAN NOT NULL DEFAULT true,
-  is_seller BOOLEAN NOT NULL DEFAULT false,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  full_name VARCHAR(255),
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  is_seller BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_users_email (email)
 );
-
-CREATE INDEX idx_users_email ON users(email);
 
 -- STORES
 CREATE TABLE stores (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  owner_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  slug TEXT NOT NULL,
-  name TEXT NOT NULL,
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  owner_id CHAR(36) NOT NULL,
+  slug VARCHAR(255) NOT NULL,
+  name VARCHAR(255) NOT NULL,
   description TEXT,
   logo_url TEXT,
-  is_published BOOLEAN DEFAULT false,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  UNIQUE (owner_id, slug)
+  is_published BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE (owner_id, slug),
+  INDEX idx_stores_slug (slug),
+  FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
-
-CREATE INDEX idx_stores_slug ON stores(slug);
 
 -- STORE CUSTOMIZATIONS
 CREATE TABLE store_customizations (
-  store_id UUID PRIMARY KEY REFERENCES stores(id) ON DELETE CASCADE,
+  store_id CHAR(36) PRIMARY KEY,
   primary_color VARCHAR(7),
   secondary_color VARCHAR(7),
-  theme JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  theme JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
 );
 
 -- CATEGORIES
 CREATE TABLE categories (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  slug TEXT NOT NULL,
-  parent_id UUID REFERENCES categories(id) ON DELETE SET NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  UNIQUE (store_id, slug)
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  store_id CHAR(36) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  slug VARCHAR(255) NOT NULL,
+  parent_id CHAR(36),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE (store_id, slug),
+  INDEX idx_categories_store (store_id),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
+  FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL
 );
-
-CREATE INDEX idx_categories_store ON categories(store_id);
 
 -- PRODUCTS
 CREATE TABLE products (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
-  category_id UUID REFERENCES categories(id) ON DELETE SET NULL,
-  title TEXT NOT NULL,
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  store_id CHAR(36) NOT NULL,
+  category_id CHAR(36),
+  title VARCHAR(255) NOT NULL,
   description TEXT,
-  sku TEXT,
-  price NUMERIC(12,2) NOT NULL CHECK (price >= 0),
-  active BOOLEAN DEFAULT true,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  sku VARCHAR(255),
+  price DECIMAL(12,2) NOT NULL CHECK (price >= 0),
+  active BOOLEAN DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_products_store (store_id),
+  FULLTEXT INDEX idx_products_title_fulltext (title, description),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
+  FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
 );
-
-CREATE INDEX idx_products_store ON products(store_id);
-CREATE INDEX idx_products_title_gin 
-  ON products USING gin (to_tsvector('portuguese', title || ' ' || coalesce(description,'')));
 
 -- PRODUCT IMAGES
 CREATE TABLE product_images (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  product_id CHAR(36) NOT NULL,
   url TEXT NOT NULL,
   position INT DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
 -- PRODUCT STOCK
 CREATE TABLE product_stocks (
-  product_id UUID PRIMARY KEY REFERENCES products(id) ON DELETE CASCADE,
+  product_id CHAR(36) PRIMARY KEY,
   quantity INT NOT NULL DEFAULT 0,
   reserved_quantity INT NOT NULL DEFAULT 0,
-  last_updated TIMESTAMP WITH TIME ZONE DEFAULT now()
+  last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
--- CART
+-- CARTS
 CREATE TABLE carts (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  user_id CHAR(36),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_cart_user (user_id),
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
+-- CART ITEMS
 CREATE TABLE cart_items (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  cart_id UUID REFERENCES carts(id) ON DELETE CASCADE,
-  product_id UUID REFERENCES products(id) ON DELETE RESTRICT,
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  cart_id CHAR(36),
+  product_id CHAR(36),
   quantity INT NOT NULL CHECK (quantity > 0),
-  unit_price NUMERIC(12,2) NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  unit_price DECIMAL(12,2) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (cart_id) REFERENCES carts(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
 );
-
-CREATE INDEX idx_cart_user ON carts(user_id);
 
 -- ADDRESSES
 CREATE TABLE addresses (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  user_id CHAR(36),
   line1 TEXT,
   line2 TEXT,
   city TEXT,
   state TEXT,
   postal_code TEXT,
   country TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- ORDER STATUS TYPE
-CREATE TYPE order_status AS ENUM (
-  'pending',
-  'paid',
-  'shipped',
-  'delivered',
-  'cancelled',
-  'refunded'
+-- ORDER STATUS ENUM
+CREATE TABLE order_status_enum (
+  status ENUM('pending','paid','shipped','delivered','cancelled','refunded')
 );
 
 -- ORDERS
 CREATE TABLE orders (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  store_id UUID NOT NULL REFERENCES stores(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE SET NULL,
-  total_amount NUMERIC(12,2) NOT NULL,
-  status order_status NOT NULL DEFAULT 'pending',
-  shipping_address_id UUID REFERENCES addresses(id),
-  placed_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  metadata JSONB
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  store_id CHAR(36) NOT NULL,
+  user_id CHAR(36),
+  total_amount DECIMAL(12,2) NOT NULL,
+  status ENUM('pending','paid','shipped','delivered','cancelled','refunded') DEFAULT 'pending',
+  shipping_address_id CHAR(36),
+  placed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  metadata JSON,
+  INDEX idx_orders_user (user_id),
+  INDEX idx_orders_store_status (store_id, status),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (shipping_address_id) REFERENCES addresses(id)
 );
-
-CREATE INDEX idx_orders_user ON orders(user_id);
-CREATE INDEX idx_orders_store_status ON orders(store_id, status);
 
 -- ORDER ITEMS
 CREATE TABLE order_items (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
-  product_id UUID REFERENCES products(id) ON DELETE SET NULL,
-  title TEXT NOT NULL,
-  sku TEXT,
-  unit_price NUMERIC(12,2) NOT NULL,
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  order_id CHAR(36) NOT NULL,
+  product_id CHAR(36),
+  title VARCHAR(255) NOT NULL,
+  sku VARCHAR(255),
+  unit_price DECIMAL(12,2) NOT NULL,
   quantity INT NOT NULL CHECK (quantity > 0),
-  total_price NUMERIC(12,2) GENERATED ALWAYS AS (unit_price * quantity) STORED
-);
-
--- PAYMENT STATUS TYPE
-CREATE TYPE payment_status AS ENUM (
-  'created',
-  'authorized',
-  'captured',
-  'failed',
-  'refunded'
+  total_price DECIMAL(12,2) AS (unit_price * quantity),
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
 );
 
 -- PAYMENTS
 CREATE TABLE payments (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  order_id UUID UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
-  method TEXT,
-  amount NUMERIC(12,2) NOT NULL,
-  status payment_status NOT NULL DEFAULT 'created',
-  payment_data JSONB,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  order_id CHAR(36) UNIQUE,
+  method VARCHAR(255),
+  amount DECIMAL(12,2) NOT NULL,
+  status ENUM('created','authorized','captured','failed','refunded') DEFAULT 'created',
+  payment_data JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 );
+
+SET FOREIGN_KEY_CHECKS = 1;
