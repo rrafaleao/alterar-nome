@@ -1,45 +1,38 @@
+from app import db
 from datetime import datetime
-from config.database import db
+from app.models.utils import uuid4_str
 
 class Product(db.Model):
     __tablename__ = "products"
 
-    id = db.Column(db.String, primary_key=True)
-    store_id = db.Column(db.String, db.ForeignKey("stores.id"))
-    category_id = db.Column(db.String, db.ForeignKey("categories.id"))
-    title = db.Column(db.String, nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=uuid4_str)
+    store_id = db.Column(db.String(36), db.ForeignKey("stores.id", ondelete="CASCADE"), nullable=False)
+    category_id = db.Column(db.String(36), db.ForeignKey("categories.id", ondelete="SET NULL"))
+    title = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text)
-    sku = db.Column(db.String)
+    sku = db.Column(db.String(255))
     price = db.Column(db.Numeric(12, 2), nullable=False)
     active = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    store = db.relationship("Store", back_populates="products")
-    category = db.relationship("Category", back_populates="products")
-    images = db.relationship("ProductImage", back_populates="product")
-    stock = db.relationship("ProductStock", back_populates="product", uselist=False)
-    order_items = db.relationship("OrderItem", back_populates="product")
-
+    images = db.relationship("ProductImage", backref="product", cascade="all, delete-orphan")
+    stock = db.relationship("ProductStock", backref="product", uselist=False, cascade="all, delete-orphan")
 
 class ProductImage(db.Model):
     __tablename__ = "product_images"
 
-    id = db.Column(db.String, primary_key=True)
-    product_id = db.Column(db.String, db.ForeignKey("products.id"))
-    url = db.Column(db.String, nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=uuid4_str)
+    product_id = db.Column(db.String(36), db.ForeignKey("products.id", ondelete="CASCADE"))
+    url = db.Column(db.Text, nullable=False)
     position = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    product = db.relationship("Product", back_populates="images")
-
 
 class ProductStock(db.Model):
     __tablename__ = "product_stocks"
 
-    product_id = db.Column(db.String, db.ForeignKey("products.id"), primary_key=True)
-    quantity = db.Column(db.Integer, default=0)
-    reserved_quantity = db.Column(db.Integer, default=0)
-    last_updated = db.Column(db.DateTime, default=datetime.utcnow)
-
-    product = db.relationship("Product", back_populates="stock")
+    product_id = db.Column(db.String(36), db.ForeignKey("products.id", ondelete="CASCADE"),
+                           primary_key=True)
+    quantity = db.Column(db.Integer, default=0, nullable=False)
+    reserved_quantity = db.Column(db.Integer, default=0, nullable=False)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
