@@ -6,10 +6,10 @@ O sistema permite que lojistas criem suas próprias lojas, personalizem seus cat
 
 A plataforma será composta por:
 
-- **Back-end (API REST)** desenvolvido em *Python + Django + Django REST Framework*
+- **Back-end (API REST)** desenvolvido em *Python + Flask*
 - **Aplicação Web** para administração e loja pública
 - **Aplicativo Mobile universal**, onde o cliente visualiza qualquer loja da plataforma e pode comprar
-- **Banco de dados PostgreSQL**
+- **Banco de dados MySQL**
 - **Gerenciamento via GitHub Projects + Codespaces**, conforme exigência do professor
 
 ---
