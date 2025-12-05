@@ -1,4 +1,4 @@
 import uuid
 
-def default_uuid():
+def uuid4_str():
     return str(uuid.uuid4())

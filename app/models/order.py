@@ -1,4 +1,4 @@
-from app import db
+from config.database import db
 from datetime import datetime
 from app.models.utils import uuid4_str
 
@@ -16,7 +16,9 @@ class Order(db.Model):
     shipping_address_id = db.Column(db.String(36), db.ForeignKey("addresses.id"))
     placed_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    metadata = db.Column(db.JSON)
+    # 'metadata' is reserved by SQLAlchemy declarative API.
+    # Use a different attribute name but keep the DB column name 'metadata' if desired.
+    metadata_ = db.Column('metadata', db.JSON)
 
     items = db.relationship("OrderItem", backref="order", cascade="all, delete-orphan")
     payment = db.relationship("Payment", backref="order", uselist=False, cascade="all, delete-orphan")

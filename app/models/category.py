@@ -1,4 +1,4 @@
-from app import db
+from config.database import db
 from datetime import datetime
 from app.models.utils import uuid4_str
 
