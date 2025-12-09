@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from config.database import db
-
+from app.routes.init import all_blueprints
 
 def create_app():
     app = Flask(__name__)
@@ -14,7 +14,9 @@ def create_app():
     app.config["SECRET_KEY"] = "uma-chave-secreta-muito-segura"
     db.init_app(app)
 
-    from app.routes.init import all_blueprints
+    with app.app_context():
+        db.create_all()
+
     for bp in all_blueprints:
         app.register_blueprint(bp)
 

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Criar Nova Loja</title>
+</head>
+<body>
+    <h1>Criar Nova Loja</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div style="color: green;">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <form action="/stores/create" method="POST">
+        <label>Nome da Loja:</label><br>
+        <input type="text" name="name" required><br><br>
+
+        <label>Slug (URL amigável):</label><br>
+        <input type="text" name="slug" required><br><br>
+
+        <label>Descrição (opcional):</label><br>
+        <textarea name="description"></textarea><br><br>
+
+        <label>Logo URL (opcional):</label><br>
+        <input type="text" name="logo_url"><br><br>
+
+        <label>Publicada:</label><br>
+        <input type="checkbox" name="is_published" value="1"><br><br>
+
+        <button type="submit">Criar Loja</button>
+    </form>
+
+    <hr>
+    <a href="/stores/list">Ver Lojas</a> | <a href="/">Voltar ao Início</a>
+</body>
+</html>

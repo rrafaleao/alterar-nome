@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lojas</title>
+</head>
+<body>
+    <h1>Lojas Cadastradas</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div style="color: green;">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <a href="/stores/create">Criar Nova Loja</a>
+
+    <hr>
+
+    {% if stores %}
+        <table border="1">
+            <tr>
+                <th>Nome</th>
+                <th>Slug</th>
+                <th>ID</th>
+                <th>Publicada</th>
+                <th>Criada em</th>
+            </tr>
+            {% for store in stores %}
+                <tr>
+                    <td>{{ store.name }}</td>
+                    <td>{{ store.slug }}</td>
+                    <td><code>{{ store.id }}</code></td>
+                    <td>{% if store.is_published %}Sim{% else %}Não{% endif %}</td>
+                    <td>{{ store.created_at }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>Nenhuma loja cadastrada ainda.</p>
+    {% endif %}
+
+    <hr>
+    <a href="/">Voltar ao Início</a>
+</body>
+</html>
