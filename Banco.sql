@@ -1,8 +1,6 @@
--- Habilita o uso de UTF8
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
--- USERS
 CREATE TABLE users (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   email VARCHAR(255) NOT NULL UNIQUE,
@@ -15,7 +13,6 @@ CREATE TABLE users (
   INDEX idx_users_email (email)
 );
 
--- STORES
 CREATE TABLE stores (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   owner_id CHAR(36) NOT NULL,
@@ -23,15 +20,23 @@ CREATE TABLE stores (
   name VARCHAR(255) NOT NULL,
   description TEXT,
   logo_url TEXT,
+  onboarding_step TINYINT NOT NULL DEFAULT 1,
+  onboarding_completed BOOLEAN NOT NULL DEFAULT FALSE,
+  person_type ENUM('PF','PJ') NOT NULL DEFAULT 'PF',
+  cpf VARCHAR(11),
+  cnpj VARCHAR(14),
+  legal_name VARCHAR(255),
+
   is_published BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
   UNIQUE (owner_id, slug),
   INDEX idx_stores_slug (slug),
+
   FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- STORE CUSTOMIZATIONS
 CREATE TABLE store_customizations (
   store_id CHAR(36) PRIMARY KEY,
   primary_color VARCHAR(7),
@@ -42,7 +47,28 @@ CREATE TABLE store_customizations (
   FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
 );
 
--- CATEGORIES
+CREATE TABLE store_payment_methods (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  store_id CHAR(36) NOT NULL,
+  method ENUM('pix','credit_card','debit_card','boleto') NOT NULL,
+  is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  config JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (store_id, method),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+);
+
+CREATE TABLE store_shipping_methods (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  store_id CHAR(36) NOT NULL,
+  method ENUM('correios','fixed','pickup','custom') NOT NULL,
+  is_enabled BOOLEAN NOT NULL DEFAULT TRUE,
+  config JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (store_id, method),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+);
+
 CREATE TABLE categories (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   store_id CHAR(36) NOT NULL,
@@ -57,7 +83,6 @@ CREATE TABLE categories (
   FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL
 );
 
--- PRODUCTS
 CREATE TABLE products (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   store_id CHAR(36) NOT NULL,
@@ -75,7 +100,6 @@ CREATE TABLE products (
   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
 );
 
--- PRODUCT IMAGES
 CREATE TABLE product_images (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   product_id CHAR(36) NOT NULL,
@@ -85,7 +109,6 @@ CREATE TABLE product_images (
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
--- PRODUCT STOCK
 CREATE TABLE product_stocks (
   product_id CHAR(36) PRIMARY KEY,
   quantity INT NOT NULL DEFAULT 0,
@@ -94,7 +117,6 @@ CREATE TABLE product_stocks (
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
--- CARTS
 CREATE TABLE carts (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   user_id CHAR(36),
@@ -104,7 +126,6 @@ CREATE TABLE carts (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );
 
--- CART ITEMS
 CREATE TABLE cart_items (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   cart_id CHAR(36),
@@ -116,7 +137,6 @@ CREATE TABLE cart_items (
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE RESTRICT
 );
 
--- ADDRESSES
 CREATE TABLE addresses (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   user_id CHAR(36),
@@ -130,13 +150,6 @@ CREATE TABLE addresses (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
--- ORDER STATUS ENUM
-CREATE TABLE order_status_enum (
-  status ENUM('pending','paid','shipped','delivered','cancelled','refunded')
-);
-
--- ORDERS
-CREATE TABLE orders (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   store_id CHAR(36) NOT NULL,
   user_id CHAR(36),
@@ -153,7 +166,7 @@ CREATE TABLE orders (
   FOREIGN KEY (shipping_address_id) REFERENCES addresses(id)
 );
 
--- ORDER ITEMS
+
 CREATE TABLE order_items (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   order_id CHAR(36) NOT NULL,
@@ -167,7 +180,6 @@ CREATE TABLE order_items (
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
 );
 
--- PAYMENTS
 CREATE TABLE payments (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   order_id CHAR(36) UNIQUE,
