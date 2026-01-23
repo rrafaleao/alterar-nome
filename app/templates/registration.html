@@ -3,476 +3,1069 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Criar Loja - Registro Multi-Step</title>
+    <title>Criar Sua Loja - Registro</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 20px;
         }
-        
+
         .container {
-            max-width: 600px;
-            margin: 0 auto;
             background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 700px;
+            width: 100%;
+            overflow: hidden;
         }
-        
-        .progress {
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .progress-bar {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 30px;
+            padding: 30px 20px;
+            background: #f8f9fa;
+            position: relative;
         }
-        
+
         .progress-step {
             flex: 1;
             text-align: center;
-            padding: 10px;
-            background: #e0e0e0;
             position: relative;
+            z-index: 1;
         }
-        
-        .progress-step.active {
-            background: #4CAF50;
+
+        .progress-step::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: #dee2e6;
+            z-index: -1;
+        }
+
+        .progress-step:first-child::before {
+            display: none;
+        }
+
+        .progress-step.active::before,
+        .progress-step.completed::before {
+            background: #667eea;
+        }
+
+        .progress-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #dee2e6;
+            color: #6c757d;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .progress-step.active .progress-circle {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .progress-step.completed .progress-circle {
+            background: #28a745;
             color: white;
         }
-        
-        .progress-step.completed {
-            background: #2196F3;
-            color: white;
+
+        .progress-step.completed .progress-circle::before {
+            content: '✓';
         }
-        
+
+        .progress-label {
+            font-size: 11px;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        .progress-step.active .progress-label {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .form-content {
+            padding: 40px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
         .step-content {
             display: none;
         }
-        
+
         .step-content.active {
             display: block;
+            animation: fadeIn 0.3s ease;
         }
-        
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h2 {
+            color: #2d3748;
+            margin-bottom: 25px;
+            font-size: 22px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         label {
             display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
             font-size: 14px;
         }
-        
-        .error {
-            color: red;
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="tel"],
+        input[type="color"],
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .url-preview {
             font-size: 12px;
+            color: #718096;
             margin-top: 5px;
         }
-        
-        .checkbox-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+
+        .url-preview strong {
+            color: #667eea;
         }
-        
+
+        .error {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        input.has-error,
+        select.has-error {
+            border-color: #e53e3e;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .checkbox-group {
+                grid-template-columns: 1fr;
+            }
+        }
+
         .checkbox-item {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        
+
+        .checkbox-item:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
         .checkbox-item input[type="checkbox"] {
-            width: auto;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
         }
-        
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        /* Layout Templates */
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .template-card {
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .template-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .template-card.selected {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .template-card input[type="radio"] {
+            display: none;
+        }
+
+        .template-preview {
+            width: 100%;
+            height: 80px;
+            background: #f7fafc;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .template-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        /* Color Pickers */
+        .color-picker-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .color-picker-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .color-preview {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+        }
+
+        input[type="color"] {
+            width: 0;
+            height: 0;
+            opacity: 0;
+            position: absolute;
+        }
+
+        /* Logo Upload */
+        .logo-upload-area {
+            border: 2px dashed #e2e8f0;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logo-upload-area:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .logo-upload-area.has-logo {
+            border-style: solid;
+            border-color: #28a745;
+        }
+
+        .logo-preview {
+            max-width: 200px;
+            max-height: 150px;
+            margin: 10px auto;
+            display: none;
+        }
+
+        .logo-preview.show {
+            display: block;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
         .buttons {
             display: flex;
             justify-content: space-between;
+            gap: 15px;
             margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
         }
-        
+
         button {
-            padding: 12px 24px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: inherit;
         }
-        
+
         .btn-primary {
-            background: #4CAF50;
+            background: #667eea;
             color: white;
+            flex: 1;
         }
-        
-        .btn-secondary {
-            background: #999;
-            color: white;
-        }
-        
+
         .btn-primary:hover {
-            background: #45a049;
+            background: #5568d3;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
-        
+
+        .btn-primary:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #718096;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4a5568;
+        }
+
         .success-message {
             text-align: center;
             padding: 40px;
         }
-        
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: #48bb78;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 40px;
+            color: white;
+        }
+
         .success-message h2 {
-            color: #4CAF50;
-            margin-bottom: 20px;
+            color: #48bb78;
+            margin-bottom: 15px;
+        }
+
+        .success-details {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .success-details p {
+            margin: 10px 0;
+            color: #4a5568;
+        }
+
+        .success-details strong {
+            color: #2d3748;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Criar Sua Loja</h1>
-        
-        <div class="progress">
-            <div class="progress-step active" id="progress-1">Etapa 1</div>
-            <div class="progress-step" id="progress-2">Etapa 2</div>
-            <div class="progress-step" id="progress-3">Etapa 3</div>
+        <div class="header">
+            <h1>🛍️ Criar Sua Loja</h1>
+            <p>Complete as 4 etapas para começar a vender online</p>
         </div>
-        
-        <!-- ETAPA 1 -->
-        <div class="step-content active" id="step-1">
-            <h2>Dados da Loja</h2>
-            <div class="form-group">
-                <label>Nome da Loja *</label>
-                <input type="text" id="store_name" placeholder="Ex: Minha Loja Online">
-                <div class="error" id="error-store_name"></div>
+
+        <div class="progress-bar">
+            <div class="progress-step active" id="progress-1">
+                <div class="progress-circle">1</div>
+                <div class="progress-label">Loja</div>
             </div>
-            
-            <div class="form-group">
-                <label>Email *</label>
-                <input type="email" id="email" placeholder="seu@email.com">
-                <div class="error" id="error-email"></div>
+            <div class="progress-step" id="progress-2">
+                <div class="progress-circle">2</div>
+                <div class="progress-label">Dados</div>
             </div>
-            
-            <div class="form-group">
-                <label>Senha *</label>
-                <input type="password" id="password" placeholder="Mínimo 8 caracteres">
-                <div class="error" id="error-password"></div>
+            <div class="progress-step" id="progress-3">
+                <div class="progress-circle">3</div>
+                <div class="progress-label">Métodos</div>
             </div>
-            
-            <div class="form-group">
-                <label>Confirmar Senha *</label>
-                <input type="password" id="confirm_password">
-                <div class="error" id="error-confirm_password"></div>
-            </div>
-            
-            <div class="buttons">
-                <button class="btn-secondary" onclick="cancelRegistration()">Cancelar</button>
-                <button class="btn-primary" onclick="submitStep1()">Próximo</button>
+            <div class="progress-step" id="progress-4">
+                <div class="progress-circle">4</div>
+                <div class="progress-label">Visual</div>
             </div>
         </div>
-        
-        <!-- ETAPA 2 -->
-        <div class="step-content" id="step-2">
-            <h2>Dados Pessoais</h2>
-            <div class="form-group">
-                <label>Nome Completo *</label>
-                <input type="text" id="full_name" placeholder="Seu nome completo">
-                <div class="error" id="error-full_name"></div>
-            </div>
-            
-            <div class="form-group">
-                <label>Tipo de Pessoa *</label>
-                <select id="person_type" onchange="togglePersonType()">
-                    <option value="PF">Pessoa Física (CPF)</option>
-                    <option value="PJ">Pessoa Jurídica (CNPJ)</option>
-                </select>
-            </div>
-            
-            <div class="form-group" id="cpf-group">
-                <label>CPF *</label>
-                <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14">
-                <div class="error" id="error-cpf"></div>
-            </div>
-            
-            <div class="form-group" id="cnpj-group" style="display: none;">
-                <label>CNPJ *</label>
-                <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18">
-                <div class="error" id="error-cnpj"></div>
-            </div>
-            
-            <div class="form-group" id="legal-name-group" style="display: none;">
-                <label>Razão Social *</label>
-                <input type="text" id="legal_name" placeholder="Razão social da empresa">
-                <div class="error" id="error-legal_name"></div>
-            </div>
-            
-            <div class="buttons">
-                <button class="btn-secondary" onclick="previousStep(2)">Voltar</button>
-                <button class="btn-primary" onclick="submitStep2()">Próximo</button>
-            </div>
-        </div>
-        
-        <!-- ETAPA 3 -->
-        <div class="step-content" id="step-3">
-            <h2>Métodos de Pagamento e Frete</h2>
-            
-            <div class="form-group">
-                <label>Métodos de Pagamento *</label>
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="payment_pix" value="pix">
-                        <label for="payment_pix">PIX</label>
+
+        <div class="form-content">
+            <!-- ETAPA 1: DADOS DA LOJA -->
+            <div class="step-content active" id="step-1">
+                <h2>Dados da Loja</h2>
+                
+                <div class="form-group">
+                    <label for="store_name">Nome da Loja *</label>
+                    <input type="text" id="store_name" placeholder="Ex: Minha Loja Online" required>
+                    <span class="error" id="error-store_name"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="store_url">URL da Loja *</label>
+                    <input type="text" id="store_url" placeholder="minha-loja" required>
+                    <div class="url-preview">
+                        Sua loja ficará em: <strong id="url-display">seudominio.com/minha-loja</strong>
                     </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="payment_credit_card" value="credit_card">
-                        <label for="payment_credit_card">Cartão de Crédito</label>
+                    <span class="error" id="error-store_url"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Seu Email *</label>
+                    <input type="email" id="email" placeholder="seu@email.com" required>
+                    <span class="error" id="error-email"></span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Senha *</label>
+                        <input type="password" id="password" placeholder="Mínimo 8 caracteres" required>
+                        <span class="error" id="error-password"></span>
                     </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="payment_debit_card" value="debit_card">
-                        <label for="payment_debit_card">Cartão de Débito</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="payment_boleto" value="boleto">
-                        <label for="payment_boleto">Boleto</label>
+
+                    <div class="form-group">
+                        <label for="confirm_password">Confirmar Senha *</label>
+                        <input type="password" id="confirm_password" placeholder="Repita a senha" required>
+                        <span class="error" id="error-confirm_password"></span>
                     </div>
                 </div>
-                <div class="error" id="error-payment_methods"></div>
+
+                <div class="buttons">
+                    <button type="button" class="btn-secondary" onclick="cancelRegistration()">Cancelar</button>
+                    <button type="button" class="btn-primary" id="btn-step1" onclick="submitStep1()">Próximo →</button>
+                </div>
             </div>
-            
-            <div class="form-group">
-                <label>Métodos de Frete *</label>
-                <div class="checkbox-group">
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="shipping_correios" value="correios">
-                        <label for="shipping_correios">Correios</label>
+
+            <!-- ETAPA 2: DADOS PESSOAIS -->
+            <div class="step-content" id="step-2">
+                <h2>Seus Dados Pessoais</h2>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="first_name">Nome *</label>
+                        <input type="text" id="first_name" placeholder="João" required>
+                        <span class="error" id="error-first_name"></span>
                     </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="shipping_fixed" value="fixed">
-                        <label for="shipping_fixed">Frete Fixo</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="shipping_pickup" value="pickup">
-                        <label for="shipping_pickup">Retirada Local</label>
-                    </div>
-                    <div class="checkbox-item">
-                        <input type="checkbox" id="shipping_custom" value="custom">
-                        <label for="shipping_custom">Personalizado</label>
+
+                    <div class="form-group">
+                        <label for="last_name">Sobrenome *</label>
+                        <input type="text" id="last_name" placeholder="Silva" required>
+                        <span class="error" id="error-last_name"></span>
                     </div>
                 </div>
-                <div class="error" id="error-shipping_methods"></div>
+
+                <div class="form-group">
+                    <label for="phone">Telefone *</label>
+                    <input type="tel" id="phone" placeholder="(11) 98888-8888" maxlength="15" required>
+                    <span class="error" id="error-phone"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="person_type">Tipo de Pessoa *</label>
+                    <select id="person_type" onchange="togglePersonType()">
+                        <option value="PF">Pessoa Física (CPF)</option>
+                        <option value="PJ">Pessoa Jurídica (CNPJ)</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="cpf-group">
+                    <label for="cpf">CPF *</label>
+                    <input type="text" id="cpf" placeholder="000.000.000-00" maxlength="14">
+                    <span class="error" id="error-cpf"></span>
+                </div>
+
+                <div class="form-group" id="cnpj-group" style="display: none;">
+                    <label for="cnpj">CNPJ *</label>
+                    <input type="text" id="cnpj" placeholder="00.000.000/0000-00" maxlength="18">
+                    <span class="error" id="error-cnpj"></span>
+                </div>
+
+                <div class="form-group" id="legal-name-group" style="display: none;">
+                    <label for="legal_name">Razão Social *</label>
+                    <input type="text" id="legal_name" placeholder="Razão social da empresa">
+                    <span class="error" id="error-legal_name"></span>
+                </div>
+
+                <div class="buttons">
+                    <button type="button" class="btn-secondary" onclick="previousStep(2)">← Voltar</button>
+                    <button type="button" class="btn-primary" id="btn-step2" onclick="submitStep2()">Próximo →</button>
+                </div>
             </div>
-            
-            <div class="buttons">
-                <button class="btn-secondary" onclick="previousStep(3)">Voltar</button>
-                <button class="btn-primary" onclick="submitStep3()">Finalizar</button>
+
+            <!-- ETAPA 3: MÉTODOS DE PAGAMENTO E FRETE -->
+            <div class="step-content" id="step-3">
+                <h2>Métodos de Pagamento e Frete</h2>
+
+                <div class="form-group">
+                    <label>Métodos de Pagamento *</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="payment_pix" value="pix">
+                            <label for="payment_pix">💳 PIX</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="payment_credit_card" value="credit_card">
+                            <label for="payment_credit_card">💳 Crédito</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="payment_debit_card" value="debit_card">
+                            <label for="payment_debit_card">💳 Débito</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="payment_boleto" value="boleto">
+                            <label for="payment_boleto">📄 Boleto</label>
+                        </div>
+                    </div>
+                    <span class="error" id="error-payment_methods"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Métodos de Frete *</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="shipping_correios" value="correios">
+                            <label for="shipping_correios">📦 Correios</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="shipping_fixed" value="fixed">
+                            <label for="shipping_fixed">💰 Fixo</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="shipping_pickup" value="pickup">
+                            <label for="shipping_pickup">🏪 Retirada</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="shipping_custom" value="custom">
+                            <label for="shipping_custom">⚙️ Customizado</label>
+                        </div>
+                    </div>
+                    <span class="error" id="error-shipping_methods"></span>
+                </div>
+
+                <div class="buttons">
+                    <button type="button" class="btn-secondary" onclick="previousStep(3)">← Voltar</button>
+                    <button type="button" class="btn-primary" id="btn-step3" onclick="submitStep3()">Próximo →</button>
+                </div>
             </div>
-        </div>
-        
-        <!-- SUCESSO -->
-        <div class="step-content" id="step-success">
-            <div class="success-message">
-                <h2>✓ Loja Criada com Sucesso!</h2>
-                <p id="success-details"></p>
-                <button class="btn-primary" onclick="window.location.href='/stores/list'">
-                    Ir para Minhas Lojas
-                </button>
+
+            <!-- ETAPA 4: PERSONALIZAÇÃO VISUAL -->
+            <div class="step-content" id="step-4">
+                <h2>Personalização Visual</h2>
+
+                <div class="form-group">
+                    <label>Escolha o Layout da Loja *</label>
+                    <div class="template-grid">
+                        <div class="template-card selected" onclick="selectTemplate('default')">
+                            <input type="radio" name="template" id="template_default" value="default" checked>
+                            <div class="template-preview">🏪</div>
+                            <div class="template-name">Padrão</div>
+                        </div>
+                        <div class="template-card" onclick="selectTemplate('modern')">
+                            <input type="radio" name="template" id="template_modern" value="modern">
+                            <div class="template-preview">✨</div>
+                            <div class="template-name">Moderno</div>
+                        </div>
+                        <div class="template-card" onclick="selectTemplate('minimal')">
+                            <input type="radio" name="template" id="template_minimal" value="minimal">
+                            <div class="template-preview">⚪</div>
+                            <div class="template-name">Minimalista</div>
+                        </div>
+                        <div class="template-card" onclick="selectTemplate('colorful')">
+                            <input type="radio" name="template" id="template_colorful" value="colorful">
+                            <div class="template-preview">🎨</div>
+                            <div class="template-name">Colorido</div>
+                        </div>
+                        <div class="template-card" onclick="selectTemplate('elegant')">
+                            <input type="radio" name="template" id="template_elegant" value="elegant">
+                            <div class="template-preview">👔</div>
+                            <div class="template-name">Elegante</div>
+                        </div>
+                    </div>
+                    <span class="error" id="error-layout_template"></span>
+                </div>
+
+                <div class="form-group">
+                    <label>Logo da Loja (opcional)</label>
+                    <div class="logo-upload-area" id="logo-upload-area" onclick="document.getElementById('logo-file').click()">
+                        <div class="upload-icon">📷</div>
+                        <p><strong>Clique para escolher uma imagem</strong></p>
+                        <p style="font-size: 12px; color: #718096; margin-top: 5px;">PNG, JPG, GIF ou WEBP (máx. 2MB)</p>
+                        <img id="logo-preview" class="logo-preview" src="" alt="Logo Preview">
+                    </div>
+                    <input type="file" id="logo-file" accept="image/png,image/jpeg,image/jpg,image/gif,image/webp" onchange="handleLogoUpload(event)">
+                    <input type="hidden" id="logo_url" value="">
+                </div>
+
+                <div class="form-group">
+                    <label>Cores da Loja</label>
+                    <div class="color-picker-group">
+                        <div class="color-picker-item">
+                            <div class="color-preview" id="primary-preview" style="background: #667eea;" onclick="document.getElementById('primary_color').click()"></div>
+                            <div>
+                                <label>Cor Primária</label>
+                                <input type="color" id="primary_color" value="#667eea" onchange="updateColorPreview('primary')">
+                                <span id="primary-hex">#667eea</span>
+                            </div>
+                        </div>
+                        <div class="color-picker-item">
+                            <div class="color-preview" id="secondary-preview" style="background: #764ba2;" onclick="document.getElementById('secondary_color').click()"></div>
+                            <div>
+                                <label>Cor Secundária</label>
+                                <input type="color" id="secondary_color" value="#764ba2" onchange="updateColorPreview('secondary')">
+                                <span id="secondary-hex">#764ba2</span>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="error" id="error-primary_color"></span>
+                    <span class="error" id="error-secondary_color"></span>
+                </div>
+
+                <div class="buttons">
+                    <button type="button" class="btn-secondary" onclick="previousStep(4)">← Voltar</button>
+                    <button type="button" class="btn-primary" id="btn-step4" onclick="submitStep4()">Finalizar ✓</button>
+                </div>
+            </div>
+
+            <!-- TELA DE SUCESSO -->
+            <div class="step-content" id="step-success">
+                <div class="success-message">
+                    <div class="success-icon">✓</div>
+                    <h2>Loja Criada com Sucesso!</h2>
+                    <p>Parabéns! Sua loja está pronta para começar a vender.</p>
+                    
+                    <div class="success-details" id="success-details">
+                        <!-- Será preenchido via JavaScript -->
+                    </div>
+
+                    <button type="button" class="btn-primary" onclick="window.location.href='/'">
+                        Ir para o Painel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    
+
     <script>
-        let currentStep = 1;
-        
-        function clearErrors() {
-            document.querySelectorAll('.error').forEach(el => el.textContent = '');
-        }
-        
-        function showError(field, message) {
-            const errorEl = document.getElementById(`error-${field}`);
-            if (errorEl) errorEl.textContent = message;
-        }
-        
-        function togglePersonType() {
-            const personType = document.getElementById('person_type').value;
-            document.getElementById('cpf-group').style.display = personType === 'PF' ? 'block' : 'none';
-            document.getElementById('cnpj-group').style.display = personType === 'PJ' ? 'block' : 'none';
-            document.getElementById('legal-name-group').style.display = personType === 'PJ' ? 'block' : 'none';
-        }
-        
-        function previousStep(step) {
-            document.getElementById(`step-${step}`).classList.remove('active');
-            document.getElementById(`step-${step-1}`).classList.add('active');
-            document.getElementById(`progress-${step}`).classList.remove('active');
-            currentStep = step - 1;
-        }
-        
-        async function submitStep1() {
-            clearErrors();
-            
-            const data = {
-                store_name: document.getElementById('store_name').value,
-                email: document.getElementById('email').value,
-                password: document.getElementById('password').value,
-                confirm_password: document.getElementById('confirm_password').value
-            };
-            
-            try {
-                const response = await fetch('/api/registration/step1', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    document.getElementById('step-1').classList.remove('active');
-                    document.getElementById('step-2').classList.add('active');
-                    document.getElementById('progress-1').classList.add('completed');
-                    document.getElementById('progress-2').classList.add('active');
-                    currentStep = 2;
-                } else {
-                    if (result.errors) {
-                        Object.keys(result.errors).forEach(field => {
-                            showError(field, result.errors[field]);
-                        });
-                    }
-                    alert(result.error || 'Erro ao processar dados');
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro ao conectar com o servidor');
-            }
-        }
-        
-        async function submitStep2() {
-            clearErrors();
-            
-            const personType = document.getElementById('person_type').value;
-            const data = {
-                full_name: document.getElementById('full_name').value,
-                person_type: personType,
-                cpf: personType === 'PF' ? document.getElementById('cpf').value : '',
-                cnpj: personType === 'PJ' ? document.getElementById('cnpj').value : '',
-                legal_name: personType === 'PJ' ? document.getElementById('legal_name').value : ''
-            };
-            
-            try {
-                const response = await fetch('/api/registration/step2', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    document.getElementById('step-2').classList.remove('active');
-                    document.getElementById('step-3').classList.add('active');
-                    document.getElementById('progress-2').classList.add('completed');
-                    document.getElementById('progress-3').classList.add('active');
-                    currentStep = 3;
-                } else {
-                    if (result.errors) {
-                        Object.keys(result.errors).forEach(field => {
-                            showError(field, result.errors[field]);
-                        });
-                    }
-                    alert(result.error || 'Erro ao processar dados');
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro ao conectar com o servidor');
-            }
-        }
-        
-        async function submitStep3() {
-            clearErrors();
-            
-            const paymentMethods = [];
-            document.querySelectorAll('input[id^="payment_"]:checked').forEach(el => {
-                paymentMethods.push(el.value);
-            });
-            
-            const shippingMethods = [];
-            document.querySelectorAll('input[id^="shipping_"]:checked').forEach(el => {
-                shippingMethods.push(el.value);
-            });
-            
-            const data = {
-                payment_methods: paymentMethods,
-                shipping_methods: shippingMethods
-            };
-            
-            try {
-                const response = await fetch('/api/registration/step3', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    document.getElementById('step-3').classList.remove('active');
-                    document.getElementById('step-success').classList.add('active');
-                    document.getElementById('progress-3').classList.add('completed');
-                    
-                    document.getElementById('success-details').innerHTML = `
-                        <p><strong>Loja:</strong> ${result.data.store_name}</p>
-                        <p><strong>URL:</strong> ${window.location.origin}/${result.data.slug}</p>
-                    `;
-                } else {
-                    if (result.errors) {
-                        Object.keys(result.errors).forEach(field => {
-                            showError(field, result.errors[field]);
-                        });
-                    }
-                    alert(result.error || 'Erro ao processar dados');
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                alert('Erro ao conectar com o servidor');
-            }
-        }
-        
-        async function cancelRegistration() {
-            if (confirm('Deseja realmente cancelar o registro?')) {
-                try {
-                    await fetch('/api/registration/cancel', { method: 'POST' });
-                    window.location.href = '/';
-                } catch (error) {
-                    console.error('Erro:', error);
-                }
-            }
-        }
-        
-        // Máscaras para CPF e CNPJ
-        document.getElementById('cpf').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 11) {
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
-                e.target.value = value;
-            }
+        // ==================== FUNÇÕES AUXILIARES ====================
+
+function clearErrors() {
+    document.querySelectorAll('.error').forEach(el => el.textContent = '');
+    document.querySelectorAll('input, select').forEach(el => el.classList.remove('has-error'));
+}
+
+function showError(field, message) {
+    const errorEl = document.getElementById(`error-${field}`);
+    const inputEl = document.getElementById(field);
+    if (errorEl) errorEl.textContent = message;
+    if (inputEl) inputEl.classList.add('has-error');
+}
+
+function disableButton(btnId, disabled) {
+    const btn = document.getElementById(btnId);
+    if (btn) btn.disabled = disabled;
+}
+
+function togglePersonType() {
+    const isPF = document.getElementById('person_type').value === 'PF';
+    document.getElementById('cpf-group').style.display = isPF ? 'block' : 'none';
+    document.getElementById('cnpj-group').style.display = isPF ? 'none' : 'block';
+    document.getElementById('legal-name-group').style.display = isPF ? 'none' : 'block';
+}
+
+function previousStep(currentStep) {
+    document.getElementById(`step-${currentStep}`).classList.remove('active');
+    document.getElementById(`step-${currentStep - 1}`).classList.add('active');
+    document.getElementById(`progress-${currentStep}`).classList.remove('active');
+}
+
+function selectTemplate(template) {
+    document.querySelectorAll('.template-card').forEach(card => card.classList.remove('selected'));
+    event.currentTarget.classList.add('selected');
+    document.getElementById(`template_${template}`).checked = true;
+}
+
+function updateColorPreview(type) {
+    const color = document.getElementById(`${type}_color`).value;
+    document.getElementById(`${type}-preview`).style.background = color;
+    document.getElementById(`${type}-hex`).textContent = color;
+}
+
+async function handleLogoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('logo', file);
+
+    try {
+        const response = await fetch('/registration/upload-logo', {
+            method: 'POST',
+            body: formData
         });
+
+        const result = await response.json();
+
+        if (result.success) {
+            document.getElementById('logo_url').value = result.logo_url;
+            document.getElementById('logo-preview').src = result.logo_url;
+            document.getElementById('logo-preview').classList.add('show');
+            document.getElementById('logo-upload-area').classList.add('has-logo');
+        } else {
+            alert(result.error || 'Erro ao fazer upload');
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao fazer upload da imagem');
+    }
+}
+
+// ==================== ETAPA 1: DADOS DA LOJA ====================
+
+// Atualiza preview da URL em tempo real
+document.getElementById('store_url').addEventListener('input', function(e) {
+    let value = e.target.value.toLowerCase();
+    value = value.replace(/[^a-z0-9-]/g, '');
+    e.target.value = value;
+    document.getElementById('url-display').textContent = `seudominio.com/${value || 'sua-loja'}`;
+});
+
+async function submitStep1() {
+    clearErrors();
+    
+    const data = {
+        store_name: document.getElementById('store_name').value.trim(),
+        store_url: document.getElementById('store_url').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+        confirm_password: document.getElementById('confirm_password').value
+    };
+
+    try {
+        disableButton('btn-step1', true);
         
-        document.getElementById('cnpj').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 14) {
-                value = value.replace(/(\d{2})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d)/, '$1.$2');
-                value = value.replace(/(\d{3})(\d)/, '$1/$2');
-                value = value.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
-                e.target.value = value;
-            }
+        const response = await fetch('/registration/step1', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
         });
-    </script>
-</body>
-</html>
+
+        const result = await response.json();
+
+        if (result.success) {
+            document.getElementById('step-1').classList.remove('active');
+            document.getElementById('step-2').classList.add('active');
+            document.getElementById('progress-1').classList.add('completed');
+            document.getElementById('progress-2').classList.add('active');
+        } else {
+            if (result.errors) {
+                Object.keys(result.errors).forEach(field => showError(field, result.errors[field]));
+            } else {
+                alert(result.error || 'Erro ao processar dados');
+            }
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao conectar com o servidor');
+    } finally {
+        disableButton('btn-step1', false);
+    }
+}
+
+// ==================== ETAPA 2: DADOS PESSOAIS ====================
+
+// Máscara para telefone: (11) 98888-8888
+document.getElementById('phone').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 11) {
+        value = value.replace(/(\d{2})(\d)/, '($1) $2');
+        value = value.replace(/(\d{5})(\d)/, '$1-$2');
+        e.target.value = value;
+    }
+});
+
+// Máscara para CPF: 000.000.000-00
+document.getElementById('cpf').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 11) {
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        e.target.value = value;
+    }
+});
+
+// Máscara para CNPJ: 00.000.000/0000-00
+document.getElementById('cnpj').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length <= 14) {
+        value = value.replace(/(\d{2})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1/$2');
+        value = value.replace(/(\d{4})(\d{1,2})$/, '$1-$2');
+        e.target.value = value;
+    }
+});
+
+async function submitStep2() {
+    clearErrors();
+
+    const personType = document.getElementById('person_type').value;
+    const data = {
+        first_name: document.getElementById('first_name').value.trim(),
+        last_name: document.getElementById('last_name').value.trim(),
+        phone: document.getElementById('phone').value,
+        person_type: personType,
+        cpf: personType === 'PF' ? document.getElementById('cpf').value : '',
+        cnpj: personType === 'PJ' ? document.getElementById('cnpj').value : '',
+        legal_name: personType === 'PJ' ? document.getElementById('legal_name').value.trim() : ''
+    };
+
+    try {
+        disableButton('btn-step2', true);
+        
+        const response = await fetch('/registration/step2', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            document.getElementById('step-2').classList.remove('active');
+            document.getElementById('step-3').classList.add('active');
+            document.getElementById('progress-2').classList.add('completed');
+            document.getElementById('progress-3').classList.add('active');
+        } else {
+            if (result.errors) {
+                Object.keys(result.errors).forEach(field => showError(field, result.errors[field]));
+            } else {
+                alert(result.error || 'Erro ao processar dados');
+            }
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao conectar com o servidor');
+    } finally {
+        disableButton('btn-step2', false);
+    }
+}
+
+// ==================== ETAPA 3: MÉTODOS DE PAGAMENTO E FRETE ====================
+
+async function submitStep3() {
+    clearErrors();
+
+    const paymentMethods = [];
+    document.querySelectorAll('input[id^="payment_"]:checked').forEach(cb => {
+        paymentMethods.push(cb.value);
+    });
+
+    const shippingMethods = [];
+    document.querySelectorAll('input[id^="shipping_"]:checked').forEach(cb => {
+        shippingMethods.push(cb.value);
+    });
+
+    const data = {
+        payment_methods: paymentMethods,
+        shipping_methods: shippingMethods
+    };
+
+    try {
+        disableButton('btn-step3', true);
+        
+        const response = await fetch('/registration/step3', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            document.getElementById('step-3').classList.remove('active');
+            document.getElementById('step-4').classList.add('active');
+            document.getElementById('progress-3').classList.add('completed');
+            document.getElementById('progress-4').classList.add('active');
+        } else {
+            if (result.errors) {
+                Object.keys(result.errors).forEach(field => showError(field, result.errors[field]));
+            } else {
+                alert(result.error || 'Erro ao processar dados');
+            }
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao conectar com o servidor');
+    } finally {
+        disableButton('btn-step3', false);
+    }
+}
+
+// ==================== ETAPA 4: PERSONALIZAÇÃO VISUAL ====================
+
+async function submitStep4() {
+    clearErrors();
+
+    const selectedTemplate = document.querySelector('input[name="template"]:checked').value;
+
+    const data = {
+        layout_template: selectedTemplate,
+        primary_color: document.getElementById('primary_color').value,
+        secondary_color: document.getElementById('secondary_color').value,
+        logo_url: document.getElementById('logo_url').value
+    };
+
+    try {
+        disableButton('btn-step4', true);
+        
+        const response = await fetch('/registration/step4', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            document.getElementById('step-4').classList.remove('active');
+            document.getElementById('step-success').classList.add('active');
+            document.getElementById('progress-4').classList.add('completed');
+
+            document.getElementById('success-details').innerHTML = `
+                <p><strong>Loja:</strong> ${result.data.store_name}</p>
+                <p><strong>URL:</strong> <a href="${result.data.store_url}" target="_blank">${window.location.origin}${result.data.store_url}</a></p>
+                <p><strong>ID:</strong> ${result.data.store_id}</p>
+            `;
+        } else {
+            if (result.errors) {
+                Object.keys(result.errors).forEach(field => showError(field, result.errors[field]));
+            } else {
+                alert(result.error || 'Erro ao processar dados');
+            }
+        }
+    } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro ao conectar com o servidor');
+    } finally {
+        disableButton('btn-step4', false);
+    }
+}
+
+// ==================== CANCELAR REGISTRO ====================
+
+async function cancelRegistration() {
+    if (confirm('Deseja realmente cancelar o registro? Todos os dados serão perdidos.')) {
+        try {
+            await fetch('/registration/cancel', { method: 'POST' });
+            window.location.href = '/';
+        } catch (error) {
+            window.location.href = '/';
+        }
+    }
+}
+</script>

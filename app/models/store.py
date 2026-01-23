@@ -3,6 +3,9 @@ from datetime import datetime
 from app.models.utils import uuid4_str
 
 
+from config.database import db
+from datetime import datetime
+
 class Store(db.Model):
     __tablename__ = 'stores'
     
@@ -31,6 +34,7 @@ class Store(db.Model):
     owner = db.relationship('User', back_populates='stores')
     payment_methods = db.relationship('StorePaymentMethod', back_populates='store', cascade='all, delete-orphan')
     shipping_methods = db.relationship('StoreShippingMethod', back_populates='store', cascade='all, delete-orphan')
+    customization = db.relationship('StoreCustomization', back_populates='store', uselist=False, cascade='all, delete-orphan')
     
     __table_args__ = (
         db.UniqueConstraint('owner_id', 'slug', name='unique_owner_slug'),
@@ -40,7 +44,7 @@ class Store(db.Model):
     def __repr__(self):
         return f'<Store {self.name} ({self.slug})>'
     
-    def to_dict(self, include_methods=False):
+    def to_dict(self, include_details=False):
         data = {
             'id': self.id,
             'owner_id': self.owner_id,
@@ -59,9 +63,11 @@ class Store(db.Model):
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }
         
-        if include_methods:
+        if include_details:
             data['payment_methods'] = [pm.to_dict() for pm in self.payment_methods]
             data['shipping_methods'] = [sm.to_dict() for sm in self.shipping_methods]
+            if self.customization:
+                data['customization'] = self.customization.to_dict()
         
         return data
 

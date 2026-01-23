@@ -11,7 +11,6 @@ class StorePaymentMethod(db.Model):
     config = db.Column(db.JSON, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relacionamento
     store = db.relationship('Store', back_populates='payment_methods')
     
     __table_args__ = (

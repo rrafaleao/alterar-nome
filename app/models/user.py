@@ -8,6 +8,7 @@ class User(db.Model):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.Text, nullable=False)
     full_name = db.Column(db.String(255), nullable=True)
+    phone = db.Column(db.String(15), nullable=True)  # NOVO CAMPO
     is_active = db.Column(db.Boolean, nullable=False, default=True)
     is_seller = db.Column(db.Boolean, nullable=False, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -28,6 +29,7 @@ class User(db.Model):
             'id': self.id,
             'email': self.email,
             'full_name': self.full_name,
+            'phone': self.phone,
             'is_active': self.is_active,
             'is_seller': self.is_seller,
             'created_at': self.created_at.isoformat() if self.created_at else None,
