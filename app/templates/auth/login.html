@@ -105,6 +105,46 @@
             color: #999;
         }
 
+        input.error {
+            border-color: #e53e3e;
+            background-color: #fff5f5;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 14px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            font-size: 16px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+        }
+
+        .alert-error {
+            background-color: #fed7d7;
+            color: #c53030;
+            border: 1px solid #fc8181;
+        }
+
+        .alert-success {
+            background-color: #c6f6d5;
+            color: #2f855a;
+            border: 1px solid #68d391;
+        }
+
         .password-input {
             position: relative;
         }
@@ -166,13 +206,43 @@
             box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
         }
 
-        .login-button:hover {
+        .login-button:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
         }
 
-        .login-button:active {
+        .login-button:active:not(:disabled) {
             transform: translateY(0);
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4A90E2;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         @media (max-width: 768px) {
@@ -210,39 +280,50 @@
             <h1>Login</h1>
             <p class="subtitle">Acesse sua conta para gerenciar sua loja</p>
 
-            <form id="loginForm">
-                <div class="input-group">
-                    <input 
-                        type="email" 
-                        id="email" 
-                        placeholder="nome@exemplo.com"
-                        required
-                    >
-                </div>
+            <div id="alert-container" class="alert"></div>
 
-                <div class="input-group password-input">
-                    <input 
-                        type="password" 
-                        id="password" 
-                        placeholder="senha forte"
-                        required
-                    >
-                    <button type="button" class="toggle-password" onclick="togglePassword()">
-                        <svg viewBox="0 0 24 24" id="eyeIcon">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
+            <div id="form-container">
+                <form id="loginForm">
+                    <div class="input-group">
+                        <input 
+                            type="email" 
+                            id="email" 
+                            placeholder="nome@exemplo.com"
+                            required
+                        >
+                        <div class="error-message" id="error-email"></div>
+                    </div>
+
+                    <div class="input-group password-input">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            placeholder="senha forte"
+                            required
+                        >
+                        <button type="button" class="toggle-password" onclick="togglePassword()">
+                            <svg viewBox="0 0 24 24" id="eyeIcon">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
+                        <div class="error-message" id="error-password"></div>
+                    </div>
+
+                    <div class="forgot-password">
+                        <a href="#" onclick="handleForgotPassword(event)">Esqueci minha senha</a>
+                    </div>
+
+                    <button type="submit" class="login-button" id="btn-login">
+                        Acessar a minha loja
                     </button>
-                </div>
+                </form>
+            </div>
 
-                <div class="forgot-password">
-                    <a href="#" onclick="handleForgotPassword(event)">Esqueci minha senha</a>
-                </div>
-
-                <button type="submit" class="login-button">
-                    Acessar a minha loja
-                </button>
-            </form>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="color: #4A90E2; font-size: 18px;">Entrando...</p>
+            </div>
         </div>
     </div>
 
@@ -266,13 +347,102 @@
             alert('Funcionalidade de recuperação de senha será implementada aqui!');
         }
 
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.classList.remove('show');
+                el.textContent = '';
+            });
+            document.querySelectorAll('input').forEach(el => {
+                el.classList.remove('error');
+            });
+            const alertEl = document.getElementById('alert-container');
+            alertEl.classList.remove('show', 'alert-error', 'alert-success');
+            alertEl.textContent = '';
+        }
+
+        function showError(field, message) {
+            const errorEl = document.getElementById(`error-${field}`);
+            const inputEl = document.getElementById(field);
             
-            console.log('Login attempt:', { email, password });
-            alert('Login enviado! Email: ' + email);
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.classList.add('show');
+            }
+            if (inputEl) {
+                inputEl.classList.add('error');
+            }
+        }
+
+        function showAlert(message, type = 'error') {
+            const alertEl = document.getElementById('alert-container');
+            alertEl.textContent = message;
+            alertEl.className = `alert alert-${type} show`;
+        }
+
+        function toggleLoading(show) {
+            document.getElementById('form-container').style.display = show ? 'none' : 'block';
+            document.getElementById('loading').classList.toggle('show', show);
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const btnLogin = document.getElementById('btn-login');
+
+            const data = {
+                email: email,
+                password: password
+            };
+
+            try {
+                toggleLoading(true);
+                btnLogin.disabled = true;
+
+                const response = await fetch('/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                console.log('Resposta da API:', result);
+
+                if (result.success) {
+                    showAlert('Login realizado com sucesso! Redirecionando...', 'success');
+                    
+                    setTimeout(() => {
+                        window.location.href = result.data.redirect_url;
+                    }, 1000);
+                } else {
+                    toggleLoading(false);
+                    btnLogin.disabled = false;
+
+                    if (result.errors) {
+                        Object.keys(result.errors).forEach(field => {
+                            showError(field, result.errors[field]);
+                        });
+                    } else {
+                        showAlert(result.error || 'Erro ao fazer login');
+                    }
+                }
+            } catch (error) {
+                toggleLoading(false);
+                btnLogin.disabled = false;
+                console.error('Erro:', error);
+                showAlert('Erro ao conectar com o servidor. Tente novamente.');
+            }
+        });
+
+        document.getElementById('email').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('password').focus();
+            }
         });
     </script>
 </body>

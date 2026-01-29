@@ -6,6 +6,7 @@ CREATE TABLE users (
   email VARCHAR(255) NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
   full_name VARCHAR(255),
+  phone VARCHAR(15),
   is_active BOOLEAN NOT NULL DEFAULT TRUE,
   is_seller BOOLEAN NOT NULL DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -26,14 +27,11 @@ CREATE TABLE stores (
   cpf VARCHAR(11),
   cnpj VARCHAR(14),
   legal_name VARCHAR(255),
-
   is_published BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
   UNIQUE (owner_id, slug),
   INDEX idx_stores_slug (slug),
-
   FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
@@ -150,6 +148,7 @@ CREATE TABLE addresses (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
+CREATE TABLE orders (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   store_id CHAR(36) NOT NULL,
   user_id CHAR(36),
@@ -165,7 +164,6 @@ CREATE TABLE addresses (
   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
   FOREIGN KEY (shipping_address_id) REFERENCES addresses(id)
 );
-
 
 CREATE TABLE order_items (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),

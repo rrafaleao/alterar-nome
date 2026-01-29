@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IM+Fell+Great+Primer+SC&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Instrument Sans', sans-serif;
+            background-color: #f5f7fa;
+            color: #2d3748;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* NAVBAR LATERAL */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            color: #2d3748;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #f7fafc;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        .logo {
+            padding: 30px 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 400;
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'IM Fell Great Primer SC', serif;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #718096;
+            font-size: 20px;
+            font-weight: 600;
+            font-family: 'Instrument Sans', sans-serif;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #718096;
+            padding: 0 24px 12px;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #4a5568;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #f7fafc;
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+
+        .nav-item.active {
+            background: #eef2ff;
+            color: #667eea;
+            border-left-color: #667eea;
+            font-weight: 600;
+        }
+
+        .nav-item .material-icons {
+            font-size: 22px;
+        }
+
+        .nav-submenu {
+            margin-top: 4px;
+            margin-left: 62px;
+        }
+
+        .nav-subitem {
+            padding: 10px 0;
+            color: #718096;
+            font-size: 14px;
+            text-decoration: none;
+            display: block;
+            transition: color 0.2s;
+        }
+
+        .nav-subitem:hover {
+            color: #667eea;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 32px;
+            width: calc(100% - 280px);
+        }
+
+        .header {
+            background: #fff;
+            padding: 24px 32px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: #4a5568;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        /* STATS CARDS */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: #fff;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .stat-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .stat-icon.blue {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            color: #667eea;
+        }
+
+        .stat-icon.green {
+            background: linear-gradient(135deg, #48bb7815 0%, #34a85315 100%);
+            color: #48bb78;
+        }
+
+        .stat-icon.orange {
+            background: linear-gradient(135deg, #ed8a3615 0%, #dd6b2015 100%);
+            color: #ed8936;
+        }
+
+        .stat-icon.purple {
+            background: linear-gradient(135deg, #9f7aea15 0%, #805ad515 100%);
+            color: #9f7aea;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 20px;
+        }
+
+        .stat-trend.up {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .stat-trend.down {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #718096;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .stat-description {
+            font-size: 13px;
+            color: #a0aec0;
+        }
+
+        /* CHARTS SECTION */
+        .charts-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .chart-card {
+            background: #fff;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a202c;
+        }
+
+        .chart-filter {
+            display: flex;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 500;
+            color: #718096;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: #667eea;
+            color: #fff;
+            border-color: #667eea;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a0aec0;
+            font-size: 14px;
+        }
+
+        /* RECENT ORDERS */
+        .orders-section {
+            background: #fff;
+            padding: 28px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        }
+
+        .orders-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .orders-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .orders-table thead {
+            background: #f7fafc;
+        }
+
+        .orders-table th {
+            padding: 14px 16px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .orders-table td {
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+
+        .orders-table tbody tr:hover {
+            background: #f7fafc;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-paid {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+
+        .status-pending {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+
+        .status-shipped {
+            background: #bee3f8;
+            color: #1a365d;
+        }
+
+        .status-cancelled {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+
+        /* QUICK ACTIONS */
+        .quick-actions {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 32px;
+            border-radius: 12px;
+            color: #fff;
+            margin-bottom: 32px;
+        }
+
+        .quick-actions h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .action-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+        }
+
+        .action-btn .material-icons {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .action-btn span {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1024px) {
+            .charts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 16px;
+                align-items: flex-start;
+            }
+
+            .orders-table {
+                font-size: 12px;
+            }
+
+            .orders-table th,
+            .orders-table td {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>
+                    <div class="logo-icon">
+                        Z
+                    </div>
+                    Loja
+                </h1>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Principal</div>
+                    <a href="#" class="nav-item active">
+                        <span class="material-icons">dashboard</span>
+                        <span>Início (Dashboard)</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Vendas</div>
+                    <a href="#" class="nav-item">
+                        <span class="material-icons">shopping_cart</span>
+                        <span>Pedidos</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <span class="material-icons">remove_shopping_cart</span>
+                        <span>Carrinhos Abandonados</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <span class="material-icons">people</span>
+                        <span>Clientes</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Catálogo</div>
+                    <a href="#" class="nav-item">
+                        <span class="material-icons">inventory_2</span>
+                        <span>Produtos</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <span class="material-icons">category</span>
+                        <span>Categorias</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <span class="material-icons">warehouse</span>
+                        <span>Gestão de Estoque</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Loja Online</div>
+                    <a href="#" class="nav-item">
+                        <span class="material-icons">palette</span>
+                        <span>Layout</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <span class="material-icons">menu</span>
+                        <span>Menus</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Marketing</div>
+                    <a href="#" class="nav-item">
+                        <span class="material-icons">local_offer</span>
+                        <span>Promoções</span>
+                    </a>
+                    <a href="#" class="nav-item">
+                        <span class="material-icons">confirmation_number</span>
+                        <span>Cupons</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Sistema</div>
+                    <a href="#" class="nav-item">
+                        <span class="material-icons">settings</span>
+                        <span>Configurações</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            <div class="header">
+                <h2>
+                    <span class="material-icons">dashboard</span>
+                    Dashboard
+                </h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary">
+                        <span class="material-icons">add</span>
+                        Novo Produto
+                    </button>
+                </div>
+            </div>
+
+            <!-- STATS CARDS -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon blue">
+                            <span class="material-icons">trending_up</span>
+                        </div>
+                        <div class="stat-trend up">
+                            <span class="material-icons" style="font-size: 16px;">arrow_upward</span>
+                            12.5%
+                        </div>
+                    </div>
+                    <div class="stat-label">Vendas Totais</div>
+                    <div class="stat-value">R$ 48.574,00</div>
+                    <div class="stat-description">Últimos 30 dias</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon green">
+                            <span class="material-icons">shopping_bag</span>
+                        </div>
+                        <div class="stat-trend up">
+                            <span class="material-icons" style="font-size: 16px;">arrow_upward</span>
+                            8.2%
+                        </div>
+                    </div>
+                    <div class="stat-label">Pedidos</div>
+                    <div class="stat-value">342</div>
+                    <div class="stat-description">156 pendentes</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon orange">
+                            <span class="material-icons">visibility</span>
+                        </div>
+                        <div class="stat-trend up">
+                            <span class="material-icons" style="font-size: 16px;">arrow_upward</span>
+                            23.1%
+                        </div>
+                    </div>
+                    <div class="stat-label">Visitas</div>
+                    <div class="stat-value">12.483</div>
+                    <div class="stat-description">5.2k sessões únicas</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <div class="stat-icon purple">
+                            <span class="material-icons">account_balance_wallet</span>
+                        </div>
+                        <div class="stat-trend down">
+                            <span class="material-icons" style="font-size: 16px;">arrow_downward</span>
+                            2.4%
+                        </div>
+                    </div>
+                    <div class="stat-label">Faturamento Médio</div>
+                    <div class="stat-value">R$ 142,06</div>
+                    <div class="stat-description">Por pedido</div>
+                </div>
+            </div>
+
+            <!-- QUICK ACTIONS -->
+            <div class="quick-actions">
+                <h3>Atalhos Rápidos</h3>
+                <div class="actions-grid">
+                    <div class="action-btn">
+                        <span class="material-icons">add_box</span>
+                        <span>Adicionar Produto</span>
+                    </div>
+                    <div class="action-btn">
+                        <span class="material-icons">local_shipping</span>
+                        <span>Configurar Frete</span>
+                    </div>
+                    <div class="action-btn">
+                        <span class="material-icons">credit_card</span>
+                        <span>Meios de Pagamento</span>
+                    </div>
+                    <div class="action-btn">
+                        <span class="material-icons">campaign</span>
+                        <span>Nova Promoção</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHARTS -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Vendas do Período</h3>
+                        <div class="chart-filter">
+                            <button class="filter-btn">7 dias</button>
+                            <button class="filter-btn active">30 dias</button>
+                            <button class="filter-btn">90 dias</button>
+                            <button class="filter-btn">Ano</button>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        Gráfico de vendas (integrar com Chart.js ou biblioteca similar)
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Status dos Pedidos</h3>
+                    </div>
+                    <div class="chart-placeholder">
+                        Gráfico de pizza (integrar com Chart.js)
+                    </div>
+                </div>
+            </div>
+
+            <!-- RECENT ORDERS -->
+            <div class="orders-section">
+                <div class="orders-header">
+                    <h3 class="chart-title">Pedidos Recentes</h3>
+                    <button class="btn btn-secondary">Ver Todos</button>
+                </div>
+                <table class="orders-table">
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Data</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>#10234</td>
+                            <td>João Silva</td>
+                            <td>28/01/2026</td>
+                            <td>R$ 247,50</td>
+                            <td><span class="status-badge status-paid">Pago</span></td>
+                        </tr>
+                        <tr>
+                            <td>#10233</td>
+                            <td>Maria Santos</td>
+                            <td>28/01/2026</td>
+                            <td>R$ 89,90</td>
+                            <td><span class="status-badge status-shipped">Enviado</span></td>
+                        </tr>
+                        <tr>
+                            <td>#10232</td>
+                            <td>Pedro Oliveira</td>
+                            <td>27/01/2026</td>
+                            <td>R$ 356,00</td>
+                            <td><span class="status-badge status-pending">Pendente</span></td>
+                        </tr>
+                        <tr>
+                            <td>#10231</td>
+                            <td>Ana Costa</td>
+                            <td>27/01/2026</td>
+                            <td>R$ 124,90</td>
+                            <td><span class="status-badge status-paid">Pago</span></td>
+                        </tr>
+                        <tr>
+                            <td>#10230</td>
+                            <td>Carlos Ferreira</td>
+                            <td>26/01/2026</td>
+                            <td>R$ 445,00</td>
+                            <td><span class="status-badge status-cancelled">Cancelado</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
