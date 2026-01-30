@@ -18,21 +18,24 @@ def view_store(slug):
         if not store:
             abort(404)
         
-        store_data = store.to_dict(include_details=True)
-        store_data['owner_name'] = store.owner.full_name if store.owner else None
-        store_data['owner_email'] = store.owner.email if store.owner else None
+        template_name = 'layout1.html'
         
-        return jsonify({
-            'success': True,
-            'data': store_data
-        }), 200
+        if store.customization and store.customization.theme:
+            template_type = store.customization.theme.get('template', 'default')
+            template_map = {
+                'default': 'layout1.html',
+                'modern': 'layout1.html',
+                'minimal': 'layout1.html',
+                'colorful': 'layout1.html',
+                'elegant': 'layout1.html'
+            }
+            template_name = template_map.get(template_type, 'layout1.html')
+        
+        return render_template(f'layouts/{template_name}', store=store)
         
     except Exception as e:
         print(f"Erro ao buscar loja: {e}")
-        return jsonify({
-            'success': False,
-            'error': 'Erro ao carregar loja'
-        }), 500
+        abort(500)
 
 
 @storefront.route('/<slug>/products')
