@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zapp - Criar Sua Loja</title>
-    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+Great+Primer+SC&display=swap" rel="stylesheet">
+    <title>Criar Sua Loja - Zapp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+Great+Primer+SC&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,195 +15,199 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background-color: #f8f9fa;
+            font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
             padding: 20px;
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
-            background-color: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         .header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 40px;
+            padding: 30px;
+            background: white;
         }
 
         .logo {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-right: auto;
+            margin-bottom: 30px;
         }
 
         .logo-icon {
-            width: 50px;
-            height: 50px;
-            position: relative;
-        }
-
-        .cart {
-            width: 40px;
-            height: 30px;
-            border: 3px solid #ff8c00;
-            border-radius: 4px;
-            position: relative;
-        }
-
-        .cart::before {
-            content: '';
-            position: absolute;
-            width: 20px;
-            height: 2px;
-            background: #ff8c00;
-            top: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-        }
-
-        .cart::after {
-            content: '';
-            position: absolute;
-            width: 12px;
-            height: 2px;
-            background: #ff8c00;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .wheels {
-            position: absolute;
-            bottom: -8px;
-            left: 5px;
-            display: flex;
-            gap: 18px;
-        }
-
-        .wheel {
-            width: 8px;
-            height: 8px;
-            background: #ff8c00;
-            border-radius: 50%;
+            width: 91px;
+            height: 91px;
+            object-fit: contain;
         }
 
         .logo-text {
-            font-size: 100px;
-            font-weight: bold;
-            color: #000;
             font-family: 'IM Fell Great Primer SC', serif;
+            font-size: 100px;
+            color: #333;
+            font-weight: normal;
+            line-height: 1;
         }
 
-        h1 {
-            text-align: center;
-            font-size: 42px;
+        .header h1 {
+            font-family: 'Instrument Sans', sans-serif;
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 20px;
             font-weight: 400;
-            margin-bottom: 30px;
-            color: #000;
+            text-align: center;
         }
 
-        .steps {
+        .tabs {
             display: flex;
-            justify-content: center;
             gap: 0;
-            margin-bottom: 50px;
+            border-bottom: 2px solid #e0e0e0;
         }
 
-        .step {
-            padding: 12px 50px;
-            font-size: 20px;
-            border: none;
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: #e8e8e8;
+            color: #666;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            background-color: #d3d3d3;
-            color: #000;
+            border: none;
+            transition: all 0.3s ease;
+            font-family: 'Instrument Sans', sans-serif;
+            border-radius: 0;
         }
 
-        .step:first-child {
-            border-radius: 4px 0 0 4px;
-        }
-
-        .step:last-child {
-            border-radius: 0 4px 4px 0;
-        }
-
-        .step.active {
-            background-color: #4A90E2;
+        .tab.active {
+            background: #4A90E2;
             color: white;
         }
 
-        .form-section {
-            margin-bottom: 40px;
+        .form-content {
+            padding: 50px 80px;
         }
 
-        .section-title {
+        h2 {
+            font-family: 'Instrument Sans', sans-serif;
             font-size: 28px;
+            color: #333;
+            margin-bottom: 40px;
             font-weight: 400;
-            margin-bottom: 30px;
-            color: #000;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         label {
             display: block;
-            font-size: 20px;
+            font-size: 18px;
+            color: #333;
             margin-bottom: 10px;
-            color: #000;
+            font-weight: 400;
+            font-family: 'Instrument Sans', sans-serif;
         }
 
-        input {
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
             width: 100%;
             padding: 15px 20px;
-            font-size: 16px;
             border: none;
-            background-color: #f0f0f0;
-            border-radius: 25px;
-            outline: none;
+            background: #f5f5f5;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Instrument Sans', sans-serif;
+            transition: all 0.3s ease;
         }
 
         input:focus {
-            background-color: #e8e8e8;
+            outline: none;
+            background: #ebebeb;
         }
 
-        .button-group {
+        .buttons {
             display: flex;
             justify-content: space-between;
-            margin-top: 40px;
+            gap: 20px;
+            margin-top: 50px;
         }
 
         button {
-            padding: 15px 60px;
-            font-size: 24px;
+            padding: 18px 50px;
             border: none;
-            border-radius: 25px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 500;
             cursor: pointer;
-            font-weight: 400;
+            transition: all 0.3s ease;
+            font-family: 'Instrument Sans', sans-serif;
         }
 
         .btn-cancel {
-            background-color: #d3d3d3;
-            color: #000;
-        }
-
-        .btn-next {
-            background-color: #4A90E2;
-            color: white;
+            background: #d0d0d0;
+            color: #666;
         }
 
         .btn-cancel:hover {
-            background-color: #c0c0c0;
+            background: #c0c0c0;
+        }
+
+        .btn-next {
+            background: #4A90E2;
+            color: white;
+            flex: 1;
         }
 
         .btn-next:hover {
-            background-color: #357ABD;
+            background: #3a7bc8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .form-content {
+                padding: 30px;
+            }
+
+            .header h1 {
+                font-size: 28px;
+            }
+
+            .logo-text {
+                font-size: 60px;
+            }
+
+            .logo-icon {
+                width: 55px;
+                height: 55px;
+            }
+
+            .tab {
+                font-size: 14px;
+                padding: 12px 10px;
+            }
+
+            h2 {
+                font-size: 24px;
+            }
+
+            label {
+                font-size: 16px;
+            }
+
+            button {
+                padding: 15px 30px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
@@ -209,54 +215,44 @@
     <div class="container">
         <div class="header">
             <div class="logo">
-                <svg width="60" height="50" viewBox="0 0 60 50" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M10 15 L5 10 L10 5" stroke="#ff8c00" stroke-width="3" fill="none"/>
-                    <path d="M10 5 L25 5" stroke="#ff8c00" stroke-width="3"/>
-                    <rect x="20" y="10" width="30" height="25" rx="3" stroke="#ff8c00" stroke-width="3" fill="none"/>
-                    <line x1="25" y1="20" x2="45" y2="20" stroke="#ff8c00" stroke-width="2"/>
-                    <line x1="25" y1="25" x2="45" y2="25" stroke="#ff8c00" stroke-width="2"/>
-                    <circle cx="28" cy="40" r="4" fill="#ff8c00"/>
-                    <circle cx="42" cy="40" r="4" fill="#ff8c00"/>
-                </svg>
-                <span class="logo-text">ZAPP</span>
+                <img src="data:image/png;base64,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" alt="Zapp Logo" class="logo-icon">
+                <span class="logo-text">Zapp</span>
+            </div>
+            <h1>Criar Sua Loja</h1>
+            <div class="tabs">
+                <div class="tab active">Etapa 1</div>
+                <div class="tab">Etapa 2</div>
+                <div class="tab">Etapa 3</div>
             </div>
         </div>
 
-        <h1>Criar Sua Loja</h1>
-
-        <div class="steps">
-            <button class="step active">Etapa 1</button>
-            <button class="step">Etapa 2</button>
-            <button class="step">Etapa 3</button>
-        </div>
-
-        <div class="form-section">
-            <h2 class="section-title">Dados da Loja</h2>
-
+        <div class="form-content">
+            <h2>Dados da Loja</h2>
+            
             <div class="form-group">
-                <label for="nome">Nome da Loja *</label>
-                <input type="text" id="nome" name="nome" required>
+                <label for="store_name">Nome da Loja *</label>
+                <input type="text" id="store_name" placeholder="">
             </div>
 
             <div class="form-group">
                 <label for="email">Email *</label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" placeholder="">
             </div>
 
             <div class="form-group">
-                <label for="senha">Senha *</label>
-                <input type="password" id="senha" name="senha" required>
+                <label for="password">Senha *</label>
+                <input type="password" id="password" placeholder="">
             </div>
 
             <div class="form-group">
-                <label for="confirmar">Confirmar Senha *</label>
-                <input type="password" id="confirmar" name="confirmar" required>
+                <label for="confirm_password">Confirmar Senha *</label>
+                <input type="password" id="confirm_password" placeholder="">
             </div>
-        </div>
 
-        <div class="button-group">
-            <button type="button" class="btn-cancel">Cancelar</button>
-            <button type="button" class="btn-next">Próximo</button>
+            <div class="buttons">
+                <button type="button" class="btn-cancel">Cancelar</button>
+                <button type="button" class="btn-next">Próximo</button>
+            </div>
         </div>
     </div>
 </body>
