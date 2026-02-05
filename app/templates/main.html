@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IM+Fell+Great+Primer+SC&display=swap" rel="stylesheet">
+
     <style>
         * {
             margin: 0;
@@ -31,13 +32,11 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            width: 292px;
-            height: 104px;
         }
 
         .logo {
-            width: 104px;
-            height: 104px;
+            width: 64px;
+            height: 64px;
             object-fit: contain;
         }
 
@@ -56,31 +55,23 @@
             background: linear-gradient(135deg, #FFB88C 0%, #FF9A6C 100%);
             border-radius: 50px;
             padding: 4px;
-            width: 381px;
-            height: 68px;
         }
 
         .header-btn {
             font-family: 'Instrument Sans', sans-serif;
-            padding: 18px 36px;
+            padding: 14px 40px;
             font-size: 22px;
             font-weight: 500;
             border: none;
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: transparent;
-            color: #000;
-            flex: 1;
-        }
-
-        .header-btn.active {
             background: linear-gradient(135deg, #FFB88C 0%, #FF9A6C 100%);
             color: #000;
         }
 
-        .header-btn:not(.active) {
-            background: transparent;
+        .header-btn.active {
+            background: linear-gradient(135deg, #FFDCC8 0%, #FFC4A8 100%);
         }
 
         .main-content {
@@ -89,7 +80,6 @@
             justify-content: space-between;
             padding: 80px 100px;
             gap: 60px;
-            padding-left: 150px;
         }
 
         .left-section {
@@ -98,10 +88,8 @@
         }
 
         .main-title {
-            font-family: 'Instrument Sans', sans-serif;
             font-size: 42px;
             font-weight: 600;
-            color: #000;
             margin-bottom: 40px;
             line-height: 1.3;
         }
@@ -113,29 +101,16 @@
         }
 
         .email-input {
-            font-family: 'Instrument Sans', sans-serif;
             flex: 1;
-            padding: 18px 24px;
+            padding: 16px 24px;
             font-size: 18px;
             border: 1px solid #e0e0e0;
             border-radius: 50px;
             background-color: #f5f5f5;
-            transition: all 0.3s ease;
-        }
-
-        .email-input:focus {
-            outline: none;
-            border-color: #4A90E2;
-            background-color: #fff;
-        }
-
-        .email-input::placeholder {
-            color: #999;
         }
 
         .submit-btn {
-            font-family: 'Instrument Sans', sans-serif;
-            padding: 18px 48px;
+            padding: 16px 40px;
             font-size: 18px;
             font-weight: 500;
             color: #fff;
@@ -143,46 +118,31 @@
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
-            white-space: nowrap;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
         }
 
         .right-section {
             flex: 1;
             display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            padding-right: 100px;
-            padding-top: 100px;
+            justify-content: center;
         }
 
-        .phone-mockup {
-            position: relative;
-            width: 100%;
-            max-width: 500px;
+        .shopping-bags {
+            width: 400px;
+            height: 400px;
         }
 
-        .phone-mockup img {
+        .shopping-bags img {
             width: 100%;
-            height: auto;
-            filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.1));
+            height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1));
         }
 
         @media (max-width: 1024px) {
             .main-content {
                 flex-direction: column;
                 padding: 60px 40px;
-            }
-
-            .left-section {
-                max-width: 100%;
-                text-align: center;
             }
 
             .email-form {
@@ -196,18 +156,17 @@
 
         @media (max-width: 768px) {
             .header {
-                padding: 20px 30px;
                 flex-direction: column;
                 gap: 20px;
             }
 
-            .logo {
-                width: 40px;
-                height: 40px;
+            .brand-name {
+                font-size: 32px;
             }
 
-            .brand-name {
-                font-size: 36px;
+            .header-btn {
+                font-size: 16px;
+                padding: 12px 30px;
             }
 
             .main-title {
@@ -216,57 +175,72 @@
         }
     </style>
 </head>
+
 <body>
-    <header class="header">
-        <div class="logo-section">
-            <img src="https://dl.airtable.com/.blockIconImages/a30bee50aeefaf4ffd8c4dc699b642c6/d3accafa" alt="Zapp Logo" class="logo">
-            <span class="brand-name">Zapp</span>
+
+<header class="header">
+    <div class="logo-section">
+        <img src="https://dl.airtable.com/.blockIconImages/a30bee50aeefaf4ffd8c4dc699b642c6/d3accafa" class="logo">
+        <span class="brand-name">Zapp</span>
+    </div>
+
+    <div class="header-buttons">
+        <button class="header-btn" onclick="goToLogin()">login</button>
+        <button class="header-btn active" onclick="goToCreateStore()">criar loja</button>
+    </div>
+</header>
+
+<main class="main-content">
+
+    <div class="left-section">
+        <h1 class="main-title">
+            Crie sua loja agora e comece a vender de forma gratis
+        </h1>
+
+        <form class="email-form" onsubmit="handleSubmit(event)">
+            <input 
+                type="email" 
+                class="email-input" 
+                placeholder="nome@exemplo.com"
+                required
+            >
+
+            <button type="submit" class="submit-btn">
+                criar loja
+            </button>
+        </form>
+    </div>
+
+    <div class="right-section">
+        <div class="shopping-bags">
+            <img src="https://cdn-icons-png.flaticon.com/512/5654/5654409.png">
         </div>
-        <div class="header-buttons">
-            <button class="header-btn" onclick="goToLogin()">login</button>
-            <button class="header-btn active" onclick="goToCreateStore()">criar loja</button>
-        </div>
-    </header>
+    </div>
 
-    <main class="main-content">
-        <div class="left-section">
-            <h1 class="main-title">Crie sua loja agora e comece a vender de forma gratis</h1>
-            <form class="email-form" onsubmit="handleSubmit(event)">
-                <input 
-                    type="email" 
-                    class="email-input" 
-                    placeholder="nome@exemplo.com"
-                    required
-                >
-                <button type="submit" class="submit-btn">criar loja</button>
-            </form>
-        </div>
+</main>
 
-        <div class="right-section">
-            <div class="phone-mockup">
-                <img src="https://cdn-icons-png.flaticon.com/512/5654/5654409.png" alt="Sacola de Compras" style="width: 100%; max-width: 400px; height: auto;">
-            </div>
-        </div>
-    </main>
+<script>
 
-    <script>
-        function goToLogin() {
-            // Redireciona para a página de login
-            window.location.href = 'login.html';
-            // Ou use: alert('Redirecionando para Login...');
-        }
+function goToLogin() {
+    window.location.href = "login.html";
+}
 
-        function goToCreateStore() {
-            // Já está na página de criar loja
-            console.log('Já está na página de criar loja');
-        }
+function goToCreateStore() {
+    window.location.href = "criar-loja.html";
+}
 
-        function handleSubmit(e) {
-            e.preventDefault();
-            const email = e.target.querySelector('.email-input').value;
-            console.log('Email enviado:', email);
-            alert('Loja criada! Email: ' + email);
-        }
-    </script>
+function handleSubmit(event) {
+    event.preventDefault();
+
+    const email = document.querySelector(".email-input").value;
+
+    console.log("Email:", email);
+
+    // redireciona ao clicar
+    window.location.href = "criar-loja.html";
+}
+
+</script>
+
 </body>
 </html>
