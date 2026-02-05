@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Painel Administrativo{% endblock %} - Zapp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IM+Fell+Great+Primer+SC&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Instrument Sans', sans-serif;
+            background-color: #f5f7fa;
+            color: #2d3748;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* NAVBAR LATERAL */
+        .sidebar {
+            width: 280px;
+            background: #ffffff;
+            color: #2d3748;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
+            border-right: 1px solid #e2e8f0;
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #f7fafc;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 3px;
+        }
+
+        .logo {
+            padding: 30px 24px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .logo h1 {
+            font-size: 28px;
+            font-weight: 400;
+            color: #1a202c;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'IM Fell Great Primer SC', serif;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #718096;
+            font-size: 20px;
+            font-weight: 600;
+            font-family: 'Instrument Sans', sans-serif;
+        }
+
+        .nav-menu {
+            padding: 20px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: #718096;
+            padding: 0 24px 12px;
+            font-weight: 600;
+        }
+
+        .nav-item {
+            padding: 14px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #4a5568;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            background: #f7fafc;
+            color: #667eea;
+            border-left-color: #667eea;
+        }
+
+        .nav-item.active {
+            background: #eef2ff;
+            color: #667eea;
+            border-left-color: #667eea;
+            font-weight: 600;
+        }
+
+        .nav-item .material-icons {
+            font-size: 22px;
+        }
+
+        .nav-submenu {
+            margin-top: 4px;
+            margin-left: 62px;
+        }
+
+        .nav-subitem {
+            padding: 10px 0;
+            color: #718096;
+            font-size: 14px;
+            text-decoration: none;
+            display: block;
+            transition: color 0.2s;
+        }
+
+        .nav-subitem:hover {
+            color: #667eea;
+        }
+
+        /* MAIN CONTENT */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 32px;
+            width: calc(100% - 280px);
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+        }
+
+        {% block extra_styles %}{% endblock %}
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <div class="logo">
+                <h1>
+                    <div class="logo-icon">
+                        Z
+                    </div>
+                    Zapp
+                </h1>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section">
+                    <div class="nav-section-title">Principal</div>
+                    <a href="{{ url_for('admin.dashboard') }}" class="nav-item {% block nav_dashboard %}{% endblock %}">
+                        <span class="material-icons">dashboard</span>
+                        <span>Início (Dashboard)</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Vendas</div>
+                    <a href="{{ url_for('admin.orders_page') }}" class="nav-item {% block nav_pedidos %}{% endblock %}">
+                        <span class="material-icons">shopping_cart</span>
+                        <span>Pedidos</span>
+                    </a>
+                    <a href="{{ url_for('admin.abandoned_carts_page') }}" class="nav-item {% block nav_carrinhos %}{% endblock %}">
+                        <span class="material-icons">remove_shopping_cart</span>
+                        <span>Carrinhos Abandonados</span>
+                    </a>
+                    <a href="{{ url_for('admin.customers_page') }}" class="nav-item {% block nav_clientes %}{% endblock %}">
+                        <span class="material-icons">people</span>
+                        <span>Clientes</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Catálogo</div>
+                    <a href="{{ url_for('admin.products_page') }}" class="nav-item {% block nav_produtos %}{% endblock %}">
+                        <span class="material-icons">inventory_2</span>
+                        <span>Produtos</span>
+                    </a>
+                    <a href="{{ url_for('admin.categories_page') }}" class="nav-item {% block nav_categorias %}{% endblock %}">
+                        <span class="material-icons">category</span>
+                        <span>Categorias</span>
+                    </a>
+                    <a href="{{ url_for('admin.stock_page') }}" class="nav-item {% block nav_estoque %}{% endblock %}">
+                        <span class="material-icons">warehouse</span>
+                        <span>Gestão de Estoque</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Loja Online</div>
+                    <a href="{{ url_for('admin.layout_page') }}" class="nav-item {% block nav_layout %}{% endblock %}">
+                        <span class="material-icons">palette</span>
+                        <span>Layout</span>
+                    </a>
+                    <a href="{{ url_for('admin.menus_page') }}" class="nav-item {% block nav_menus %}{% endblock %}">
+                        <span class="material-icons">menu</span>
+                        <span>Menus</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Marketing</div>
+                    <a href="{{ url_for('admin.promotions_page') }}" class="nav-item {% block nav_promocoes %}{% endblock %}">
+                        <span class="material-icons">local_offer</span>
+                        <span>Promoções</span>
+                    </a>
+                    <a href="{{ url_for('admin.coupons_page') }}" class="nav-item {% block nav_cupons %}{% endblock %}">
+                        <span class="material-icons">confirmation_number</span>
+                        <span>Cupons</span>
+                    </a>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">Sistema</div>
+                    <a href="{{ url_for('admin.settings_page') }}" class="nav-item {% block nav_configuracoes %}{% endblock %}">
+                        <span class="material-icons">settings</span>
+                        <span>Configurações</span>
+                    </a>
+                    <div class="nav-submenu">
+                        <a href="{{ url_for('admin.payment_methods_page') }}" class="nav-subitem">• Meios de Pagamento</a>
+                        <a href="{{ url_for('admin.shipping_methods_page') }}" class="nav-subitem">• Meios de Envio</a>
+                        <a href="{{ url_for('admin.business_data_page') }}" class="nav-subitem">• Dados do Negócio</a>
+                        <a href="{{ url_for('admin.users_permissions_page') }}" class="nav-subitem">• Usuários e Permissões</a>
+                        <a href="{{ url_for('admin.domains_page') }}" class="nav-subitem">• Domínios</a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html>

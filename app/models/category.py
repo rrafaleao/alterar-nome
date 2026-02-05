@@ -19,3 +19,14 @@ class Category(db.Model):
 
     children = db.relationship("Category")
     products = db.relationship("Product", backref="category")
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'store_id': self.store_id,
+            'name': self.name,
+            'slug': self.slug,
+            'parent_id': self.parent_id,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'updated_at': self.updated_at.isoformat() if self.updated_at else None
+        }
