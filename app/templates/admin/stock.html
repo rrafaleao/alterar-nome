@@ -1,6 +1,6 @@
-{% extends "/admin/base.html" %}
+﻿{% extends "/admin/base.html" %}
 
-{% block title %}Gestão de Estoque{% endblock %}
+{% block title %}GestÃ£o de Estoque{% endblock %}
 
 {% block nav_estoque %}active{% endblock %}
 
@@ -21,6 +21,7 @@
         font-size: 28px;
         font-weight: 700;
         color: #1a202c;
+        margin-bottom: 25px;
         display: flex;
         align-items: center;
         gap: 12px;
@@ -46,7 +47,7 @@
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--primary-gradient);
         color: #fff;
     }
 
@@ -81,7 +82,7 @@
 
     .btn-icon:hover {
         background: #f7fafc;
-        color: #667eea;
+        color: var(--primary-color);
     }
 
     /* STATS CARDS */
@@ -109,7 +110,7 @@
         left: 0;
         width: 4px;
         height: 100%;
-        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        background: var(--primary-gradient-vertical);
     }
 
     .stat-card:hover {
@@ -135,8 +136,8 @@
     }
 
     .stat-icon.blue {
-        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-        color: #667eea;
+        background: var(--primary-color-light);
+        color: var(--primary-color);
     }
 
     .stat-icon.green {
@@ -211,9 +212,9 @@
     }
 
     .filter-tab.active {
-        background: #667eea;
+        background: var(--primary-color);
         color: #fff;
-        border-color: #667eea;
+        border-color: var(--primary-color);
     }
 
     .filter-tab .badge {
@@ -255,7 +256,7 @@
     .form-input:focus,
     .form-select:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: var(--primary-color);
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
@@ -469,9 +470,9 @@
     }
 
     .pagination-btn.active {
-        background: #667eea;
+        background: var(--primary-color);
         color: #fff;
-        border-color: #667eea;
+        border-color: var(--primary-color);
     }
 
     /* RESPONSIVE */
@@ -516,18 +517,8 @@
 <div class="page-header">
     <h2>
         <span class="material-icons">warehouse</span>
-        Gestão de Estoque
+        GestÃ£o de Estoque
     </h2>
-    <div class="page-actions">
-        <button class="btn btn-secondary">
-            <span class="material-icons">download</span>
-            Exportar
-        </button>
-        <button class="btn btn-primary">
-            <span class="material-icons">add</span>
-            Ajustar Estoque
-        </button>
-    </div>
 </div>
 
 <!-- STATS CARDS -->
@@ -607,10 +598,10 @@
             <label class="form-label">Categoria</label>
             <select class="form-select">
                 <option value="">Todas</option>
-                <option value="eletronicos">Eletrônicos</option>
+                <option value="eletronicos">EletrÃ´nicos</option>
                 <option value="roupas">Roupas</option>
-                <option value="acessorios">Acessórios</option>
-                <option value="casa">Casa & Decoração</option>
+                <option value="acessorios">AcessÃ³rios</option>
+                <option value="casa">Casa & DecoraÃ§Ã£o</option>
             </select>
         </div>
 
@@ -638,11 +629,11 @@
                 <tr>
                     <th>Produto</th>
                     <th>SKU</th>
-                    <th>Estoque Disponível</th>
+                    <th>Estoque DisponÃ­vel</th>
                     <th>Estoque Reservado</th>
                     <th>Status</th>
-                    <th>Última Atualização</th>
-                    <th style="text-align: center;">Ações</th>
+                    <th>Ãšltima AtualizaÃ§Ã£o</th>
+                    <th style="text-align: center;">AÃ§Ãµes</th>
                 </tr>
             </thead>
             <tbody>
@@ -740,7 +731,7 @@
                 <tr>
                     <td>
                         <div class="product-info">
-                            <span class="product-title">Camiseta Básica Algodão</span>
+                            <span class="product-title">Camiseta BÃ¡sica AlgodÃ£o</span>
                         </div>
                     </td>
                     <td>CAM-004</td>
@@ -800,7 +791,7 @@
                 <tr>
                     <td>
                         <div class="product-info">
-                            <span class="product-title">Luminária LED Mesa</span>
+                            <span class="product-title">LuminÃ¡ria LED Mesa</span>
                         </div>
                     </td>
                     <td>LUM-006</td>
@@ -830,7 +821,7 @@
                 <tr>
                     <td>
                         <div class="product-info">
-                            <span class="product-title">Teclado Mecânico RGB</span>
+                            <span class="product-title">Teclado MecÃ¢nico RGB</span>
                         </div>
                     </td>
                     <td>TEC-007</td>

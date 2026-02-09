@@ -1,0 +1,943 @@
+﻿{% extends "/admin/base.html" %}
+
+{% block title %}Categorias{% endblock %}
+
+{% block nav_categorias %}active{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* PAGE HEADER */
+    .page-header {
+        background: #fff;
+        padding: 24px 32px;
+        border-radius: 12px;
+        margin-bottom: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-header h2 {
+        font-size: 28px;
+        margin-bottom: 25px;
+        font-weight: 700;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 12px;
+    }
+
+    /* BUTTONS */
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: var(--primary-gradient);
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+        background: #edf2f7;
+        color: #4a5568;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .btn-icon {
+        padding: 8px;
+        width: 36px;
+        height: 36px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        background: transparent;
+        color: var(--primary-color);
+    }
+
+    .btn-icon:hover {
+        background: #eef2ff;
+    }
+
+    .btn-icon.danger {
+        color: #e53e3e;
+    }
+
+    .btn-icon.danger:hover {
+        background: #fff5f5;
+    }
+
+    /* STATS CARDS */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+
+    .stat-card {
+        background: #fff;
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--primary-gradient-vertical);
+    }
+
+    .stat-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+    }
+
+    .stat-icon.blue {
+        background: var(--primary-color-light);
+        color: var(--primary-color);
+    }
+
+    .stat-icon.green {
+        background: linear-gradient(135deg, #48bb7815 0%, #34a85315 100%);
+        color: #48bb78;
+    }
+
+    .stat-icon.orange {
+        background: linear-gradient(135deg, #ed8a3615 0%, #dd6b2015 100%);
+        color: #ed8936;
+    }
+
+    .stat-icon.purple {
+        background: linear-gradient(135deg, #9f7aea15 0%, #805ad515 100%);
+        color: #9f7aea;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: #718096;
+        font-weight: 500;
+        margin-bottom: 8px;
+    }
+
+    .stat-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a202c;
+    }
+
+    /* SEARCH BAR */
+    .controls-bar {
+        background: #fff;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .search-wrapper {
+        flex: 1;
+        position: relative;
+    }
+
+    .search-wrapper .material-icons {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0aec0;
+        font-size: 20px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 10px 14px 10px 44px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .filter-select {
+        padding: 10px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 14px;
+        background: #fff;
+        color: #2d3748;
+        min-width: 160px;
+        cursor: pointer;
+    }
+
+    /* CATEGORIES GRID */
+    .categories-section {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    .categories-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        padding: 24px;
+    }
+
+    .category-card {
+        background: #f8fafc;
+        border-radius: 12px;
+        padding: 20px;
+        transition: all 0.3s ease;
+        border: 1px solid #e2e8f0;
+    }
+
+    .category-card:hover {
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        border-color: var(--primary-color);
+    }
+
+    .category-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+
+    .category-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 10px;
+        background: var(--primary-color-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+    }
+
+    .category-actions {
+        display: flex;
+        gap: 4px;
+    }
+
+    .category-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1a202c;
+        margin-bottom: 4px;
+    }
+
+    .category-slug {
+        font-size: 13px;
+        color: #718096;
+        margin-bottom: 12px;
+    }
+
+    .category-meta {
+        display: flex;
+        gap: 16px;
+        padding-top: 12px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .meta-item {
+        font-size: 13px;
+        color: #4a5568;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .meta-item .material-icons {
+        font-size: 16px;
+        color: #a0aec0;
+    }
+
+    /* PARENT BADGE */
+    .parent-badge {
+        font-size: 12px;
+        padding: 4px 10px;
+        background: #eef2ff;
+        color: var(--primary-color);
+        border-radius: 20px;
+        margin-bottom: 8px;
+        display: inline-block;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal {
+        background: #fff;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow: hidden;
+        animation: slideUp 0.3s ease;
+    }
+
+    .modal-header {
+        padding: 24px 28px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1a202c;
+    }
+
+    .modal-close {
+        width: 36px;
+        height: 36px;
+        border: none;
+        background: #f7fafc;
+        border-radius: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #64748b;
+        transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+        background: #eef2ff;
+        color: var(--primary-color);
+    }
+
+    .modal-body {
+        padding: 28px;
+        overflow-y: auto;
+        max-height: calc(90vh - 180px);
+    }
+
+    .modal-footer {
+        padding: 20px 28px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        background: #f8fafc;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+    }
+
+    .form-input,
+    .form-select {
+        width: 100%;
+        padding: 11px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 14px;
+        transition: all 0.2s;
+        background: #fff;
+        color: #1f2937;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-hint {
+        font-size: 12px;
+        color: #718096;
+        margin-top: 6px;
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+        padding: 60px 24px;
+        text-align: center;
+    }
+
+    .empty-state .material-icons {
+        font-size: 64px;
+        color: #cbd5e0;
+        margin-bottom: 16px;
+    }
+
+    .empty-state h3 {
+        font-size: 18px;
+        color: #4a5568;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .empty-state p {
+        font-size: 14px;
+        color: #94a3b8;
+        margin-bottom: 24px;
+    }
+
+    /* LOADING */
+    .loading-state {
+        padding: 60px 24px;
+        text-align: center;
+        color: #94a3b8;
+    }
+
+    /* TOAST NOTIFICATION */
+    .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        padding: 16px 24px;
+        border-radius: 12px;
+        color: #fff;
+        font-weight: 500;
+        display: none;
+        z-index: 2000;
+        animation: slideUp 0.3s ease;
+    }
+
+    .toast.success {
+        background: #10b981;
+    }
+
+    .toast.error {
+        background: #ef4444;
+    }
+
+    .toast.show {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .controls-bar {
+            flex-direction: column;
+        }
+
+        .categories-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- PAGE HEADER -->
+<div class="page-header">
+    <h2>
+        <span class="material-icons" style="color: var(--primary-color);">category</span>
+        Categorias
+    </h2>
+</div>
+
+<!-- STATS CARDS -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-header">
+            <div>
+                <div class="stat-label">Total de Categorias</div>
+                <div class="stat-value" id="statTotal">0</div>
+            </div>
+            <div class="stat-icon blue">
+                <span class="material-icons">category</span>
+            </div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div>
+                <div class="stat-label">Categorias Principais</div>
+                <div class="stat-value" id="statRoot">0</div>
+            </div>
+            <div class="stat-icon green">
+                <span class="material-icons">folder</span>
+            </div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div>
+                <div class="stat-label">Subcategorias</div>
+                <div class="stat-value" id="statSub">0</div>
+            </div>
+            <div class="stat-icon purple">
+                <span class="material-icons">subdirectory_arrow_right</span>
+            </div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-header">
+            <div>
+                <div class="stat-label">Sem Produtos</div>
+                <div class="stat-value" id="statEmpty">0</div>
+            </div>
+            <div class="stat-icon orange">
+                <span class="material-icons">warning</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SEARCH AND FILTERS -->
+<div class="controls-bar">
+    <div class="search-wrapper">
+        <span class="material-icons">search</span>
+        <input type="text" class="search-input" id="searchInput" placeholder="Buscar categorias...">
+    </div>
+    <select class="filter-select" id="filterParent">
+        <option value="">Todas</option>
+        <option value="root">Categorias Principais</option>
+    </select>
+</div>
+
+<!-- CATEGORIES GRID -->
+<div class="categories-section">
+    <div class="categories-grid" id="categoriesGrid">
+        <div class="loading-state">Carregando categorias...</div>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="categoryModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title" id="modalTitle">Nova Categoria</h3>
+            <button class="modal-close" onclick="closeModal()">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <form id="categoryForm" onsubmit="handleSubmit(event)">
+            <input type="hidden" id="categoryId" name="id">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Nome da Categoria *</label>
+                    <input type="text" class="form-input" name="name" id="categoryName" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Slug</label>
+                    <input type="text" class="form-input" name="slug" id="categorySlug" placeholder="gerado-automaticamente">
+                    <p class="form-hint">Deixe em branco para gerar automaticamente a partir do nome</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Categoria Pai</label>
+                    <select class="form-select" name="parent_id" id="categoryParent">
+                        <option value="">Nenhuma (categoria principal)</option>
+                    </select>
+                    <p class="form-hint">Se selecionada, esta serÃ¡ uma subcategoria</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="submitBtn">
+                    <span class="material-icons" style="font-size: 18px;">check</span>
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let categories = [];
+let editingId = null;
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    loadStats();
+    loadCategories();
+    setupEventListeners();
+});
+
+// Setup event listeners
+function setupEventListeners() {
+    document.getElementById('searchInput').addEventListener('input', debounce(function(e) {
+        loadCategories(e.target.value, document.getElementById('filterParent').value);
+    }, 300));
+
+    document.getElementById('filterParent').addEventListener('change', function(e) {
+        loadCategories(document.getElementById('searchInput').value, e.target.value);
+    });
+
+    // Close modal on overlay click
+    document.getElementById('categoryModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+}
+
+// Debounce function
+function debounce(func, wait) {
+    let timeout;
+    return function(...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(this, args), wait);
+    };
+}
+
+// Load stats
+async function loadStats() {
+    try {
+        const response = await fetch('/admin/api/categories/stats');
+        const result = await response.json();
+        
+        if (result.success) {
+            document.getElementById('statTotal').textContent = result.data.total_categories;
+            document.getElementById('statRoot').textContent = result.data.root_categories;
+            document.getElementById('statSub').textContent = result.data.sub_categories;
+            document.getElementById('statEmpty').textContent = result.data.empty_categories;
+        }
+    } catch (error) {
+        console.error('Erro ao carregar estatÃ­sticas:', error);
+    }
+}
+
+// Load categories
+async function loadCategories(search = '', parentFilter = '') {
+    const grid = document.getElementById('categoriesGrid');
+    grid.innerHTML = '<div class="loading-state">Carregando categorias...</div>';
+    
+    try {
+        let url = '/admin/api/categories?';
+        if (search) url += `search=${encodeURIComponent(search)}&`;
+        if (parentFilter) url += `parent_id=${parentFilter}`;
+        
+        const response = await fetch(url);
+        const result = await response.json();
+        
+        if (result.success) {
+            categories = result.data.categories;
+            renderCategories();
+            updateParentSelect();
+        } else {
+            showToast(result.error || 'Erro ao carregar categorias', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao carregar categorias:', error);
+        showToast('Erro ao carregar categorias', 'error');
+    }
+}
+
+// Render categories
+function renderCategories() {
+    const grid = document.getElementById('categoriesGrid');
+    
+    if (categories.length === 0) {
+        grid.innerHTML = `
+            <div class="empty-state" style="grid-column: 1 / -1;">
+                <span class="material-icons">category</span>
+                <h3>Nenhuma categoria encontrada</h3>
+                <p>Crie sua primeira categoria para organizar seus produtos</p>
+                <button class="btn btn-primary" onclick="openModal()">
+                    <span class="material-icons" style="font-size: 18px;">add</span>
+                    Nova Categoria
+                </button>
+            </div>
+        `;
+        return;
+    }
+
+    // Get parent names for subcategories
+    const categoryMap = {};
+    categories.forEach(cat => categoryMap[cat.id] = cat.name);
+
+    grid.innerHTML = categories.map(category => {
+        const parentName = category.parent_id ? categoryMap[category.parent_id] : null;
+        
+        return `
+            <div class="category-card">
+                <div class="category-header">
+                    <div class="category-icon">
+                        <span class="material-icons">${category.parent_id ? 'subdirectory_arrow_right' : 'folder'}</span>
+                    </div>
+                    <div class="category-actions">
+                        <button class="btn-icon" onclick="editCategory('${category.id}')" title="Editar">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button class="btn-icon danger" onclick="deleteCategory('${category.id}', '${category.name}')" title="Excluir">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </div>
+                </div>
+                ${parentName ? `<span class="parent-badge">ðŸ“ ${parentName}</span>` : ''}
+                <div class="category-name">${category.name}</div>
+                <div class="category-slug">/${category.slug}</div>
+                <div class="category-meta">
+                    <div class="meta-item">
+                        <span class="material-icons">inventory_2</span>
+                        ${category.products_count} produto${category.products_count !== 1 ? 's' : ''}
+                    </div>
+                    ${category.children_count > 0 ? `
+                        <div class="meta-item">
+                            <span class="material-icons">account_tree</span>
+                            ${category.children_count} subcategoria${category.children_count !== 1 ? 's' : ''}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Update parent select
+function updateParentSelect() {
+    const select = document.getElementById('categoryParent');
+    const currentOptions = select.innerHTML;
+    
+    select.innerHTML = '<option value="">Nenhuma (categoria principal)</option>';
+    
+    // Only root categories can be parents (to keep it simple)
+    const rootCategories = categories.filter(cat => !cat.parent_id);
+    
+    rootCategories.forEach(category => {
+        // Don't show itself as option when editing
+        if (editingId !== category.id) {
+            select.innerHTML += `<option value="${category.id}">${category.name}</option>`;
+        }
+    });
+}
+
+// Open modal
+function openModal(categoryId = null) {
+    editingId = categoryId;
+    const modal = document.getElementById('categoryModal');
+    const form = document.getElementById('categoryForm');
+    const title = document.getElementById('modalTitle');
+    
+    form.reset();
+    updateParentSelect();
+    
+    if (categoryId) {
+        title.textContent = 'Editar Categoria';
+        const category = categories.find(c => c.id === categoryId);
+        if (category) {
+            document.getElementById('categoryId').value = category.id;
+            document.getElementById('categoryName').value = category.name;
+            document.getElementById('categorySlug').value = category.slug;
+            document.getElementById('categoryParent').value = category.parent_id || '';
+        }
+    } else {
+        title.textContent = 'Nova Categoria';
+        document.getElementById('categoryId').value = '';
+    }
+    
+    modal.classList.add('active');
+}
+
+// Close modal
+function closeModal() {
+    const modal = document.getElementById('categoryModal');
+    modal.classList.remove('active');
+    editingId = null;
+}
+
+// Edit category
+function editCategory(id) {
+    openModal(id);
+}
+
+// Delete category
+async function deleteCategory(id, name) {
+    if (!confirm(`Tem certeza que deseja excluir a categoria "${name}"?`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/admin/api/categories/${id}`, {
+            method: 'DELETE'
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast('Categoria excluÃ­da com sucesso', 'success');
+            loadStats();
+            loadCategories();
+        } else {
+            showToast(result.error || 'Erro ao excluir categoria', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao excluir categoria:', error);
+        showToast('Erro ao excluir categoria', 'error');
+    }
+}
+
+// Handle form submit
+async function handleSubmit(event) {
+    event.preventDefault();
+    
+    const form = event.target;
+    const formData = new FormData(form);
+    const data = {
+        name: formData.get('name'),
+        slug: formData.get('slug') || null,
+        parent_id: formData.get('parent_id') || null
+    };
+    
+    const categoryId = formData.get('id');
+    const isEdit = !!categoryId;
+    
+    try {
+        const url = isEdit 
+            ? `/admin/api/categories/${categoryId}` 
+            : '/admin/api/categories';
+        
+        const response = await fetch(url, {
+            method: isEdit ? 'PUT' : 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            showToast(result.message || (isEdit ? 'Categoria atualizada' : 'Categoria criada'), 'success');
+            closeModal();
+            loadStats();
+            loadCategories();
+        } else {
+            showToast(result.error || 'Erro ao salvar categoria', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao salvar categoria:', error);
+        showToast('Erro ao salvar categoria', 'error');
+    }
+}
+
+// Show toast notification
+function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast ${type} show`;
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+</script>
+{% endblock %}
