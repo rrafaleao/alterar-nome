@@ -114,14 +114,14 @@
 
         .nav-item:hover {
             background: #f7fafc;
-            color: #667eea;
-            border-left-color: #667eea;
+            color: #4A90E2;
+            border-left-color: #4A90E2;
         }
 
         .nav-item.active {
             background: #eef2ff;
-            color: #667eea;
-            border-left-color: #667eea;
+            color: #4A90E2;
+            border-left-color: #4A90E2;
             font-weight: 600;
         }
 
@@ -144,7 +144,7 @@
         }
 
         .nav-subitem:hover {
-            color: #667eea;
+            color: #4A90E2;
         }
 
         /* MAIN CONTENT */
@@ -226,10 +226,6 @@
                     <a href="{{ url_for('admin.layout_page') }}" class="nav-item {% block nav_layout %}{% endblock %}">
                         <span class="material-icons">palette</span>
                         <span>Layout</span>
-                    </a>
-                    <a href="{{ url_for('admin.menus_page') }}" class="nav-item {% block nav_menus %}{% endblock %}">
-                        <span class="material-icons">menu</span>
-                        <span>Menus</span>
                     </a>
                 </div>
 

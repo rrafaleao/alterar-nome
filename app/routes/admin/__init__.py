@@ -9,3 +9,4 @@ from .store import *
 from .marketing import *
 from .settings import *
 from .products import *
+from .categories import *

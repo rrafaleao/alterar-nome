@@ -1,4 +1,4 @@
-{% extends "/admin/base.html" %}
+﻿{% extends "/admin/base.html" %}
 
 {% block title %}Dashboard{% endblock %}
 
@@ -19,6 +19,7 @@
 
     .header h2 {
         font-size: 28px;
+        margin-bottom: 25px;
         font-weight: 700;
         color: #1a202c;
         display: flex;
@@ -46,7 +47,7 @@
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: var(--primary-gradient);
         color: #fff;
     }
 
@@ -89,7 +90,7 @@
         left: 0;
         width: 4px;
         height: 100%;
-        background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        background: var(--primary-gradient-vertical);
     }
 
     .stat-card:hover {
@@ -115,8 +116,8 @@
     }
 
     .stat-icon.blue {
-        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-        color: #667eea;
+        background: var(--primary-color-light);
+        color: var(--primary-color);
     }
 
     .stat-icon.green {
@@ -222,9 +223,9 @@
 
     .filter-btn:hover,
     .filter-btn.active {
-        background: #667eea;
+        background: var(--primary-color);
         color: #fff;
-        border-color: #667eea;
+        border-color: var(--primary-color);
     }
 
     .chart-placeholder {
@@ -312,7 +313,7 @@
 
     /* QUICK ACTIONS */
     .quick-actions {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: rgb(112, 113, 117);
         padding: 32px;
         border-radius: 12px;
         color: #fff;
@@ -392,16 +393,6 @@
         <span class="material-icons">dashboard</span>
         Dashboard
     </h2>
-    <div class="header-actions">
-        <button class="btn btn-secondary">
-            <span class="material-icons">download</span>
-            Exportar
-        </button>
-        <button class="btn btn-primary">
-            <span class="material-icons">add</span>
-            Novo Produto
-        </button>
-    </div>
 </div>
 
 <!-- STATS CARDS -->
@@ -418,7 +409,7 @@
         </div>
         <div class="stat-label">Vendas Totais</div>
         <div class="stat-value">R$ 48.574,00</div>
-        <div class="stat-description">Últimos 30 dias</div>
+        <div class="stat-description">Ãšltimos 30 dias</div>
     </div>
 
     <div class="stat-card">
@@ -448,7 +439,7 @@
         </div>
         <div class="stat-label">Visitas</div>
         <div class="stat-value">12.483</div>
-        <div class="stat-description">5.2k sessões únicas</div>
+        <div class="stat-description">5.2k sessÃµes Ãºnicas</div>
     </div>
 
     <div class="stat-card">
@@ -536,7 +527,7 @@
         <tbody>
             <tr>
                 <td>#10234</td>
-                <td>João Silva</td>
+                <td>JoÃ£o Silva</td>
                 <td>28/01/2026</td>
                 <td>R$ 247,50</td>
                 <td><span class="status-badge status-paid">Pago</span></td>

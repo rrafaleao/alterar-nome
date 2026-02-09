@@ -1,4 +1,4 @@
-{% extends "/admin/base.html" %}
+﻿{% extends "/admin/base.html" %}
 
 {% block title %}Produtos{% endblock %}
 
@@ -82,7 +82,7 @@
         justify-content: center;
         transition: all 0.2s;
         background: transparent;
-        color: #667eea;
+        color: var(--primary-color);
     }
 
     .btn-icon:hover {
@@ -127,7 +127,7 @@
     }
 
     .filter-tab.active {
-        background: #667eea;
+        background: var(--primary-color);
         color: #fff;
     }
 
@@ -169,7 +169,7 @@
 
     .search-input:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: var(--primary-color);
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
@@ -188,7 +188,7 @@
 
     .filter-select:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: var(--primary-color);
     }
 
     /* TABLE CONTAINER */
@@ -260,8 +260,8 @@
     }
 
     .table-checkbox:checked {
-        background: #667eea;
-        border-color: #667eea;
+        background: var(--primary-color);
+        border-color: var(--primary-color);
     }
 
     /* PRODUCT INFO */
@@ -432,9 +432,9 @@
     }
 
     .page-btn.active {
-        background: #667eea;
+        background: var(--primary-color);
         color: #fff;
-        border-color: #667eea;
+        border-color: var(--primary-color);
     }
 
     /* MODAL */
@@ -542,7 +542,7 @@
     .form-select:focus,
     .form-textarea:focus {
         outline: none;
-        border-color: #667eea;
+        border-color: var(--primary-color);
         box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
@@ -569,7 +569,7 @@
     }
 
     .upload-area:hover {
-        border-color: #667eea;
+        border-color: var(--primary-color);
         background: #eef2ff;
     }
 
@@ -586,7 +586,7 @@
     }
 
     .upload-area span {
-        color: #667eea;
+        color: var(--primary-color);
         font-weight: 600;
     }
 
@@ -753,8 +753,8 @@
         <option value="recent">Mais Recentes</option>
         <option value="name_asc">Nome (A-Z)</option>
         <option value="name_desc">Nome (Z-A)</option>
-        <option value="price_asc">Menor Preço</option>
-        <option value="price_desc">Maior Preço</option>
+        <option value="price_asc">Menor PreÃ§o</option>
+        <option value="price_desc">Maior PreÃ§o</option>
     </select>
 </div>
 
@@ -767,10 +767,10 @@
                     <th><input type="checkbox" class="table-checkbox" id="selectAll"></th>
                     <th>Produto</th>
                     <th>Categoria</th>
-                    <th>Preço</th>
+                    <th>PreÃ§o</th>
                     <th>Estoque</th>
                     <th>Status</th>
-                    <th style="text-align: right;">Ações</th>
+                    <th style="text-align: right;">AÃ§Ãµes</th>
                 </tr>
             </thead>
             <tbody id="productsTableBody">
@@ -789,7 +789,7 @@
             Mostrando 0-0 de 0 produtos
         </div>
         <div class="pagination-controls" id="paginationControls">
-            <!-- Será preenchido via JavaScript -->
+            <!-- SerÃ¡ preenchido via JavaScript -->
         </div>
     </div>
 </div>
@@ -806,12 +806,12 @@
         <form id="productForm" onsubmit="handleSubmit(event)">
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="form-label">Título *</label>
+                    <label class="form-label">TÃ­tulo *</label>
                     <input type="text" class="form-input" name="title" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Descrição</label>
+                    <label class="form-label">DescriÃ§Ã£o</label>
                     <textarea class="form-textarea" name="description"></textarea>
                 </div>
 
@@ -821,7 +821,7 @@
                         <input type="text" class="form-input" name="sku">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Preço (R$) *</label>
+                        <label class="form-label">PreÃ§o (R$) *</label>
                         <input type="number" class="form-input" name="price" step="0.01" min="0" required>
                     </div>
                 </div>
@@ -844,7 +844,7 @@
                     <div class="upload-area" onclick="document.getElementById('imageUpload').click()">
                         <span class="material-icons">cloud_upload</span>
                         <p>Arraste imagens ou <span>clique para selecionar</span></p>
-                        <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">PNG, JPG, GIF ou WEBP (máx. 5MB)</p>
+                        <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">PNG, JPG, GIF ou WEBP (mÃ¡x. 5MB)</p>
                     </div>
                     <input type="file" id="imageUpload" class="upload-input" accept="image/*" multiple>
                     <div class="preview-grid" id="previewGrid"></div>
@@ -944,7 +944,7 @@ function setupImageUpload() {
     
     uploadArea.addEventListener('dragover', (e) => {
         e.preventDefault();
-        uploadArea.style.borderColor = '#667eea';
+        uploadArea.style.borderColor = 'var(--primary-color)';
         uploadArea.style.background = '#eef2ff';
     });
     
@@ -967,7 +967,7 @@ function handleFiles(files) {
     
     Array.from(files).forEach(file => {
         if (!file.type.startsWith('image/')) {
-            alert(`"${file.name}" não é uma imagem válida.`);
+            alert(`"${file.name}" nÃ£o Ã© uma imagem vÃ¡lida.`);
             return;
         }
         
@@ -1016,8 +1016,9 @@ async function loadCategories() {
         
         if (data.success) {
             const selects = [document.getElementById('categoryFilter'), document.getElementById('modalCategorySelect')];
+            const categories = data.data.categories || data.data;
             
-            data.data.forEach(cat => {
+            categories.forEach(cat => {
                 selects.forEach(select => {
                     const opt = document.createElement('option');
                     opt.value = cat.id;
@@ -1219,7 +1220,7 @@ async function uploadImages(productId) {
 }
 
 function editProduct(id) {
-    alert('Edição em breve!');
+    alert('EdiÃ§Ã£o em breve!');
 }
 
 async function deleteProduct(id) {
@@ -1231,7 +1232,7 @@ async function deleteProduct(id) {
         
         if (data.success) {
             loadProducts();
-            alert('Produto excluído!');
+            alert('Produto excluÃ­do!');
         } else {
             alert('Erro: ' + data.error);
         }

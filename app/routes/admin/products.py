@@ -362,29 +362,6 @@ def delete_product(product_id):
         }), 500
 
 
-@admin.route('/api/categories', methods=['GET'])
-@login_required
-@store_required
-def get_categories():
-    """API para listar categorias da loja"""
-    try:
-        store_id = session.get('store_id')
-        
-        categories = Category.query.filter_by(store_id=store_id).order_by(Category.name.asc()).all()
-        
-        return jsonify({
-            'success': True,
-            'data': [cat.to_dict() for cat in categories]
-        }), 200
-        
-    except Exception as e:
-        print(f"Erro ao buscar categorias: {e}")
-        return jsonify({
-            'success': False,
-            'error': 'Erro ao carregar categorias'
-        }), 500
-
-
 @admin.route('/api/products/<product_id>/images', methods=['POST'])
 @login_required
 @store_required
