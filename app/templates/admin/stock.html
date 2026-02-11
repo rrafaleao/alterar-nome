@@ -1,6 +1,6 @@
-﻿{% extends "/admin/base.html" %}
+{% extends "/admin/base.html" %}
 
-{% block title %}GestÃ£o de Estoque{% endblock %}
+{% block title %}Gestão de Estoque{% endblock %}
 
 {% block nav_estoque %}active{% endblock %}
 
@@ -53,7 +53,7 @@
 
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
     }
 
     .btn-secondary {
@@ -257,7 +257,7 @@
     .form-select:focus {
         outline: none;
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
     }
 
     .search-input-wrapper {
@@ -517,7 +517,7 @@
 <div class="page-header">
     <h2>
         <span class="material-icons">warehouse</span>
-        GestÃ£o de Estoque
+        Gestão de Estoque
     </h2>
 </div>
 
@@ -598,10 +598,10 @@
             <label class="form-label">Categoria</label>
             <select class="form-select">
                 <option value="">Todas</option>
-                <option value="eletronicos">EletrÃ´nicos</option>
+                <option value="eletronicos">Eletrônicos</option>
                 <option value="roupas">Roupas</option>
-                <option value="acessorios">AcessÃ³rios</option>
-                <option value="casa">Casa & DecoraÃ§Ã£o</option>
+                <option value="acessorios">Acessórios</option>
+                <option value="casa">Casa & Decoração</option>
             </select>
         </div>
 
@@ -629,11 +629,11 @@
                 <tr>
                     <th>Produto</th>
                     <th>SKU</th>
-                    <th>Estoque DisponÃ­vel</th>
+                    <th>Estoque Disponível</th>
                     <th>Estoque Reservado</th>
                     <th>Status</th>
-                    <th>Ãšltima AtualizaÃ§Ã£o</th>
-                    <th style="text-align: center;">AÃ§Ãµes</th>
+                    <th>Última Atualização</th>
+                    <th style="text-align: center;">Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -731,7 +731,7 @@
                 <tr>
                     <td>
                         <div class="product-info">
-                            <span class="product-title">Camiseta BÃ¡sica AlgodÃ£o</span>
+                            <span class="product-title">Camiseta Básica Algodão</span>
                         </div>
                     </td>
                     <td>CAM-004</td>
@@ -791,7 +791,7 @@
                 <tr>
                     <td>
                         <div class="product-info">
-                            <span class="product-title">LuminÃ¡ria LED Mesa</span>
+                            <span class="product-title">Luminária LED Mesa</span>
                         </div>
                     </td>
                     <td>LUM-006</td>
@@ -821,7 +821,7 @@
                 <tr>
                     <td>
                         <div class="product-info">
-                            <span class="product-title">Teclado MecÃ¢nico RGB</span>
+                            <span class="product-title">Teclado Mecânico RGB</span>
                         </div>
                     </td>
                     <td>TEC-007</td>

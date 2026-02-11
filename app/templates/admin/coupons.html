@@ -1,4 +1,4 @@
-﻿{% extends "/admin/base.html" %}
+{% extends "/admin/base.html" %}
 
 {% block title %}Cupons{% endblock %}
 
@@ -55,7 +55,7 @@
 
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
     }
 
     .btn-secondary {
@@ -201,7 +201,7 @@
     .search-input:focus {
         outline: none;
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
     }
 
     .filter-select {
@@ -503,7 +503,7 @@
 <div class="controls-bar">
     <div class="search-wrapper">
         <span class="material-icons">search</span>
-        <input type="text" class="search-input" placeholder="Buscar cupom pelo cÃ³digo...">
+        <input type="text" class="search-input" placeholder="Buscar cupom pelo código...">
     </div>
     <select class="filter-select">
         <option value="">Status</option>
@@ -524,12 +524,12 @@
         <table class="coupons-table">
             <thead>
                 <tr>
-                    <th>CÃ³digo</th>
+                    <th>Código</th>
                     <th>Desconto</th>
                     <th>Uso</th>
                     <th>Validade</th>
                     <th>Status</th>
-                    <th style="text-align: right;">AÃ§Ãµes</th>
+                    <th style="text-align: right;">Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -557,7 +557,7 @@
         </div>
         <div class="pagination-controls">
             <button class="pagination-btn" disabled>Anterior</button>
-            <button class="pagination-btn" disabled>PrÃ³ximo</button>
+            <button class="pagination-btn" disabled>Próximo</button>
         </div>
     </div>
 </div>

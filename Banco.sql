@@ -20,7 +20,6 @@ CREATE TABLE IF NOT EXISTS stores (
   slug VARCHAR(255) NOT NULL,
   name VARCHAR(255) NOT NULL,
   description TEXT,
-  logo_url TEXT,
   onboarding_step TINYINT NOT NULL DEFAULT 1,
   onboarding_completed BOOLEAN NOT NULL DEFAULT FALSE,
   person_type ENUM('PF','PJ') NOT NULL DEFAULT 'PF',
@@ -37,6 +36,7 @@ CREATE TABLE IF NOT EXISTS stores (
 
 CREATE TABLE IF NOT EXISTS store_customizations (
   store_id CHAR(36) PRIMARY KEY,
+  logo VARCHAR(255),
   primary_color VARCHAR(7),
   secondary_color VARCHAR(7),
   theme JSON,

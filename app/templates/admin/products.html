@@ -1,4 +1,4 @@
-﻿{% extends "/admin/base.html" %}
+{% extends "/admin/base.html" %}
 
 {% block title %}Produtos{% endblock %}
 
@@ -170,7 +170,7 @@
     .search-input:focus {
         outline: none;
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
     }
 
     .filter-select {
@@ -543,7 +543,7 @@
     .form-textarea:focus {
         outline: none;
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
     }
 
     .form-textarea {
@@ -753,8 +753,8 @@
         <option value="recent">Mais Recentes</option>
         <option value="name_asc">Nome (A-Z)</option>
         <option value="name_desc">Nome (Z-A)</option>
-        <option value="price_asc">Menor PreÃ§o</option>
-        <option value="price_desc">Maior PreÃ§o</option>
+        <option value="price_asc">Menor Preço</option>
+        <option value="price_desc">Maior Preço</option>
     </select>
 </div>
 
@@ -767,10 +767,10 @@
                     <th><input type="checkbox" class="table-checkbox" id="selectAll"></th>
                     <th>Produto</th>
                     <th>Categoria</th>
-                    <th>PreÃ§o</th>
+                    <th>Preço</th>
                     <th>Estoque</th>
                     <th>Status</th>
-                    <th style="text-align: right;">AÃ§Ãµes</th>
+                    <th style="text-align: right;">Ações</th>
                 </tr>
             </thead>
             <tbody id="productsTableBody">
@@ -789,7 +789,7 @@
             Mostrando 0-0 de 0 produtos
         </div>
         <div class="pagination-controls" id="paginationControls">
-            <!-- SerÃ¡ preenchido via JavaScript -->
+            <!-- Será preenchido via JavaScript -->
         </div>
     </div>
 </div>
@@ -806,12 +806,12 @@
         <form id="productForm" onsubmit="handleSubmit(event)">
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="form-label">TÃ­tulo *</label>
+                    <label class="form-label">Título *</label>
                     <input type="text" class="form-input" name="title" required>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">DescriÃ§Ã£o</label>
+                    <label class="form-label">Descrição</label>
                     <textarea class="form-textarea" name="description"></textarea>
                 </div>
 
@@ -821,7 +821,7 @@
                         <input type="text" class="form-input" name="sku">
                     </div>
                     <div class="form-group">
-                        <label class="form-label">PreÃ§o (R$) *</label>
+                        <label class="form-label">Preço (R$) *</label>
                         <input type="number" class="form-input" name="price" step="0.01" min="0" required>
                     </div>
                 </div>
@@ -844,7 +844,7 @@
                     <div class="upload-area" onclick="document.getElementById('imageUpload').click()">
                         <span class="material-icons">cloud_upload</span>
                         <p>Arraste imagens ou <span>clique para selecionar</span></p>
-                        <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">PNG, JPG, GIF ou WEBP (mÃ¡x. 5MB)</p>
+                        <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">PNG, JPG, GIF ou WEBP (máx. 5MB)</p>
                     </div>
                     <input type="file" id="imageUpload" class="upload-input" accept="image/*" multiple>
                     <div class="preview-grid" id="previewGrid"></div>
@@ -967,7 +967,7 @@ function handleFiles(files) {
     
     Array.from(files).forEach(file => {
         if (!file.type.startsWith('image/')) {
-            alert(`"${file.name}" nÃ£o Ã© uma imagem vÃ¡lida.`);
+            alert(`"${file.name}" não é uma imagem válida.`);
             return;
         }
         
@@ -1220,7 +1220,7 @@ async function uploadImages(productId) {
 }
 
 function editProduct(id) {
-    alert('EdiÃ§Ã£o em breve!');
+    alert('Edição em breve!');
 }
 
 async function deleteProduct(id) {
@@ -1232,7 +1232,7 @@ async function deleteProduct(id) {
         
         if (data.success) {
             loadProducts();
-            alert('Produto excluÃ­do!');
+            alert('Produto excluído!');
         } else {
             alert('Erro: ' + data.error);
         }

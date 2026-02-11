@@ -18,6 +18,27 @@ def view_store(slug):
         if not store:
             abort(404)
         
+        # Buscar produtos ativos da loja
+        products = Product.query.filter_by(
+            store_id=store.id, 
+            active=True
+        ).order_by(Product.created_at.desc()).limit(12).all()
+        
+        # Buscar categorias da loja
+        categories = Category.query.filter_by(
+            store_id=store.id
+        ).order_by(Category.name).all()
+        
+        # Preparar dados de customização
+        customization = {
+            'primary_color': '#667eea',
+            'secondary_color': '#764ba2'
+        }
+        
+        if store.customization:
+            customization['primary_color'] = store.customization.primary_color or '#667eea'
+            customization['secondary_color'] = store.customization.secondary_color or '#764ba2'
+        
         template_name = 'layout1.html'
         
         if store.customization and store.customization.theme:
@@ -31,7 +52,13 @@ def view_store(slug):
             }
             template_name = template_map.get(template_type, 'layout1.html')
         
-        return render_template(f'layouts/{template_name}', store=store)
+        return render_template(
+            f'layouts/{template_name}', 
+            store=store,
+            products=products,
+            categories=categories,
+            customization=customization
+        )
         
     except Exception as e:
         print(f"Erro ao buscar loja: {e}")

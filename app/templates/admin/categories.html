@@ -1,4 +1,4 @@
-﻿{% extends "/admin/base.html" %}
+{% extends "/admin/base.html" %}
 
 {% block title %}Categorias{% endblock %}
 
@@ -55,7 +55,7 @@
 
     .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
     }
 
     .btn-secondary {
@@ -216,7 +216,7 @@
     .search-input:focus {
         outline: none;
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
     }
 
     .filter-select {
@@ -433,7 +433,7 @@
     .form-select:focus {
         outline: none;
         border-color: var(--primary-color);
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
     }
 
     .form-hint {
@@ -643,7 +643,7 @@
                     <select class="form-select" name="parent_id" id="categoryParent">
                         <option value="">Nenhuma (categoria principal)</option>
                     </select>
-                    <p class="form-hint">Se selecionada, esta serÃ¡ uma subcategoria</p>
+                    <p class="form-hint">Se selecionada, esta será uma subcategoria</p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -711,7 +711,7 @@ async function loadStats() {
             document.getElementById('statEmpty').textContent = result.data.empty_categories;
         }
     } catch (error) {
-        console.error('Erro ao carregar estatÃ­sticas:', error);
+        console.error('Erro ao carregar estatísticas:', error);
     }
 }
 
@@ -782,7 +782,7 @@ function renderCategories() {
                         </button>
                     </div>
                 </div>
-                ${parentName ? `<span class="parent-badge">ðŸ“ ${parentName}</span>` : ''}
+                ${parentName ? `<span class="parent-badge">📁 ${parentName}</span>` : ''}
                 <div class="category-name">${category.name}</div>
                 <div class="category-slug">/${category.slug}</div>
                 <div class="category-meta">
@@ -873,7 +873,7 @@ async function deleteCategory(id, name) {
         const result = await response.json();
         
         if (result.success) {
-            showToast('Categoria excluÃ­da com sucesso', 'success');
+            showToast('Categoria excluída com sucesso', 'success');
             loadStats();
             loadCategories();
         } else {

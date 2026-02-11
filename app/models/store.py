@@ -9,7 +9,6 @@ class Store(db.Model):
     slug = db.Column(db.String(255), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    logo_url = db.Column(db.Text, nullable=True)
     
     # Campos de onboarding
     onboarding_step = db.Column(db.SmallInteger, nullable=False, default=1)
@@ -54,7 +53,6 @@ class Store(db.Model):
             'slug': self.slug,
             'name': self.name,
             'description': self.description,
-            'logo_url': self.logo_url,
             'onboarding_step': self.onboarding_step,
             'onboarding_completed': self.onboarding_completed,
             'person_type': self.person_type,
@@ -84,6 +82,7 @@ class StoreCustomization(db.Model):
         primary_key=True
     )
 
+    logo = db.Column(db.String(255), nullable=True)
     primary_color = db.Column(db.String(7))
     secondary_color = db.Column(db.String(7))
     theme = db.Column(db.JSON)
@@ -105,6 +104,7 @@ class StoreCustomization(db.Model):
     def to_dict(self):
         return {
             'store_id': self.store_id,
+            'logo': self.logo,
             'primary_color': self.primary_color,
             'secondary_color': self.secondary_color,
             'theme': self.theme,
