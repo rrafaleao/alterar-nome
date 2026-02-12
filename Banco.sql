@@ -115,6 +115,22 @@ CREATE TABLE IF NOT EXISTS product_stocks (
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS store_customers (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  store_id CHAR(36) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  password_hash TEXT NOT NULL,
+  full_name VARCHAR(255),
+  phone VARCHAR(15),
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE (store_id, email),
+  INDEX idx_store_customers_store (store_id),
+  INDEX idx_store_customers_email (email),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+);
+
 CREATE TABLE IF NOT EXISTS carts (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   user_id CHAR(36),

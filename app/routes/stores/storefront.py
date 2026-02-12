@@ -1,13 +1,9 @@
-from flask import Blueprint, jsonify, render_template, abort, request
+from flask import render_template, abort, request, jsonify
 from config.database import db
 from app.models.store import Store, StoreCustomization
-from app.models.user import User
-from app.models.store_payment_method import StorePaymentMethod
-from app.models.store_shipping_methods import StoreShippingMethod
 from app.models.product import Product
 from app.models.category import Category
-
-storefront = Blueprint("storefront", __name__)
+from . import storefront
 
 
 @storefront.route('/<slug>')
@@ -179,7 +175,6 @@ def store_info(slug):
             'id': store.id,
             'name': store.name,
             'description': store.description,
-            'logo_url': store.logo_url,
             'slug': store.slug,
             'person_type': store.person_type
         }
@@ -234,7 +229,6 @@ def list_all_stores():
                 'name': store.name,
                 'slug': store.slug,
                 'description': store.description,
-                'logo_url': store.logo_url,
                 'created_at': store.created_at.isoformat() if store.created_at else None
             }
             

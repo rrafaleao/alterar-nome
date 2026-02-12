@@ -1,4 +1,4 @@
-{% extends "/admin/base.html" %}
+﻿{% extends "/admin/base.html" %}
 
 {% block title %}Clientes{% endblock %}
 
@@ -368,7 +368,7 @@
         <div class="stat-header">
             <div>
                 <div class="stat-label">Total de Clientes</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value" id="statTotal">0</div>
             </div>
             <div class="stat-icon blue">
                 <span class="material-icons">people</span>
@@ -379,7 +379,7 @@
         <div class="stat-header">
             <div>
                 <div class="stat-label">Novos este Mês</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value" id="statNewMonth">0</div>
             </div>
             <div class="stat-icon green">
                 <span class="material-icons">person_add</span>
@@ -389,8 +389,8 @@
     <div class="stat-card">
         <div class="stat-header">
             <div>
-                <div class="stat-label">Clientes Recorrentes</div>
-                <div class="stat-value">0</div>
+                <div class="stat-label">Clientes Ativos</div>
+                <div class="stat-value" id="statActive">0</div>
             </div>
             <div class="stat-icon purple">
                 <span class="material-icons">loyalty</span>
@@ -400,11 +400,11 @@
     <div class="stat-card">
         <div class="stat-header">
             <div>
-                <div class="stat-label">Ticket Médio</div>
-                <div class="stat-value">R$ 0</div>
+                <div class="stat-label">Clientes Inativos</div>
+                <div class="stat-value" id="statInactive">0</div>
             </div>
             <div class="stat-icon orange">
-                <span class="material-icons">payments</span>
+                <span class="material-icons">person_off</span>
             </div>
         </div>
     </div>
@@ -414,25 +414,267 @@
 <div class="controls-bar">
     <div class="search-wrapper">
         <span class="material-icons">search</span>
-        <input type="text" class="search-input" placeholder="Buscar por nome, email ou telefone...">
+        <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nome, email ou telefone..." oninput="debounceSearch()">
     </div>
-    <select class="filter-select">
-        <option value="">Ordenar por</option>
+    <select class="filter-select" id="sortSelect" onchange="loadCustomers()">
         <option value="recent">Mais recentes</option>
         <option value="name">Nome (A-Z)</option>
-        <option value="orders">Mais pedidos</option>
-        <option value="spent">Maior valor gasto</option>
+        <option value="oldest">Mais antigos</option>
     </select>
 </div>
 
 <!-- CUSTOMERS GRID -->
 <div class="customers-section">
-    <div class="customers-grid">
-        <div class="empty-state">
-            <span class="material-icons">people_outline</span>
-            <h3>Nenhum cliente encontrado</h3>
-            <p>Quando você tiver clientes, eles aparecerão aqui</p>
+    <div class="customers-grid" id="customersGrid">
+        <!-- Loading state -->
+        <div class="empty-state" id="loadingState">
+            <span class="material-icons">hourglass_empty</span>
+            <h3>Carregando clientes...</h3>
+            <p>Aguarde um momento</p>
         </div>
     </div>
 </div>
+
+<!-- PAGINATION -->
+<div class="pagination-bar" id="paginationBar" style="display: none; background: #fff; border-radius: 12px; padding: 16px 24px; margin-top: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); display: flex; justify-content: space-between; align-items: center;">
+    <span class="pagination-info" id="paginationInfo" style="font-size: 14px; color: #718096;"></span>
+    <div style="display: flex; gap: 8px;">
+        <button class="btn btn-secondary" id="prevBtn" onclick="changePage(-1)" disabled>
+            <span class="material-icons" style="font-size: 18px;">chevron_left</span>
+            Anterior
+        </button>
+        <button class="btn btn-secondary" id="nextBtn" onclick="changePage(1)" disabled>
+            Próxima
+            <span class="material-icons" style="font-size: 18px;">chevron_right</span>
+        </button>
+    </div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="confirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: #fff; border-radius: 16px; padding: 32px; max-width: 420px; width: 90%; text-align: center;">
+        <span class="material-icons" style="font-size: 48px; color: #e53e3e; margin-bottom: 16px;">warning</span>
+        <h3 style="font-size: 18px; color: #1a202c; margin-bottom: 8px;" id="modalTitle">Confirmar ação</h3>
+        <p style="font-size: 14px; color: #718096; margin-bottom: 24px;" id="modalText">Tem certeza?</p>
+        <div style="display: flex; gap: 12px; justify-content: center;">
+            <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+            <button class="btn" id="modalConfirmBtn" style="background: #e53e3e; color: #fff;" onclick="confirmAction()">Confirmar</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let currentPage = 1;
+    let searchTimeout = null;
+    let pendingAction = null;
+
+    function debounceSearch() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            currentPage = 1;
+            loadCustomers();
+        }, 400);
+    }
+
+    async function loadCustomers() {
+        const search = document.getElementById('searchInput').value.trim();
+        const sort = document.getElementById('sortSelect').value;
+        const grid = document.getElementById('customersGrid');
+
+        grid.innerHTML = `
+            <div class="empty-state">
+                <span class="material-icons">hourglass_empty</span>
+                <h3>Carregando...</h3>
+            </div>
+        `;
+
+        try {
+            const params = new URLSearchParams({
+                page: currentPage,
+                per_page: 20,
+                search: search,
+                sort: sort
+            });
+
+            const response = await fetch(`/admin/customers/data?${params}`);
+            const result = await response.json();
+
+            if (!result.success) {
+                showError('Erro ao carregar clientes');
+                return;
+            }
+
+            // Atualiza stats
+            const stats = result.stats;
+            document.getElementById('statTotal').textContent = stats.total;
+            document.getElementById('statNewMonth').textContent = stats.new_this_month;
+            document.getElementById('statActive').textContent = stats.active;
+            document.getElementById('statInactive').textContent = stats.total - stats.active;
+
+            // Renderiza clientes
+            if (result.data.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <span class="material-icons">people_outline</span>
+                        <h3>${search ? 'Nenhum cliente encontrado' : 'Nenhum cliente cadastrado'}</h3>
+                        <p>${search ? 'Tente buscar com outros termos' : 'Quando clientes se registrarem na sua loja, eles aparecerão aqui'}</p>
+                    </div>
+                `;
+                document.getElementById('paginationBar').style.display = 'none';
+                return;
+            }
+
+            grid.innerHTML = result.data.map(customer => renderCustomerCard(customer)).join('');
+
+            // Atualiza paginação
+            const pag = result.pagination;
+            const paginationBar = document.getElementById('paginationBar');
+            paginationBar.style.display = 'flex';
+
+            document.getElementById('paginationInfo').textContent = 
+                `Mostrando ${(pag.page - 1) * pag.per_page + 1} - ${Math.min(pag.page * pag.per_page, pag.total)} de ${pag.total} clientes`;
+
+            document.getElementById('prevBtn').disabled = !pag.has_prev;
+            document.getElementById('nextBtn').disabled = !pag.has_next;
+
+        } catch (err) {
+            console.error('Erro:', err);
+            showError('Erro de conexão ao carregar clientes');
+        }
+    }
+
+    function renderCustomerCard(customer) {
+        const initials = getInitials(customer.full_name);
+        const date = formatDate(customer.created_at);
+        const statusBadge = customer.is_active 
+            ? '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:50px;font-size:12px;font-weight:600;background:#f0fdf4;color:#166534;"><span class="material-icons" style="font-size:14px;">check_circle</span>Ativo</span>'
+            : '<span style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:50px;font-size:12px;font-weight:600;background:#fef2f2;color:#991b1b;"><span class="material-icons" style="font-size:14px;">cancel</span>Inativo</span>';
+
+        return `
+            <div class="customer-card">
+                <div class="customer-header">
+                    <div class="customer-avatar">${initials}</div>
+                    <div class="customer-info">
+                        <h3>${escapeHtml(customer.full_name)}</h3>
+                        <p>${escapeHtml(customer.email)}</p>
+                    </div>
+                </div>
+                <div class="customer-stats">
+                    <div class="customer-stat">
+                        <div class="customer-stat-value">${customer.phone || '—'}</div>
+                        <div class="customer-stat-label">Telefone</div>
+                    </div>
+                    <div class="customer-stat">
+                        <div class="customer-stat-value">${date}</div>
+                        <div class="customer-stat-label">Cadastro</div>
+                    </div>
+                </div>
+                <div style="margin-top: 12px; text-align: center;">${statusBadge}</div>
+                <div class="customer-actions">
+                    <button class="btn btn-secondary" onclick="toggleActive('${customer.id}', ${customer.is_active})">
+                        <span class="material-icons" style="font-size:16px;">${customer.is_active ? 'block' : 'check_circle'}</span>
+                        ${customer.is_active ? 'Desativar' : 'Ativar'}
+                    </button>
+                    <button class="btn" style="background:#fef2f2;color:#e53e3e;" onclick="confirmDelete('${customer.id}', '${escapeHtml(customer.full_name)}')">
+                        <span class="material-icons" style="font-size:16px;">delete</span>
+                        Excluir
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    function getInitials(name) {
+        if (!name) return '?';
+        const parts = name.trim().split(' ');
+        if (parts.length >= 2) {
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+        return parts[0][0].toUpperCase();
+    }
+
+    function formatDate(isoString) {
+        if (!isoString) return '—';
+        const d = new Date(isoString);
+        return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    function changePage(delta) {
+        currentPage += delta;
+        loadCustomers();
+    }
+
+    async function toggleActive(customerId, isCurrentlyActive) {
+        try {
+            const response = await fetch(`/admin/customers/${customerId}/toggle-active`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const result = await response.json();
+            if (result.success) {
+                loadCustomers();
+            } else {
+                alert(result.error || 'Erro ao alterar status');
+            }
+        } catch (err) {
+            alert('Erro de conexão');
+        }
+    }
+
+    function confirmDelete(customerId, customerName) {
+        document.getElementById('modalTitle').textContent = 'Excluir cliente';
+        document.getElementById('modalText').textContent = `Tem certeza que deseja excluir "${customerName}"? Esta ação não pode ser desfeita.`;
+        document.getElementById('confirmModal').style.display = 'flex';
+        pendingAction = () => deleteCustomer(customerId);
+    }
+
+    function closeModal() {
+        document.getElementById('confirmModal').style.display = 'none';
+        pendingAction = null;
+    }
+
+    function confirmAction() {
+        if (pendingAction) pendingAction();
+        closeModal();
+    }
+
+    async function deleteCustomer(customerId) {
+        try {
+            const response = await fetch(`/admin/customers/${customerId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            const result = await response.json();
+            if (result.success) {
+                loadCustomers();
+            } else {
+                alert(result.error || 'Erro ao excluir cliente');
+            }
+        } catch (err) {
+            alert('Erro de conexão');
+        }
+    }
+
+    function showError(msg) {
+        document.getElementById('customersGrid').innerHTML = `
+            <div class="empty-state">
+                <span class="material-icons">error_outline</span>
+                <h3>${msg}</h3>
+                <p>Tente recarregar a página</p>
+            </div>
+        `;
+    }
+
+    // Carrega ao abrir
+    document.addEventListener('DOMContentLoaded', loadCustomers);
+</script>
 {% endblock %}

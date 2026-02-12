@@ -1,0 +1,821 @@
+{% extends "/admin/base.html" %}
+
+{% block title %}Layout da Loja{% endblock %}
+
+{% block nav_layout %}active{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* PAGE HEADER */
+    .page-header {
+        background: #fff;
+        padding: 24px 32px;
+        border-radius: 12px;
+        margin-bottom: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .page-header h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    /* BUTTONS */
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: var(--primary-gradient);
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+    }
+
+    .btn-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .btn-secondary {
+        background: #edf2f7;
+        color: #4a5568;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .btn-danger {
+        background: #fef2f2;
+        color: #e53e3e;
+        border: 1px solid #fecaca;
+    }
+
+    .btn-danger:hover {
+        background: #fee2e2;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 2px dashed #cbd5e0;
+        color: #718096;
+    }
+
+    .btn-outline:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+        background: rgba(74, 144, 226, 0.05);
+    }
+
+    /* CARDS */
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+        margin-bottom: 24px;
+    }
+
+    .card-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-header h3 {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-header h3 .material-icons {
+        font-size: 22px;
+        color: var(--primary-color);
+    }
+
+    .card-header .subtitle {
+        font-size: 13px;
+        color: #a0aec0;
+        font-weight: 400;
+    }
+
+    .card-body {
+        padding: 24px;
+    }
+
+    /* LOGO SECTION */
+    .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+    }
+
+    .logo-preview {
+        width: 120px;
+        height: 120px;
+        border-radius: 16px;
+        border: 2px dashed #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: #f8fafc;
+        transition: all 0.3s;
+        flex-shrink: 0;
+        cursor: pointer;
+    }
+
+    .logo-preview:hover {
+        border-color: var(--primary-color);
+        background: rgba(74, 144, 226, 0.03);
+    }
+
+    .logo-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .logo-preview.has-logo {
+        border-style: solid;
+        border-color: #e2e8f0;
+        cursor: default;
+    }
+
+    .logo-placeholder-icon {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        color: #a0aec0;
+    }
+
+    .logo-placeholder-icon .material-icons {
+        font-size: 36px;
+    }
+
+    .logo-placeholder-icon span:last-child {
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    .logo-info {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .logo-info p {
+        font-size: 13px;
+        color: #718096;
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .logo-buttons {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .file-input-hidden {
+        display: none;
+    }
+
+    /* COLOR PICKER SECTION */
+    .colors-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        margin-bottom: 24px;
+    }
+
+    .color-field label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 8px;
+    }
+
+    .color-picker-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        background: #f8fafc;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .color-picker-wrapper:hover,
+    .color-picker-wrapper:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .color-swatch {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: 2px solid #e2e8f0;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .color-swatch::-webkit-color-swatch-wrapper { padding: 0; }
+    .color-swatch::-webkit-color-swatch { border: none; border-radius: 6px; }
+
+    .color-hex-input {
+        border: none;
+        background: transparent;
+        font-family: 'Instrument Sans', monospace;
+        font-size: 14px;
+        font-weight: 600;
+        color: #2d3748;
+        width: 80px;
+        outline: none;
+        text-transform: uppercase;
+    }
+
+    /* PRESETS */
+    .presets-section {
+        border-top: 1px solid #f0f0f0;
+        padding-top: 20px;
+    }
+
+    .presets-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #718096;
+        margin-bottom: 12px;
+    }
+
+    .preset-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .preset-btn {
+        width: 48px;
+        height: 32px;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .preset-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .preset-btn.active {
+        border-color: #1a202c;
+        box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1a202c;
+    }
+
+    /* FORM FIELDS */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 8px;
+    }
+
+    .form-group textarea {
+        width: 100%;
+        padding: 14px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 14px;
+        resize: vertical;
+        min-height: 100px;
+        background: #f8fafc;
+        transition: all 0.2s;
+        outline: none;
+        line-height: 1.6;
+        color: #2d3748;
+        box-sizing: border-box;
+    }
+
+    .form-group textarea:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        background: #fff;
+    }
+
+    .char-count {
+        font-size: 12px;
+        color: #a0aec0;
+        text-align: right;
+        margin-top: 4px;
+    }
+
+    /* SAVE FOOTER */
+    .save-footer {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        padding: 20px 24px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .save-footer .save-hint {
+        font-size: 13px;
+        color: #a0aec0;
+        margin-right: auto;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .save-footer .save-hint .material-icons {
+        font-size: 16px;
+    }
+
+    /* TOAST */
+    .toast {
+        position: fixed;
+        bottom: 32px;
+        right: 32px;
+        padding: 16px 24px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 9999;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+
+    .toast.visible {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .toast-success {
+        background: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+    }
+
+    .toast-error {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #fecaca;
+    }
+
+    /* LOADING OVERLAY */
+    .saving-overlay {
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(255,255,255,0.6);
+        z-index: 9998;
+        display: none;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .saving-overlay.visible { display: flex; }
+
+    .saving-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e2e8f0;
+        border-top-color: var(--primary-color);
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .logo-section {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .colors-grid {
+            grid-template-columns: 1fr;
+        }
+        .save-footer {
+            flex-direction: column;
+        }
+        .save-footer .save-hint {
+            margin-right: 0;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- PAGE HEADER -->
+<div class="page-header">
+    <h2>
+        <span class="material-icons" style="color: var(--primary-color);">palette</span>
+        Layout da Loja
+    </h2>
+    <a id="btnPreviewStore" href="#" target="_blank" class="btn btn-secondary" style="text-decoration:none;">
+        <span class="material-icons" style="font-size:18px;">open_in_new</span>
+        Ver loja
+    </a>
+</div>
+
+<!-- LOGO -->
+<div class="card">
+    <div class="card-header">
+        <h3>
+            <span class="material-icons">image</span>
+            Logo da Loja
+        </h3>
+    </div>
+    <div class="card-body">
+        <div class="logo-section">
+            <div class="logo-preview" id="logoPreview" onclick="document.getElementById('logoInput').click()">
+                <div class="logo-placeholder-icon" id="logoPlaceholder">
+                    <span class="material-icons">add_photo_alternate</span>
+                    <span>Clique para enviar</span>
+                </div>
+                <img id="logoImage" src="" alt="Logo" style="display:none;">
+            </div>
+            <div class="logo-info">
+                <p>Envie a logo da sua loja. Ela aparecerá no cabeçalho e nas páginas da loja.<br>
+                   <strong>Formatos:</strong> PNG, JPG, WEBP, SVG &nbsp;|&nbsp; <strong>Máx:</strong> 5 MB &nbsp;|&nbsp; <strong>Ideal:</strong> 512×512px</p>
+                <div class="logo-buttons">
+                    <input type="file" id="logoInput" class="file-input-hidden" accept="image/*" onchange="handleLogoUpload(event)">
+                    <button class="btn btn-outline" onclick="document.getElementById('logoInput').click()">
+                        <span class="material-icons" style="font-size:18px;">upload</span>
+                        Enviar logo
+                    </button>
+                    <button class="btn btn-danger" id="btnRemoveLogo" onclick="removeLogo()" style="display:none;">
+                        <span class="material-icons" style="font-size:18px;">delete_outline</span>
+                        Remover
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CORES -->
+<div class="card">
+    <div class="card-header">
+        <h3>
+            <span class="material-icons">color_lens</span>
+            Cores
+        </h3>
+        <span class="subtitle">Definem o visual da sua loja</span>
+    </div>
+    <div class="card-body">
+        <div class="colors-grid">
+            <div class="color-field">
+                <label>Cor Primária</label>
+                <div class="color-picker-wrapper">
+                    <input type="color" class="color-swatch" id="primaryColor" value="#667eea" oninput="onColorChange()">
+                    <input type="text" class="color-hex-input" id="primaryHex" value="#667eea" maxlength="7" oninput="onHexInput('primary')">
+                </div>
+            </div>
+            <div class="color-field">
+                <label>Cor Secundária</label>
+                <div class="color-picker-wrapper">
+                    <input type="color" class="color-swatch" id="secondaryColor" value="#764ba2" oninput="onColorChange()">
+                    <input type="text" class="color-hex-input" id="secondaryHex" value="#764ba2" maxlength="7" oninput="onHexInput('secondary')">
+                </div>
+            </div>
+        </div>
+
+        <div class="presets-section">
+            <div class="presets-label">Combinações prontas</div>
+            <div class="preset-grid">
+                <button class="preset-btn" style="background: linear-gradient(135deg, #667eea, #764ba2);" onclick="applyPreset('#667eea','#764ba2')" title="Roxo"></button>
+                <button class="preset-btn" style="background: linear-gradient(135deg, #4A90E2, #357ABD);" onclick="applyPreset('#4A90E2','#357ABD')" title="Azul"></button>
+                <button class="preset-btn" style="background: linear-gradient(135deg, #48bb78, #38a169);" onclick="applyPreset('#48bb78','#38a169')" title="Verde"></button>
+                <button class="preset-btn" style="background: linear-gradient(135deg, #ed8936, #dd6b20);" onclick="applyPreset('#ed8936','#dd6b20')" title="Laranja"></button>
+                <button class="preset-btn" style="background: linear-gradient(135deg, #e53e3e, #c53030);" onclick="applyPreset('#e53e3e','#c53030')" title="Vermelho"></button>
+                <button class="preset-btn" style="background: linear-gradient(135deg, #d69e2e, #b7791f);" onclick="applyPreset('#d69e2e','#b7791f')" title="Dourado"></button>
+                <button class="preset-btn" style="background: linear-gradient(135deg, #9f7aea, #805ad5);" onclick="applyPreset('#9f7aea','#805ad5')" title="Violeta"></button>
+                <button class="preset-btn" style="background: linear-gradient(135deg, #38b2ac, #319795);" onclick="applyPreset('#38b2ac','#319795')" title="Teal"></button>
+                <button class="preset-btn" style="background: linear-gradient(135deg, #e91e8c, #be185d);" onclick="applyPreset('#e91e8c','#be185d')" title="Rosa"></button>
+                <button class="preset-btn" style="background: linear-gradient(135deg, #1a202c, #2d3748);" onclick="applyPreset('#1a202c','#2d3748')" title="Escuro"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- DESCRIÇÃO -->
+<div class="card">
+    <div class="card-header">
+        <h3>
+            <span class="material-icons">description</span>
+            Descrição da Loja
+        </h3>
+    </div>
+    <div class="card-body">
+        <div class="form-group" style="margin-bottom:0;">
+            <label for="storeDescription">Texto exibido na página inicial da loja</label>
+            <textarea id="storeDescription" placeholder="Descreva sua loja em poucas palavras... Ex: Encontre os melhores produtos com os melhores preços." maxlength="500" oninput="updateCharCount()"></textarea>
+            <div class="char-count"><span id="charCount">0</span> / 500 caracteres</div>
+        </div>
+    </div>
+</div>
+
+<!-- SAVE FOOTER -->
+<div class="save-footer">
+    <span class="save-hint">
+        <span class="material-icons">info_outline</span>
+        A logo é salva automaticamente ao enviar
+    </span>
+    <button class="btn btn-primary" id="btnSave" onclick="saveAll()">
+        <span class="material-icons" style="font-size:18px;">save</span>
+        Salvar alterações
+    </button>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+    <span class="material-icons" id="toastIcon">check_circle</span>
+    <span id="toastText"></span>
+</div>
+
+<!-- SAVING OVERLAY -->
+<div class="saving-overlay" id="savingOverlay">
+    <div class="saving-spinner"></div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let storeSlug = '';
+
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded', loadLayoutData);
+
+    async function loadLayoutData() {
+        try {
+            const res = await fetch('/admin/api/layout');
+            const result = await res.json();
+
+            if (!result.success) {
+                showToast('Erro ao carregar dados da loja', 'error');
+                return;
+            }
+
+            const d = result.data;
+            storeSlug = d.slug;
+
+            // Logo
+            if (d.logo) {
+                setLogoPreview(d.logo);
+            }
+
+            // Colors
+            document.getElementById('primaryColor').value = d.primary_color;
+            document.getElementById('primaryHex').value = d.primary_color;
+            document.getElementById('secondaryColor').value = d.secondary_color;
+            document.getElementById('secondaryHex').value = d.secondary_color;
+
+            // Description
+            document.getElementById('storeDescription').value = d.description || '';
+            updateCharCount();
+
+            // Link da loja
+            document.getElementById('btnPreviewStore').href = `/${d.slug}`;
+        } catch (err) {
+            console.error(err);
+            showToast('Erro de conexão', 'error');
+        }
+    }
+
+    // ===== LOGO =====
+    async function handleLogoUpload(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('Arquivo muito grande. Máximo: 5MB', 'error');
+            return;
+        }
+
+        showSaving(true);
+
+        const formData = new FormData();
+        formData.append('logo', file);
+
+        try {
+            const res = await fetch('/admin/api/layout/logo', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await res.json();
+
+            if (result.success) {
+                setLogoPreview(result.data.logo_url);
+                showToast('Logo atualizada!', 'success');
+            } else {
+                showToast(result.error || 'Erro ao enviar logo', 'error');
+            }
+        } catch (err) {
+            showToast('Erro de conexão', 'error');
+        } finally {
+            showSaving(false);
+            e.target.value = '';
+        }
+    }
+
+    async function removeLogo() {
+        if (!confirm('Tem certeza que deseja remover a logo?')) return;
+
+        showSaving(true);
+        try {
+            const res = await fetch('/admin/api/layout/logo', { method: 'DELETE' });
+            const result = await res.json();
+
+            if (result.success) {
+                clearLogoPreview();
+                showToast('Logo removida!', 'success');
+            } else {
+                showToast(result.error || 'Erro ao remover logo', 'error');
+            }
+        } catch (err) {
+            showToast('Erro de conexão', 'error');
+        } finally {
+            showSaving(false);
+        }
+    }
+
+    function setLogoPreview(url) {
+        const img = document.getElementById('logoImage');
+        const placeholder = document.getElementById('logoPlaceholder');
+        const preview = document.getElementById('logoPreview');
+        const btnRemove = document.getElementById('btnRemoveLogo');
+
+        img.src = url;
+        img.style.display = 'block';
+        placeholder.style.display = 'none';
+        preview.classList.add('has-logo');
+        btnRemove.style.display = 'inline-flex';
+    }
+
+    function clearLogoPreview() {
+        const img = document.getElementById('logoImage');
+        const placeholder = document.getElementById('logoPlaceholder');
+        const preview = document.getElementById('logoPreview');
+        const btnRemove = document.getElementById('btnRemoveLogo');
+
+        img.src = '';
+        img.style.display = 'none';
+        placeholder.style.display = 'flex';
+        preview.classList.remove('has-logo');
+        btnRemove.style.display = 'none';
+    }
+
+    // ===== COLORS =====
+    function onColorChange() {
+        const primary = document.getElementById('primaryColor').value;
+        const secondary = document.getElementById('secondaryColor').value;
+        document.getElementById('primaryHex').value = primary;
+        document.getElementById('secondaryHex').value = secondary;
+    }
+
+    function onHexInput(type) {
+        const hexInput = document.getElementById(type + 'Hex');
+        const colorInput = document.getElementById(type === 'primary' ? 'primaryColor' : 'secondaryColor');
+        let val = hexInput.value;
+
+        if (!val.startsWith('#')) val = '#' + val;
+        if (/^#[0-9a-fA-F]{6}$/.test(val)) {
+            colorInput.value = val;
+        }
+    }
+
+    function applyPreset(primary, secondary) {
+        document.getElementById('primaryColor').value = primary;
+        document.getElementById('primaryHex').value = primary;
+        document.getElementById('secondaryColor').value = secondary;
+        document.getElementById('secondaryHex').value = secondary;
+
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        event.target.closest('.preset-btn').classList.add('active');
+    }
+
+    // ===== DESCRIPTION =====
+    function updateCharCount() {
+        const text = document.getElementById('storeDescription').value;
+        document.getElementById('charCount').textContent = text.length;
+    }
+
+    // ===== SAVE =====
+    async function saveAll() {
+        const primary = document.getElementById('primaryHex').value;
+        const secondary = document.getElementById('secondaryHex').value;
+        const description = document.getElementById('storeDescription').value;
+
+        const hexRegex = /^#[0-9a-fA-F]{6}$/;
+        if (!hexRegex.test(primary)) {
+            showToast('Cor primária inválida (use #RRGGBB)', 'error');
+            return;
+        }
+        if (!hexRegex.test(secondary)) {
+            showToast('Cor secundária inválida (use #RRGGBB)', 'error');
+            return;
+        }
+
+        showSaving(true);
+        document.getElementById('btnSave').disabled = true;
+
+        try {
+            const res = await fetch('/admin/api/layout', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    primary_color: primary,
+                    secondary_color: secondary,
+                    description: description
+                })
+            });
+
+            const result = await res.json();
+
+            if (result.success) {
+                showToast('Alterações salvas com sucesso!', 'success');
+            } else {
+                showToast(result.error || 'Erro ao salvar', 'error');
+            }
+        } catch (err) {
+            showToast('Erro de conexão', 'error');
+        } finally {
+            showSaving(false);
+            document.getElementById('btnSave').disabled = false;
+        }
+    }
+
+    // ===== TOAST =====
+    function showToast(message, type) {
+        const toast = document.getElementById('toast');
+        const icon = document.getElementById('toastIcon');
+        const text = document.getElementById('toastText');
+
+        toast.className = `toast toast-${type}`;
+        icon.textContent = type === 'success' ? 'check_circle' : 'error_outline';
+        text.textContent = message;
+
+        toast.classList.add('visible');
+        setTimeout(() => toast.classList.remove('visible'), 3500);
+    }
+
+    function showSaving(show) {
+        document.getElementById('savingOverlay').classList.toggle('visible', show);
+    }
+</script>
+{% endblock %}

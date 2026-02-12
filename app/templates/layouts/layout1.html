@@ -953,7 +953,26 @@
                             <span class="material-icons">shopping_bag</span>
                             <span class="cart-badge" id="cartCount">0</span>
                         </button>
-                        <button class="btn-login">Entrar</button>
+                        {% if session.get('customer_id') and session.get('customer_store_id') == store.id %}
+                        <div class="user-menu-wrapper" style="position: relative;">
+                            <button class="btn-login" onclick="toggleUserMenu()" style="display: flex; align-items: center; gap: 8px;">
+                                <span class="material-icons" style="font-size: 18px;">person</span>
+                                {{ session.get('customer_name', 'Minha Conta').split(' ')[0] }}
+                            </button>
+                            <div class="user-dropdown" id="userDropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 8px; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); border: 1px solid var(--gray-200); min-width: 200px; z-index: 100; overflow: hidden;">
+                                <div style="padding: 16px; border-bottom: 1px solid var(--gray-100);">
+                                    <p style="font-weight: 600; font-size: 14px; color: var(--gray-900);">{{ session.get('customer_name', '') }}</p>
+                                    <p style="font-size: 13px; color: var(--gray-500);">{{ session.get('customer_email', '') }}</p>
+                                </div>
+                                <a href="{{ url_for('storefront.customer_logout', slug=store.slug) }}" style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.2s;">
+                                    <span class="material-icons" style="font-size: 18px;">logout</span>
+                                    Sair
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <a href="{{ url_for('storefront.customer_login_page', slug=store.slug) }}" class="btn-login" style="text-decoration: none;">Entrar</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -1197,6 +1216,23 @@
     </aside>
 
     <script>
+        // User menu toggle
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        // Fecha o dropdown ao clicar fora
+        document.addEventListener('click', function(e) {
+            const wrapper = document.querySelector('.user-menu-wrapper');
+            const dropdown = document.getElementById('userDropdown');
+            if (wrapper && dropdown && !wrapper.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
         // Cart functionality
         let cart = [];
 

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta - {{ store.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary: {{ customization.primary_color }};
+            --secondary: {{ customization.secondary_color }};
+            --accent: #ff6b6b;
+            --success: #10b981;
+            --dark: #1f2937;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--gray-50);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .auth-header {
+            padding: 20px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .auth-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .auth-header-left .logo-placeholder {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .auth-header-left .store-name {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--gray-500);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: var(--primary); }
+
+        /* Main */
+        .auth-main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            padding: 48px 40px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+            border: 1px solid var(--gray-200);
+        }
+
+        .auth-card h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .auth-card .subtitle {
+            font-size: 15px;
+            color: var(--gray-500);
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper .material-icons {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 20px;
+            color: var(--gray-400);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            background: var(--gray-50);
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: var(--accent);
+        }
+
+        .error-message {
+            font-size: 13px;
+            color: var(--accent);
+            margin-top: 4px;
+            display: none;
+        }
+
+        .error-message.visible { display: block; }
+
+        .password-strength {
+            margin-top: 8px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .strength-bar {
+            flex: 1;
+            height: 4px;
+            border-radius: 2px;
+            background: var(--gray-200);
+            transition: background 0.3s;
+        }
+
+        .strength-bar.active-weak { background: var(--accent); }
+        .strength-bar.active-medium { background: var(--warning, #f59e0b); }
+        .strength-bar.active-strong { background: var(--success); }
+
+        .strength-text {
+            font-size: 12px;
+            margin-top: 4px;
+            color: var(--gray-500);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-submit .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            display: none;
+        }
+
+        .btn-submit.loading .spinner { display: block; }
+        .btn-submit.loading .btn-text { display: none; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 28px 0;
+            color: var(--gray-400);
+            font-size: 13px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .divider::before { margin-right: 16px; }
+        .divider::after { margin-left: 16px; }
+
+        .auth-footer-text {
+            text-align: center;
+            font-size: 14px;
+            color: var(--gray-500);
+        }
+
+        .auth-footer-text a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer-text a:hover { text-decoration: underline; }
+
+        /* Alert */
+        .alert {
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert.visible { display: flex; }
+
+        .alert-error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .alert-success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        /* Terms */
+        .terms-text {
+            font-size: 12px;
+            color: var(--gray-500);
+            text-align: center;
+            margin-top: 16px;
+            line-height: 1.6;
+        }
+
+        .terms-text a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .terms-text a:hover { text-decoration: underline; }
+
+        /* Responsive */
+        @media (max-width: 540px) {
+            .auth-card {
+                padding: 32px 24px;
+                border-radius: 16px;
+            }
+            .auth-card h1 { font-size: 24px; }
+            .auth-header { padding: 16px 20px; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="auth-header">
+        <a href="{{ url_for('storefront.view_store', slug=store.slug) }}" class="auth-header-left">
+            <div class="logo-placeholder">{{ store.name[0] | upper }}</div>
+            <span class="store-name">{{ store.name }}</span>
+        </a>
+        <a href="{{ url_for('storefront.view_store', slug=store.slug) }}" class="back-link">
+            <span class="material-icons">arrow_back</span>
+            Voltar à loja
+        </a>
+    </header>
+
+    <!-- Main -->
+    <main class="auth-main">
+        <div class="auth-card">
+            <h1>Criar Conta</h1>
+            <p class="subtitle">Cadastre-se em {{ store.name }} e comece a comprar</p>
+
+            <div class="alert alert-error" id="alertError">
+                <span class="material-icons">error_outline</span>
+                <span id="alertErrorText"></span>
+            </div>
+
+            <div class="alert alert-success" id="alertSuccess">
+                <span class="material-icons">check_circle</span>
+                <span id="alertSuccessText"></span>
+            </div>
+
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label for="full_name">Nome completo</label>
+                    <div class="input-wrapper">
+                        <span class="material-icons">person</span>
+                        <input type="text" id="full_name" name="full_name" placeholder="Seu nome completo" required>
+                    </div>
+                    <p class="error-message" id="full_nameError"></p>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="email">E-mail</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons">email</span>
+                            <input type="email" id="email" name="email" placeholder="seu@email.com" required>
+                        </div>
+                        <p class="error-message" id="emailError"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Telefone <span style="color: var(--gray-400); font-weight: 400;">(opcional)</span></label>
+                        <div class="input-wrapper">
+                            <span class="material-icons">phone</span>
+                            <input type="tel" id="phone" name="phone" placeholder="(00) 00000-0000">
+                        </div>
+                        <p class="error-message" id="phoneError"></p>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Senha</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons">lock</span>
+                            <input type="password" id="password" name="password" placeholder="Mín. 6 caracteres" required oninput="checkPasswordStrength()">
+                        </div>
+                        <div class="password-strength">
+                            <div class="strength-bar" id="str1"></div>
+                            <div class="strength-bar" id="str2"></div>
+                            <div class="strength-bar" id="str3"></div>
+                            <div class="strength-bar" id="str4"></div>
+                        </div>
+                        <p class="strength-text" id="strengthText"></p>
+                        <p class="error-message" id="passwordError"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password">Confirmar senha</label>
+                        <div class="input-wrapper">
+                            <span class="material-icons">lock_outline</span>
+                            <input type="password" id="confirm_password" name="confirm_password" placeholder="Repita a senha" required>
+                        </div>
+                        <p class="error-message" id="confirm_passwordError"></p>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit" id="btnSubmit">
+                    <span class="btn-text">Criar conta</span>
+                    <span class="spinner"></span>
+                </button>
+            </form>
+
+            <p class="terms-text">
+                Ao criar sua conta, você concorda com os
+                <a href="#">Termos de Uso</a> e a
+                <a href="#">Política de Privacidade</a>.
+            </p>
+
+            <div class="divider">ou</div>
+
+            <p class="auth-footer-text">
+                Já tem uma conta? <a href="{{ url_for('storefront.customer_login_page', slug=store.slug) }}">Entrar</a>
+            </p>
+        </div>
+    </main>
+
+    <script>
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.classList.remove('visible');
+                el.textContent = '';
+            });
+            document.querySelectorAll('input').forEach(el => el.classList.remove('error'));
+            document.getElementById('alertError').classList.remove('visible');
+            document.getElementById('alertSuccess').classList.remove('visible');
+        }
+
+        function showFieldError(field, message) {
+            const errorEl = document.getElementById(field + 'Error');
+            const inputEl = document.getElementById(field);
+            if (errorEl) {
+                errorEl.textContent = message;
+                errorEl.classList.add('visible');
+            }
+            if (inputEl) inputEl.classList.add('error');
+        }
+
+        function showAlert(message, type) {
+            if (type === 'success') {
+                const alert = document.getElementById('alertSuccess');
+                document.getElementById('alertSuccessText').textContent = message;
+                alert.classList.add('visible');
+            } else {
+                const alert = document.getElementById('alertError');
+                document.getElementById('alertErrorText').textContent = message;
+                alert.classList.add('visible');
+            }
+        }
+
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const bars = [
+                document.getElementById('str1'),
+                document.getElementById('str2'),
+                document.getElementById('str3'),
+                document.getElementById('str4')
+            ];
+            const strengthText = document.getElementById('strengthText');
+
+            // Reset
+            bars.forEach(b => b.className = 'strength-bar');
+            strengthText.textContent = '';
+
+            if (!password) return;
+
+            let score = 0;
+            if (password.length >= 6) score++;
+            if (password.length >= 8) score++;
+            if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score++;
+            if (/[0-9]/.test(password)) score++;
+            if (/[^A-Za-z0-9]/.test(password)) score++;
+
+            let level = 0;
+            let label = '';
+            let cls = '';
+
+            if (score <= 1) { level = 1; label = 'Fraca'; cls = 'active-weak'; }
+            else if (score <= 2) { level = 2; label = 'Razoável'; cls = 'active-medium'; }
+            else if (score <= 3) { level = 3; label = 'Boa'; cls = 'active-medium'; }
+            else { level = 4; label = 'Forte'; cls = 'active-strong'; }
+
+            for (let i = 0; i < level; i++) {
+                bars[i].classList.add(cls);
+            }
+            strengthText.textContent = label;
+        }
+
+        // Máscara de telefone
+        document.getElementById('phone').addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '');
+            if (v.length > 11) v = v.slice(0, 11);
+            if (v.length > 7) {
+                v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+            } else if (v.length > 2) {
+                v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+            } else if (v.length > 0) {
+                v = `(${v}`;
+            }
+            e.target.value = v;
+        });
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const btn = document.getElementById('btnSubmit');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            const full_name = document.getElementById('full_name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const password = document.getElementById('password').value;
+            const confirm_password = document.getElementById('confirm_password').value;
+
+            // Validação client-side
+            let hasError = false;
+
+            if (full_name.length < 3) {
+                showFieldError('full_name', 'Nome deve ter pelo menos 3 caracteres');
+                hasError = true;
+            }
+
+            if (!email) {
+                showFieldError('email', 'E-mail é obrigatório');
+                hasError = true;
+            }
+
+            if (password.length < 6) {
+                showFieldError('password', 'Senha deve ter pelo menos 6 caracteres');
+                hasError = true;
+            }
+
+            if (password !== confirm_password) {
+                showFieldError('confirm_password', 'As senhas não coincidem');
+                hasError = true;
+            }
+
+            if (hasError) {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+                return;
+            }
+
+            try {
+                const response = await fetch('{{ url_for("storefront.customer_register", slug=store.slug) }}', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ full_name, email, phone, password, confirm_password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert(data.message, 'success');
+                    setTimeout(() => {
+                        window.location.href = data.data.redirect_url;
+                    }, 1000);
+                    return;
+                }
+
+                if (data.errors) {
+                    for (const [field, msg] of Object.entries(data.errors)) {
+                        showFieldError(field, msg);
+                    }
+                } else if (data.error) {
+                    showAlert(data.error, 'error');
+                }
+
+            } catch (err) {
+                showAlert('Erro de conexão. Verifique sua internet e tente novamente.', 'error');
+            } finally {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
