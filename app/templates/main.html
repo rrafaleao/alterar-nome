@@ -7,12 +7,17 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IM+Fell+Great+Primer+SC&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
@@ -26,6 +31,11 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
         }
 
         .logo-section {
@@ -52,7 +62,7 @@
             display: flex;
             align-items: center;
             gap: 0;
-            background: linear-gradient(135deg, #FFB88C 0%, #FF9A6C 100%);
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
             border-radius: 50px;
             padding: 4px;
         }
@@ -66,20 +76,27 @@
             border-radius: 50px;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: linear-gradient(135deg, #FFB88C 0%, #FF9A6C 100%);
-            color: #000;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            color: #fff;
+        }
+
+        .header-btn:hover {
+            transform: translateY(-2px);
         }
 
         .header-btn.active {
-            background: linear-gradient(135deg, #FFDCC8 0%, #FFC4A8 100%);
+            background: linear-gradient(135deg, #6BA3E8 0%, #4A90E2 100%);
         }
 
-        .main-content {
+        /* Hero Section */
+        .hero-section {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 80px 100px;
             gap: 60px;
+            min-height: 80vh;
+            background: linear-gradient(180deg, #ffffff 0%, #EEF5FC 100%);
         }
 
         .left-section {
@@ -88,10 +105,21 @@
         }
 
         .main-title {
-            font-size: 42px;
-            font-weight: 600;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            line-height: 1.2;
+            background: black;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 20px;
+            color: #666;
             margin-bottom: 40px;
-            line-height: 1.3;
+            line-height: 1.6;
         }
 
         .email-form {
@@ -102,23 +130,35 @@
 
         .email-input {
             flex: 1;
-            padding: 16px 24px;
+            padding: 18px 28px;
             font-size: 18px;
-            border: 1px solid #e0e0e0;
+            border: 2px solid #e0e0e0;
             border-radius: 50px;
-            background-color: #f5f5f5;
+            background-color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .email-input:focus {
+            outline: none;
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
         }
 
         .submit-btn {
-            padding: 16px 40px;
+            padding: 18px 44px;
             font-size: 18px;
-            font-weight: 500;
             color: #fff;
             background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
             border: none;
             border-radius: 50px;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+            box-shadow: 0 8px 24px rgba(74, 144, 226, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(74, 144, 226, 0.4);
         }
 
         .right-section {
@@ -127,22 +167,608 @@
             justify-content: center;
         }
 
-        .shopping-bags {
-            width: 400px;
-            height: 400px;
+        .hero-illustration {
+            position: relative;
+            width: 500px;
+            height: 450px;
         }
 
-        .shopping-bags img {
+        .mockup-container {
+            position: relative;
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.1));
         }
 
+        .mockup-browser {
+            width: 420px;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 30px 80px rgba(74, 144, 226, 0.25), 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .browser-header {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .browser-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .browser-dots span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .browser-dots span:nth-child(1) { background: #ff5f57; }
+        .browser-dots span:nth-child(2) { background: #febc2e; }
+        .browser-dots span:nth-child(3) { background: #28c840; }
+
+        .browser-url {
+            flex: 1;
+            background: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #666;
+            border: 1px solid #e0e0e0;
+        }
+
+        .browser-content {
+            padding: 20px;
+            background: #fafbfc;
+        }
+
+        .store-header-mock {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .store-logo-mock {
+            width: 80px;
+            height: 28px;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            border-radius: 6px;
+        }
+
+        .store-nav-mock {
+            display: flex;
+            gap: 16px;
+        }
+
+        .store-nav-mock span {
+            width: 50px;
+            height: 10px;
+            background: #ddd;
+            border-radius: 5px;
+        }
+
+        .store-products-mock {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .product-card-mock {
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        }
+
+        .product-img-mock {
+            height: 80px;
+            background: linear-gradient(135deg, #e8f4fd 0%, #d6e8f9 100%);
+        }
+
+        .product-card-mock:nth-child(2) .product-img-mock {
+            background: linear-gradient(135deg, #e3f2e8 0%, #d4eddb 100%);
+        }
+
+        .product-card-mock:nth-child(3) .product-img-mock {
+            background: linear-gradient(135deg, #fef3e8 0%, #fde8d4 100%);
+        }
+
+        .product-info-mock {
+            padding: 12px;
+        }
+
+        .product-title-mock {
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            width: 80%;
+        }
+
+        .product-price-mock {
+            height: 10px;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            border-radius: 5px;
+            width: 50%;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+
+        .floating-card {
+            position: absolute;
+            background: #fff;
+            padding: 12px 18px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            animation: floatCard 4s ease-in-out infinite;
+        }
+
+        .floating-card i {
+            font-size: 18px;
+        }
+
+        .card-1 {
+            top: 30px;
+            right: 0;
+            animation-delay: 0s;
+        }
+
+        .card-1 i {
+            color: #4A90E2;
+        }
+
+        .card-2 {
+            bottom: 100px;
+            left: -30px;
+            animation-delay: 1.5s;
+        }
+
+        .card-2 i {
+            color: #28c840;
+        }
+
+        .card-3 {
+            top: 150px;
+            right: -20px;
+            animation-delay: 0.8s;
+        }
+
+        .card-3 i {
+            color: #ff9500;
+        }
+
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Free Section */
+        .free-section {
+            padding: 100px 100px;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            text-align: center;
+        }
+
+        .free-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.25);
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 24px;
+        }
+
+        .free-title {
+            font-size: 52px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 24px;
+        }
+
+        .free-description {
+            font-size: 22px;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 700px;
+            margin: 0 auto 50px;
+            line-height: 1.6;
+        }
+
+        .free-features {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            flex-wrap: wrap;
+        }
+
+        .free-feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #fff;
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        .free-feature i {
+            font-size: 24px;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 120px 100px;
+            background: #FAFAFA;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #D6E8F9 0%, #B8D4F1 100%);
+            padding: 8px 24px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #357ABD;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 44px;
+            font-weight: 700;
+            color: #222;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            font-size: 20px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: #fff;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+            transition: all 0.4s ease;
+            border: 1px solid #f0f0f0;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 60px rgba(74, 144, 226, 0.12);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #D6E8F9 0%, #B8D4F1 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+        }
+
+        .feature-icon i {
+            font-size: 28px;
+            color: #357ABD;
+        }
+
+        .feature-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 12px;
+        }
+
+        .feature-description {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.7;
+        }
+
+        /* Testimonials Section */
+        .testimonials-section {
+            padding: 120px 100px;
+            background: #fff;
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .testimonial-card {
+            background: linear-gradient(180deg, #FAFAFA 0%, #fff 100%);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid #f0f0f0;
+            position: relative;
+        }
+
+        .testimonial-quote {
+            font-size: 48px;
+            color: #4A90E2;
+            position: absolute;
+            top: 20px;
+            left: 30px;
+            font-family: Georgia, serif;
+        }
+
+        .testimonial-text {
+            font-size: 17px;
+            color: #444;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            margin-top: 20px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .author-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 20px;
+        }
+
+        .author-info {
+            text-align: left;
+        }
+
+        .author-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #222;
+        }
+
+        .author-role {
+            font-size: 14px;
+            color: #888;
+        }
+
+        .testimonial-stars {
+            color: #FFC107;
+            margin-bottom: 16px;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px;
+            background: linear-gradient(135deg, #1a365d 0%, #2c5282 100%);
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 44px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        .cta-subtitle {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 20px 60px;
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a365d;
+            background: linear-gradient(135deg, #fff 0%, #E8F0FE 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Footer */
+        .footer {
+            background: #0f1f36;
+            padding: 80px 100px 40px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .footer-logo span {
+            font-family: 'IM Fell Great Primer SC', serif;
+            font-size: 32px;
+            color: #fff;
+        }
+
+        .footer-description {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.7;
+            margin-bottom: 24px;
+        }
+
+        .footer-social {
+            display: flex;
+            gap: 16px;
+        }
+
+        .social-link {
+            width: 44px;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            transform: translateY(-3px);
+        }
+
+        .footer-column h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 14px;
+        }
+
+        .footer-links a {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #6BA3E8;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-copyright {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-legal a {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-legal a:hover {
+            color: #6BA3E8;
+        }
+
+        /* Responsive */
         @media (max-width: 1024px) {
-            .main-content {
+            .hero-section {
                 flex-direction: column;
                 padding: 60px 40px;
+            }
+
+            .features-grid,
+            .testimonials-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .email-form {
@@ -152,12 +778,17 @@
             .submit-btn {
                 width: 100%;
             }
+
+            .free-features {
+                gap: 30px;
+            }
         }
 
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
                 gap: 20px;
+                padding: 20px;
             }
 
             .brand-name {
@@ -172,6 +803,68 @@
             .main-title {
                 font-size: 32px;
             }
+
+            .hero-section,
+            .free-section,
+            .features-section,
+            .testimonials-section,
+            .cta-section {
+                padding: 60px 24px;
+            }
+
+            .features-grid,
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .footer {
+                padding: 60px 24px 30px;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .section-title,
+            .free-title,
+            .cta-title {
+                font-size: 32px;
+            }
+
+            .free-features {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .hero-illustration {
+                width: 100%;
+                height: 350px;
+            }
+
+            .mockup-browser {
+                width: 100%;
+                max-width: 320px;
+                margin: 0 auto;
+            }
+
+            .floating-card {
+                display: none;
+            }
+
+            .store-products-mock {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .product-card-mock:nth-child(3) {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -185,17 +878,20 @@
     </div>
 
     <div class="header-buttons">
-        <button class="header-btn" onclick="goToLogin()">login</button>
-        <button class="header-btn active" onclick="goToCreateStore()">criar loja</button>
+        <button class="header-btn" onclick="goToLogin()">Login</button>
+        <button class="header-btn active" onclick="goToCreateStore()">Criar loja</button>
     </div>
 </header>
 
-<main class="main-content">
-
+<!-- Hero Section -->
+<section class="hero-section">
     <div class="left-section">
         <h1 class="main-title">
-            Crie sua loja agora e comece a vender de forma gratis
+            Crie sua loja online em minutos e comece a vender hoje
         </h1>
+        <p class="subtitle">
+            A plataforma mais fácil e completa para você criar sua loja virtual sem precisar de conhecimento técnico.
+        </p>
 
         <form class="email-form" onsubmit="handleSubmit(event)">
             <input 
@@ -204,20 +900,313 @@
                 placeholder="nome@exemplo.com"
                 required
             >
-
             <button type="submit" class="submit-btn">
-                criar loja
+                Criar loja grátis
             </button>
         </form>
     </div>
 
     <div class="right-section">
-        <div class="shopping-bags">
-            <img src="https://cdn-icons-png.flaticon.com/512/5654/5654409.png">
+        <div class="hero-illustration">
+            <div class="mockup-container">
+                <div class="mockup-browser">
+                    <div class="browser-header">
+                        <div class="browser-dots">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                        <div class="browser-url">sualojaonline.zapp.com</div>
+                    </div>
+                    <div class="browser-content">
+                        <div class="store-header-mock">
+                            <div class="store-logo-mock"></div>
+                            <div class="store-nav-mock">
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </div>
+                        </div>
+                        <div class="store-products-mock">
+                            <div class="product-card-mock">
+                                <div class="product-img-mock"></div>
+                                <div class="product-info-mock">
+                                    <div class="product-title-mock"></div>
+                                    <div class="product-price-mock"></div>
+                                </div>
+                            </div>
+                            <div class="product-card-mock">
+                                <div class="product-img-mock"></div>
+                                <div class="product-info-mock">
+                                    <div class="product-title-mock"></div>
+                                    <div class="product-price-mock"></div>
+                                </div>
+                            </div>
+                            <div class="product-card-mock">
+                                <div class="product-img-mock"></div>
+                                <div class="product-info-mock">
+                                    <div class="product-title-mock"></div>
+                                    <div class="product-price-mock"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="floating-elements">
+                    <div class="floating-card card-1">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span>+1 item</span>
+                    </div>
+                    <div class="floating-card card-2">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Venda confirmada!</span>
+                    </div>
+                    <div class="floating-card card-3">
+                        <i class="fas fa-chart-line"></i>
+                        <span>+127% vendas</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Free Section -->
+<section class="free-section">
+    <span class="free-badge">100% Gratuito</span>
+    <h2 class="free-title">Tudo de graça. Para sempre.</h2>
+    <p class="free-description">
+        Sem taxas escondidas, sem surpresas. Crie sua loja, adicione produtos e comece a vender sem pagar nada. Simples assim.
+    </p>
+    <div class="free-features">
+        <div class="free-feature">
+            <i class="fas fa-check-circle"></i>
+            <span>Sem mensalidade</span>
+        </div>
+        <div class="free-feature">
+            <i class="fas fa-check-circle"></i>
+            <span>Sem taxa por venda</span>
+        </div>
+        <div class="free-feature">
+            <i class="fas fa-check-circle"></i>
+            <span>Produtos ilimitados</span>
+        </div>
+        <div class="free-feature">
+            <i class="fas fa-check-circle"></i>
+            <span>Suporte gratuito</span>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="section-header">
+        <span class="section-badge">Recursos</span>
+        <h2 class="section-title">Tudo que você precisa para vender online</h2>
+        <p class="section-subtitle">
+            Ferramentas poderosas para gerenciar sua loja e aumentar suas vendas
+        </p>
+    </div>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-paint-brush"></i>
+            </div>
+            <h3 class="feature-title">Temas Personalizáveis</h3>
+            <p class="feature-description">
+                Escolha entre dezenas de temas profissionais e personalize cores, fontes e layout da sua loja.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-mobile-alt"></i>
+            </div>
+            <h3 class="feature-title">100% Responsivo</h3>
+            <p class="feature-description">
+                Sua loja funciona perfeitamente em qualquer dispositivo: celular, tablet ou computador.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-credit-card"></i>
+            </div>
+            <h3 class="feature-title">Pagamentos Integrados</h3>
+            <p class="feature-description">
+                Aceite Pix, cartão de crédito, boleto e mais. Integração fácil com as principais plataformas.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-truck"></i>
+            </div>
+            <h3 class="feature-title">Cálculo de Frete</h3>
+            <p class="feature-description">
+                Integração automática com Correios e transportadoras. Frete calculado em tempo real.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h3 class="feature-title">Relatórios Completos</h3>
+            <p class="feature-description">
+                Acompanhe vendas, visitantes e métricas importantes para tomar decisões inteligentes.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3 class="feature-title">Segurança Total</h3>
+            <p class="feature-description">
+                SSL gratuito, proteção contra fraudes e backups automáticos para sua tranquilidade.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+    <div class="section-header">
+        <span class="section-badge">Depoimentos</span>
+        <h2 class="section-title">O que nossos clientes dizem</h2>
+        <p class="section-subtitle">
+            Milhares de empreendedores já confiam na Zapp para suas vendas online
+        </p>
+    </div>
+
+    <div class="testimonials-grid">
+        <div class="testimonial-card">
+            <span class="testimonial-quote">"</span>
+            <div class="testimonial-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+            </div>
+            <p class="testimonial-text">
+                Consegui criar minha loja em menos de 10 minutos! A plataforma é muito intuitiva e o suporte é excelente. Recomendo demais!
+            </p>
+            <div class="testimonial-author">
+                <div class="author-avatar">MC</div>
+                <div class="author-info">
+                    <div class="author-name">Maria Costa</div>
+                    <div class="author-role">Dona da Boutique Elegance</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="testimonial-card">
+            <span class="testimonial-quote">"</span>
+            <div class="testimonial-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+            </div>
+            <p class="testimonial-text">
+                Migrei de outra plataforma e a diferença foi absurda. Minhas vendas aumentaram 40% no primeiro mês com a Zapp.
+            </p>
+            <div class="testimonial-author">
+                <div class="author-avatar">RS</div>
+                <div class="author-info">
+                    <div class="author-name">Rafael Santos</div>
+                    <div class="author-role">Fundador da Tech Store</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="testimonial-card">
+            <span class="testimonial-quote">"</span>
+            <div class="testimonial-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+            </div>
+            <p class="testimonial-text">
+                O fato de ser gratuito me fez desconfiar no início, mas a qualidade é impressionante. Melhor decisão que tomei!
+            </p>
+            <div class="testimonial-author">
+                <div class="author-avatar">AL</div>
+                <div class="author-info">
+                    <div class="author-name">Ana Lima</div>
+                    <div class="author-role">CEO da Doces da Ana</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <h2 class="cta-title">Pronto para começar?</h2>
+    <p class="cta-subtitle">Crie sua loja gratuita agora e comece a vender em minutos</p>
+    <a href="/registration" class="cta-btn">Criar minha loja grátis</a>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-brand">
+            <div class="footer-logo">
+                <img src="https://dl.airtable.com/.blockIconImages/a30bee50aeefaf4ffd8c4dc699b642c6/d3accafa" alt="Zapp">
+                <span>Zapp</span>
+            </div>
+            <p class="footer-description">
+                A plataforma mais fácil para criar sua loja online. Comece a vender sem complicação, 100% gratuito.
+            </p>
+        </div>
+
+        <div class="footer-column">
+            <h4>Produto</h4>
+            <ul class="footer-links">
+                <li><a href="#">Recursos</a></li>
+                <li><a href="#">Preços</a></li>
+                <li><a href="#">Integrações</a></li>
+                <li><a href="#">Temas</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>Empresa</h4>
+            <ul class="footer-links">
+                <li><a href="#">Sobre nós</a></li>
+                <li><a href="#">Blog</a></li>
+                <li><a href="#">Carreiras</a></li>
+                <li><a href="#">Contato</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>Suporte</h4>
+            <ul class="footer-links">
+                <li><a href="#">Central de Ajuda</a></li>
+                <li><a href="#">Tutoriais</a></li>
+                <li><a href="#">API</a></li>
+                <li><a href="#">Status</a></li>
+            </ul>
         </div>
     </div>
 
-</main>
+    <div class="footer-bottom">
+        <p class="footer-copyright">&copy; 2026 Zapp. Todos os direitos reservados.</p>
+        <div class="footer-legal">
+            <a href="#">Termos de Uso</a>
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Cookies</a>
+        </div>
+    </div>
+</footer>
 
 <script>
 
@@ -231,13 +1220,9 @@ function goToCreateStore() {
 
 function handleSubmit(event) {
     event.preventDefault();
-
     const email = document.querySelector(".email-input").value;
-
     console.log("Email:", email);
-
-    // redireciona ao clicar
-    window.location.href = "criar-loja.html";
+    window.location.href = "/registration?email=" + encodeURIComponent(email);
 }
 
 </script>

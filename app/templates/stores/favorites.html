@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ store.name }} - Loja Online</title>
+    <title>Meus Favoritos - {{ store.name }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -34,11 +34,22 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--gray-50);
             color: var(--gray-800);
             line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-wrapper {
+            flex: 1;
         }
 
         .container {
@@ -100,6 +111,11 @@
             font-weight: 700;
             color: var(--gray-900);
             letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .store-name:hover {
+            color: var(--primary);
         }
 
         /* Search Bar */
@@ -152,7 +168,6 @@
             font-size: 20px;
         }
 
-        /* Header Actions */
         .header-actions {
             display: flex;
             align-items: center;
@@ -171,6 +186,7 @@
             justify-content: center;
             transition: all 0.2s;
             position: relative;
+            text-decoration: none;
         }
 
         .icon-btn:hover {
@@ -186,6 +202,14 @@
             font-size: 22px;
             color: var(--gray-600);
             transition: color 0.2s;
+        }
+
+        .icon-btn.active {
+            background: var(--accent);
+        }
+
+        .icon-btn.active .material-icons {
+            color: white;
         }
 
         .cart-badge {
@@ -215,6 +239,7 @@
             font-weight: 600;
             transition: all 0.3s;
             box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+            text-decoration: none;
         }
 
         .btn-login:hover {
@@ -260,193 +285,52 @@
             font-size: 18px;
         }
 
-        /* ===== HERO SECTION ===== */
-        .hero-section {
-            padding: 32px 0;
-        }
-
-        .hero-banner {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 24px;
-            padding: 60px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-banner::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .hero-banner::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -5%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            color: white;
-        }
-
-        .hero-content h1 {
-            font-size: 48px;
-            font-weight: 800;
-            margin-bottom: 16px;
-            letter-spacing: -1px;
-        }
-
-        .hero-content p {
-            font-size: 18px;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto 32px;
-        }
-
-        .hero-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 16px 32px;
-            background: white;
-            color: var(--primary);
-            border-radius: 50px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-        }
-
-        .hero-cta:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        }
-
-        /* ===== CATEGORIES SECTION ===== */
-        .categories-section {
+        /* ===== PAGE CONTENT ===== */
+        .page-content {
             padding: 48px 0;
         }
 
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
+        .page-header {
+            margin-bottom: 40px;
         }
 
-        .section-title {
-            font-size: 28px;
+        .page-title {
+            font-size: 32px;
             font-weight: 700;
             color: var(--gray-900);
-        }
-
-        .section-title span {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .view-all {
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
-            gap: 4px;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: gap 0.2s;
+            gap: 12px;
         }
 
-        .view-all:hover {
-            gap: 8px;
+        .page-title .material-icons {
+            font-size: 36px;
+            color: var(--accent);
         }
 
-        .categories-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 20px;
-        }
-
-        .category-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .category-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--card-shadow-hover);
-            border-color: var(--primary);
-        }
-
-        .category-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 16px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .category-icon .material-icons {
-            font-size: 28px;
-            color: var(--primary);
-        }
-
-        .category-card h3 {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--gray-800);
-            margin-bottom: 4px;
-        }
-
-        .category-card span {
-            font-size: 13px;
+        .page-subtitle {
+            font-size: 16px;
             color: var(--gray-500);
         }
 
-        /* ===== PRODUCTS SECTION ===== */
-        .products-section {
-            padding: 48px 0;
-        }
-
+        /* ===== PRODUCTS GRID ===== */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 24px;
         }
 
         .product-card {
             background: white;
-            border-radius: 20px;
+            border-radius: 16px;
             overflow: hidden;
             transition: all 0.3s;
             border: 1px solid var(--gray-200);
         }
 
         .product-card:hover {
-            transform: translateY(-6px);
+            transform: translateY(-4px);
             box-shadow: var(--card-shadow-hover);
         }
 
@@ -483,18 +367,6 @@
             margin-bottom: 8px;
         }
 
-        .product-badge {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            background: var(--accent);
-            color: white;
-            padding: 6px 12px;
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
         .product-actions {
             position: absolute;
             top: 12px;
@@ -502,14 +374,6 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-            opacity: 0;
-            transform: translateX(10px);
-            transition: all 0.3s;
-        }
-
-        .product-card:hover .product-actions {
-            opacity: 1;
-            transform: translateX(0);
         }
 
         .product-action-btn {
@@ -589,16 +453,6 @@
             color: var(--gray-900);
         }
 
-        .price-current.price-promo {
-            color: #10b981;
-        }
-
-        .price-original {
-            font-size: 14px;
-            color: var(--gray-400);
-            text-decoration: line-through;
-        }
-
         .btn-add-cart {
             width: 44px;
             height: 44px;
@@ -631,66 +485,41 @@
         }
 
         .empty-state .material-icons {
-            font-size: 64px;
+            font-size: 80px;
             color: var(--gray-300);
             margin-bottom: 16px;
         }
 
         .empty-state h3 {
-            font-size: 20px;
+            font-size: 24px;
             color: var(--gray-700);
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .empty-state p {
             color: var(--gray-500);
+            margin-bottom: 24px;
         }
 
-        /* ===== FEATURES SECTION ===== */
-        .features-section {
-            padding: 48px 0;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 24px;
-        }
-
-        .feature-card {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            text-align: center;
-            border: 1px solid var(--gray-200);
-        }
-
-        .feature-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-radius: 50%;
-            display: flex;
+        .btn-explore {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-        }
-
-        .feature-icon .material-icons {
-            font-size: 28px;
-            color: var(--primary);
-        }
-
-        .feature-card h3 {
+            gap: 8px;
+            padding: 14px 32px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
             font-size: 16px;
             font-weight: 600;
-            color: var(--gray-900);
-            margin-bottom: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
         }
 
-        .feature-card p {
-            font-size: 14px;
-            color: var(--gray-500);
+        .btn-explore:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
         }
 
         /* ===== FOOTER ===== */
@@ -698,7 +527,6 @@
             background: var(--gray-900);
             color: white;
             padding: 64px 0 32px;
-            margin-top: 64px;
         }
 
         .footer-content {
@@ -884,12 +712,13 @@
                 margin-top: 16px;
             }
 
-            .hero-banner {
-                padding: 40px 24px;
+            .page-title {
+                font-size: 24px;
             }
 
-            .hero-content h1 {
-                font-size: 32px;
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
             }
 
             .footer-content {
@@ -912,19 +741,6 @@
                 font-size: 18px;
             }
 
-            .hero-content h1 {
-                font-size: 24px;
-            }
-
-            .section-title {
-                font-size: 22px;
-            }
-
-            .products-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
-            }
-
             .product-info {
                 padding: 12px;
             }
@@ -936,6 +752,7 @@
     </style>
 </head>
 <body>
+    <div class="main-wrapper">
     <!-- Header -->
     <header class="header">
         <div class="header-top">
@@ -947,7 +764,7 @@
                         {% else %}
                             <div class="logo-placeholder">{{ store.name[0] | upper }}</div>
                         {% endif %}
-                        <h1 class="store-name">{{ store.name }}</h1>
+                        <a href="{{ url_for('storefront.view_store', slug=store.slug) }}" class="store-name">{{ store.name }}</a>
                     </div>
 
                     <div class="search-bar">
@@ -958,8 +775,8 @@
                     </div>
 
                     <div class="header-actions">
-                        <a href="{{ url_for('storefront.favorites_page', slug=store.slug) }}" class="icon-btn" title="Favoritos">
-                            <span class="material-icons">favorite_border</span>
+                        <a href="{{ url_for('storefront.favorites_page', slug=store.slug) }}" class="icon-btn active" title="Favoritos">
+                            <span class="material-icons">favorite</span>
                         </a>
                         <button class="icon-btn" onclick="openCart()" title="Carrinho">
                             <span class="material-icons">shopping_bag</span>
@@ -983,7 +800,7 @@
                             </div>
                         </div>
                         {% else %}
-                        <a href="{{ url_for('storefront.customer_login_page', slug=store.slug) }}" class="btn-login" style="text-decoration: none;">Entrar</a>
+                        <a href="{{ url_for('storefront.customer_login_page', slug=store.slug) }}" class="btn-login">Entrar</a>
                         {% endif %}
                     </div>
                 </div>
@@ -995,14 +812,14 @@
             <div class="container">
                 <ul class="nav-menu">
                     <li>
-                        <a href="#" class="nav-link active">
+                        <a href="{{ url_for('storefront.view_store', slug=store.slug) }}" class="nav-link">
                             <span class="material-icons">home</span>
                             Início
                         </a>
                     </li>
                     {% for category in categories %}
                     <li>
-                        <a href="#category-{{ category.id }}" class="nav-link">
+                        <a href="{{ url_for('storefront.view_store', slug=store.slug) }}#category-{{ category.id }}" class="nav-link">
                             <span class="material-icons">category</span>
                             {{ category.name }}
                         </a>
@@ -1019,120 +836,24 @@
         </nav>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero-section">
+    <!-- Page Content -->
+    <main class="page-content">
         <div class="container">
-            <div class="hero-banner">
-                <div class="hero-content">
-                    <h1>Bem-vindo à {{ store.name }}</h1>
-                    <p>{{ store.description or 'Encontre os melhores produtos com os melhores preços. Qualidade e confiança em cada compra.' }}</p>
-                    <a href="#products" class="hero-cta">
-                        <span class="material-icons">shopping_bag</span>
-                        Ver Produtos
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Categories Section -->
-    {% if categories %}
-    <section class="categories-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Navegue por <span>Categorias</span></h2>
-                <a href="#" class="view-all">
-                    Ver todas
-                    <span class="material-icons">arrow_forward</span>
-                </a>
+            <div class="page-header">
+                <h1 class="page-title">
+                    <span class="material-icons">favorite</span>
+                    Meus Favoritos
+                </h1>
+                <p class="page-subtitle">
+                    {% if products %}
+                        {{ products | length }} produto(s) salvo(s)
+                    {% else %}
+                        Você ainda não tem produtos favoritos
+                    {% endif %}
+                </p>
             </div>
 
-            <div class="categories-grid">
-                {% for category in categories %}
-                <a href="#category-{{ category.id }}" class="category-card">
-                    <div class="category-icon">
-                        <span class="material-icons">folder</span>
-                    </div>
-                    <h3>{{ category.name }}</h3>
-                    <span>{{ category.products | length }} produtos</span>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    {% endif %}
-
-    <!-- Products Section -->
-    <section class="products-section" id="products">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Nossos <span>Produtos</span></h2>
-                <a href="#" class="view-all">
-                    Ver todos
-                    <span class="material-icons">arrow_forward</span>
-                </a>
-            </div>
-
-            {% if products_with_promo %}
-            <div class="products-grid">
-                {% for item in products_with_promo %}
-                {% set product = item.product %}
-                {% set promo = item.promo %}
-                <div class="product-card" data-product-id="{{ product.id }}">
-                    <div class="product-image">
-                        {% if product.images and product.images | length > 0 %}
-                            <img src="{{ product.images[0].url }}" alt="{{ product.title }}">
-                        {% else %}
-                            <div class="product-placeholder">
-                                <span class="material-icons">image</span>
-                                <span>Sem imagem</span>
-                            </div>
-                        {% endif %}
-                        
-                        {% if promo.has_promotion %}
-                        <div class="product-badge">-{{ promo.discount_percent }}%</div>
-                        {% endif %}
-                        
-                        <div class="product-actions">
-                            <button class="product-action-btn favorite-btn" data-product-id="{{ product.id }}" onclick="toggleFavorite('{{ product.id }}')" title="Adicionar aos favoritos">
-                                <span class="material-icons">favorite_border</span>
-                            </button>
-                            <button class="product-action-btn" title="Visualização rápida">
-                                <span class="material-icons">visibility</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="product-info">
-                        {% if product.category %}
-                        <p class="product-category">{{ product.category.name }}</p>
-                        {% endif %}
-                        <h3 class="product-title">{{ product.title }}</h3>
-                        
-                        <div class="product-price-row">
-                            <div class="product-price">
-                                {% if promo.has_promotion %}
-                                <span class="price-original">R$ {{ "%.2f" | format(promo.original_price) | replace('.', ',') }}</span>
-                                <span class="price-current price-promo">R$ {{ "%.2f" | format(promo.promo_price) | replace('.', ',') }}</span>
-                                {% else %}
-                                <span class="price-current">R$ {{ "%.2f" | format(product.price) | replace('.', ',') }}</span>
-                                {% endif %}
-                            </div>
-                            {% if promo.has_promotion %}
-                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ promo.promo_price }})" title="Adicionar ao carrinho">
-                                <span class="material-icons">add_shopping_cart</span>
-                            </button>
-                            {% else %}
-                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }})" title="Adicionar ao carrinho">
-                                <span class="material-icons">add_shopping_cart</span>
-                            </button>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% elif products %}
+            {% if products %}
             <div class="products-grid">
                 {% for product in products %}
                 <div class="product-card" data-product-id="{{ product.id }}">
@@ -1147,11 +868,8 @@
                         {% endif %}
                         
                         <div class="product-actions">
-                            <button class="product-action-btn favorite-btn" data-product-id="{{ product.id }}" onclick="toggleFavorite('{{ product.id }}')" title="Adicionar aos favoritos">
-                                <span class="material-icons">favorite_border</span>
-                            </button>
-                            <button class="product-action-btn" title="Visualização rápida">
-                                <span class="material-icons">visibility</span>
+                            <button class="product-action-btn favorite-btn favorited" data-product-id="{{ product.id }}" onclick="toggleFavorite('{{ product.id }}')" title="Remover dos favoritos">
+                                <span class="material-icons">favorite</span>
                             </button>
                         </div>
                     </div>
@@ -1176,49 +894,18 @@
             </div>
             {% else %}
             <div class="empty-state">
-                <span class="material-icons">inventory_2</span>
-                <h3>Nenhum produto disponível</h3>
-                <p>Em breve teremos novidades para você!</p>
+                <span class="material-icons">favorite_border</span>
+                <h3>Nenhum favorito ainda</h3>
+                <p>Explore a loja e salve os produtos que você mais gosta clicando no coração!</p>
+                <a href="{{ url_for('storefront.view_store', slug=store.slug) }}" class="btn-explore">
+                    <span class="material-icons">storefront</span>
+                    Explorar produtos
+                </a>
             </div>
             {% endif %}
         </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features-section">
-        <div class="container">
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <span class="material-icons">local_shipping</span>
-                    </div>
-                    <h3>Entrega Rápida</h3>
-                    <p>Receba seus produtos no conforto da sua casa</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <span class="material-icons">security</span>
-                    </div>
-                    <h3>Pagamento Seguro</h3>
-                    <p>Suas informações sempre protegidas</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <span class="material-icons">support_agent</span>
-                    </div>
-                    <h3>Suporte 24/7</h3>
-                    <p>Estamos sempre prontos para ajudar</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <span class="material-icons">replay</span>
-                    </div>
-                    <h3>Troca Fácil</h3>
-                    <p>Política de devolução sem complicações</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    </main>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -1287,6 +974,8 @@
     </aside>
 
     <script>
+        const storeSlug = '{{ store.slug }}';
+        
         // User menu toggle
         function toggleUserMenu() {
             const dropdown = document.getElementById('userDropdown');
@@ -1391,46 +1080,8 @@
                 searchProducts();
             }
         });
-
-        // ========================================
-        // FAVORITES FUNCTIONALITY
-        // ========================================
         
-        const storeSlug = '{{ store.slug }}';
-        
-        // Carrega os favoritos ao carregar a página
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFavorites();
-        });
-        
-        function loadFavorites() {
-            const productCards = document.querySelectorAll('.product-card');
-            const productIds = Array.from(productCards).map(card => card.dataset.productId);
-            
-            if (productIds.length === 0) return;
-            
-            fetch(`/${storeSlug}/favorites/check`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ product_ids: productIds })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.favorites) {
-                    data.favorites.forEach(productId => {
-                        const btn = document.querySelector(`.favorite-btn[data-product-id="${productId}"]`);
-                        if (btn) {
-                            btn.classList.add('favorited');
-                            btn.querySelector('.material-icons').textContent = 'favorite';
-                        }
-                    });
-                }
-            })
-            .catch(error => console.error('Erro ao carregar favoritos:', error));
-        }
-        
+        // Favorites functionality
         function toggleFavorite(productId) {
             fetch(`/${storeSlug}/favorites/toggle`, {
                 method: 'POST',
@@ -1442,27 +1093,44 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    const btn = document.querySelector(`.favorite-btn[data-product-id="${productId}"]`);
-                    if (btn) {
-                        if (data.action === 'added') {
-                            btn.classList.add('favorited');
-                            btn.querySelector('.material-icons').textContent = 'favorite';
-                        } else {
-                            btn.classList.remove('favorited');
-                            btn.querySelector('.material-icons').textContent = 'favorite_border';
+                    if (data.action === 'removed') {
+                        // Remove o card da página
+                        const card = document.querySelector(`.product-card[data-product-id="${productId}"]`);
+                        if (card) {
+                            card.style.opacity = '0';
+                            card.style.transform = 'scale(0.8)';
+                            card.style.transition = 'all 0.3s ease';
+                            setTimeout(() => {
+                                card.remove();
+                                updateEmptyState();
+                            }, 300);
                         }
                     }
                 } else if (data.redirect) {
-                    // Usuário não logado - redireciona para login
                     window.location.href = data.redirect;
                 } else {
-                    alert(data.error || 'Erro ao favoritar produto');
+                    alert(data.error || 'Erro ao remover favorito');
                 }
             })
             .catch(error => {
                 console.error('Erro ao favoritar:', error);
                 alert('Erro ao processar favorito');
             });
+        }
+        
+        function updateEmptyState() {
+            const productsGrid = document.querySelector('.products-grid');
+            const remainingCards = productsGrid ? productsGrid.querySelectorAll('.product-card').length : 0;
+            
+            if (remainingCards === 0) {
+                location.reload();
+            } else {
+                // Atualiza contador
+                const subtitle = document.querySelector('.page-subtitle');
+                if (subtitle) {
+                    subtitle.textContent = `${remainingCards} produto(s) salvo(s)`;
+                }
+            }
         }
     </script>
 </body>

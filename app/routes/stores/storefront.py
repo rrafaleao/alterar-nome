@@ -1,9 +1,56 @@
-from flask import render_template, abort, request, jsonify
+from flask import render_template, abort, request, jsonify, session
+from datetime import datetime
 from config.database import db
 from app.models.store import Store, StoreCustomization
 from app.models.product import Product
 from app.models.category import Category
+from app.models.customer_favorite import CustomerFavorite
+from app.models.promotion import Promotion, PromotionProduct, PromotionCategory
 from . import storefront
+
+
+def get_active_promotions(store_id):
+    """Busca promoções ativas da loja"""
+    now = datetime.utcnow()
+    return Promotion.query.filter(
+        Promotion.store_id == store_id,
+        Promotion.is_active == True,
+        Promotion.start_date <= now,
+        Promotion.end_date >= now
+    ).all()
+
+
+def calculate_product_promotion(product, active_promotions):
+    """Calcula se um produto tem promoção e retorna os dados"""
+    for promo in active_promotions:
+        applies = False
+        
+        if promo.applies_to == 'all':
+            applies = True
+        elif promo.applies_to == 'products':
+            product_ids = [pp.product_id for pp in promo.products]
+            if product.id in product_ids:
+                applies = True
+        elif promo.applies_to == 'categories':
+            category_ids = [pc.category_id for pc in promo.categories]
+            if product.category_id and product.category_id in category_ids:
+                applies = True
+        
+        if applies:
+            original_price = float(product.price)
+            promo_price = promo.calculate_discount(original_price)
+            discount_percent = ((original_price - promo_price) / original_price) * 100
+            return {
+                'has_promotion': True,
+                'promotion_name': promo.name,
+                'original_price': original_price,
+                'promo_price': promo_price,
+                'discount_percent': round(discount_percent),
+                'discount_type': promo.discount_type,
+                'discount_value': float(promo.discount_value)
+            }
+    
+    return {'has_promotion': False}
 
 
 @storefront.route('/<slug>')
@@ -24,6 +71,18 @@ def view_store(slug):
         categories = Category.query.filter_by(
             store_id=store.id
         ).order_by(Category.name).all()
+        
+        # Buscar promoções ativas
+        active_promotions = get_active_promotions(store.id)
+        
+        # Calcular promoções para cada produto
+        products_with_promo = []
+        for product in products:
+            promo_info = calculate_product_promotion(product, active_promotions)
+            products_with_promo.append({
+                'product': product,
+                'promo': promo_info
+            })
         
         # Preparar dados de customização
         customization = {
@@ -52,6 +111,7 @@ def view_store(slug):
             f'layouts/{template_name}', 
             store=store,
             products=products,
+            products_with_promo=products_with_promo,
             categories=categories,
             customization=customization
         )
@@ -256,4 +316,218 @@ def list_all_stores():
         return jsonify({
             'success': False,
             'error': 'Erro ao buscar lojas'
+        }), 500
+
+
+# ========================================
+# FAVORITES
+# ========================================
+
+@storefront.route('/<slug>/favorites')
+def favorites_page(slug):
+    """Página de favoritos do cliente"""
+    store = Store.query.filter_by(slug=slug, onboarding_completed=True).first()
+    
+    if not store:
+        abort(404)
+    
+    # Se não estiver logado, redireciona para login
+    if not session.get('customer_id') or session.get('customer_store_id') != store.id:
+        from flask import redirect, url_for
+        return redirect(url_for('storefront.customer_login_page', slug=slug))
+    
+    # Buscar favoritos do cliente
+    favorites = CustomerFavorite.query.filter_by(
+        customer_id=session.get('customer_id')
+    ).order_by(CustomerFavorite.created_at.desc()).all()
+    
+    # Filtrar produtos ativos da loja
+    favorite_products = [
+        fav.product for fav in favorites 
+        if fav.product and fav.product.active and fav.product.store_id == store.id
+    ]
+    
+    # Buscar categorias da loja
+    categories = Category.query.filter_by(store_id=store.id).order_by(Category.name).all()
+    
+    # Preparar dados de customização
+    customization = {
+        'primary_color': '#667eea',
+        'secondary_color': '#764ba2'
+    }
+    
+    if store.customization:
+        customization['primary_color'] = store.customization.primary_color or '#667eea'
+        customization['secondary_color'] = store.customization.secondary_color or '#764ba2'
+    
+    return render_template(
+        'stores/favorites.html',
+        store=store,
+        products=favorite_products,
+        categories=categories,
+        customization=customization
+    )
+
+
+@storefront.route('/<slug>/favorites/toggle', methods=['POST'])
+def toggle_favorite(slug):
+    """Adiciona ou remove um produto dos favoritos"""
+    try:
+        store = Store.query.filter_by(slug=slug, onboarding_completed=True).first()
+        
+        if not store:
+            return jsonify({'success': False, 'error': 'Loja não encontrada'}), 404
+        
+        # Verifica se está logado
+        customer_id = session.get('customer_id')
+        customer_store_id = session.get('customer_store_id')
+        
+        if not customer_id or customer_store_id != store.id:
+            return jsonify({
+                'success': False, 
+                'error': 'Você precisa estar logado para favoritar produtos',
+                'redirect': f'/{slug}/auth/login'
+            }), 401
+        
+        data = request.get_json()
+        product_id = data.get('product_id')
+        
+        if not product_id:
+            return jsonify({'success': False, 'error': 'ID do produto é obrigatório'}), 400
+        
+        # Verifica se o produto existe e pertence à loja
+        product = Product.query.filter_by(id=product_id, store_id=store.id, active=True).first()
+        
+        if not product:
+            return jsonify({'success': False, 'error': 'Produto não encontrado'}), 404
+        
+        # Verifica se já é favorito
+        existing_favorite = CustomerFavorite.query.filter_by(
+            customer_id=customer_id,
+            product_id=product_id
+        ).first()
+        
+        if existing_favorite:
+            # Remove dos favoritos
+            db.session.delete(existing_favorite)
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'action': 'removed',
+                'message': 'Produto removido dos favoritos'
+            }), 200
+        else:
+            # Adiciona aos favoritos
+            new_favorite = CustomerFavorite(
+                customer_id=customer_id,
+                product_id=product_id
+            )
+            db.session.add(new_favorite)
+            db.session.commit()
+            return jsonify({
+                'success': True,
+                'action': 'added',
+                'message': 'Produto adicionado aos favoritos'
+            }), 200
+            
+    except Exception as e:
+        print(f"Erro ao favoritar produto: {e}")
+        db.session.rollback()
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao processar favorito'
+        }), 500
+
+
+@storefront.route('/<slug>/favorites/check', methods=['POST'])
+def check_favorites(slug):
+    """Verifica quais produtos são favoritos"""
+    try:
+        store = Store.query.filter_by(slug=slug, onboarding_completed=True).first()
+        
+        if not store:
+            return jsonify({'success': False, 'error': 'Loja não encontrada'}), 404
+        
+        customer_id = session.get('customer_id')
+        customer_store_id = session.get('customer_store_id')
+        
+        if not customer_id or customer_store_id != store.id:
+            return jsonify({
+                'success': True,
+                'favorites': [],
+                'logged_in': False
+            }), 200
+        
+        data = request.get_json()
+        product_ids = data.get('product_ids', [])
+        
+        if not product_ids:
+            return jsonify({
+                'success': True,
+                'favorites': [],
+                'logged_in': True
+            }), 200
+        
+        # Busca favoritos do cliente que estão na lista
+        favorites = CustomerFavorite.query.filter(
+            CustomerFavorite.customer_id == customer_id,
+            CustomerFavorite.product_id.in_(product_ids)
+        ).all()
+        
+        favorite_ids = [fav.product_id for fav in favorites]
+        
+        return jsonify({
+            'success': True,
+            'favorites': favorite_ids,
+            'logged_in': True
+        }), 200
+        
+    except Exception as e:
+        print(f"Erro ao verificar favoritos: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao verificar favoritos'
+        }), 500
+
+
+@storefront.route('/<slug>/favorites/list')
+def list_favorites(slug):
+    """Lista todos os favoritos do cliente (API)"""
+    try:
+        store = Store.query.filter_by(slug=slug, onboarding_completed=True).first()
+        
+        if not store:
+            return jsonify({'success': False, 'error': 'Loja não encontrada'}), 404
+        
+        customer_id = session.get('customer_id')
+        customer_store_id = session.get('customer_store_id')
+        
+        if not customer_id or customer_store_id != store.id:
+            return jsonify({
+                'success': False,
+                'error': 'Você precisa estar logado',
+                'redirect': f'/{slug}/auth/login'
+            }), 401
+        
+        favorites = CustomerFavorite.query.filter_by(
+            customer_id=customer_id
+        ).order_by(CustomerFavorite.created_at.desc()).all()
+        
+        # Filtrar produtos ativos da loja
+        favorites_data = []
+        for fav in favorites:
+            if fav.product and fav.product.active and fav.product.store_id == store.id:
+                favorites_data.append(fav.to_dict())
+        
+        return jsonify({
+            'success': True,
+            'data': favorites_data,
+            'count': len(favorites_data)
+        }), 200
+        
+    except Exception as e:
+        print(f"Erro ao listar favoritos: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao carregar favoritos'
         }), 500

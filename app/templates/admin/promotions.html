@@ -21,11 +21,11 @@
     .page-header h2 {
         font-size: 28px;
         font-weight: 700;
-        margin-bottom: 25px;
         color: #1a202c;
         display: flex;
         align-items: center;
         gap: 12px;
+        margin: 0;
     }
 
     .header-actions {
@@ -65,6 +65,15 @@
 
     .btn-secondary:hover {
         background: #e2e8f0;
+    }
+
+    .btn-danger {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .btn-danger:hover {
+        background: #fecaca;
     }
 
     .btn-icon {
@@ -131,7 +140,6 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-bottom: 12px;
     }
 
     .stat-icon {
@@ -234,6 +242,14 @@
         position: relative;
     }
 
+    .promotion-banner.expired {
+        background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
+    }
+
+    .promotion-banner.scheduled {
+        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    }
+
     .promotion-discount {
         font-size: 36px;
         font-weight: 700;
@@ -266,6 +282,11 @@
         color: #991b1b;
     }
 
+    .promotion-badge.inactive {
+        background: #e2e8f0;
+        color: #4a5568;
+    }
+
     .promotion-content {
         padding: 20px;
     }
@@ -289,6 +310,7 @@
         gap: 16px;
         padding-top: 16px;
         border-top: 1px solid #e2e8f0;
+        flex-wrap: wrap;
     }
 
     .meta-item {
@@ -311,6 +333,165 @@
         padding: 12px 20px;
         background: #fff;
         border-top: 1px solid #e2e8f0;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s;
+    }
+
+    .modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal {
+        background: #fff;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+        transform: translateY(20px);
+        transition: transform 0.3s;
+    }
+
+    .modal-overlay.active .modal {
+        transform: translateY(0);
+    }
+
+    .modal-header {
+        padding: 24px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1a202c;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #718096;
+        padding: 8px;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+        background: #f7fafc;
+        color: #1a202c;
+    }
+
+    .modal-body {
+        padding: 24px;
+    }
+
+    .modal-footer {
+        padding: 20px 24px;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    /* FORM */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .form-label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 8px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 14px;
+        transition: all 0.2s;
+    }
+
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-hint {
+        font-size: 12px;
+        color: #718096;
+        margin-top: 6px;
+    }
+
+    /* CHECKBOX GROUP */
+    .checkbox-group {
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px;
+    }
+
+    .checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .checkbox-item:hover {
+        background: #f7fafc;
+    }
+
+    .checkbox-item input {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--primary-color);
+    }
+
+    .checkbox-item label {
+        font-size: 14px;
+        color: #4a5568;
+        cursor: pointer;
     }
 
     /* EMPTY STATE */
@@ -339,6 +520,39 @@
         margin-bottom: 24px;
     }
 
+    /* TOAST */
+    .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        padding: 16px 24px;
+        border-radius: 12px;
+        background: #1a202c;
+        color: #fff;
+        font-size: 14px;
+        font-weight: 500;
+        z-index: 10000;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .toast.success {
+        background: #059669;
+    }
+
+    .toast.error {
+        background: #dc2626;
+    }
+
     /* RESPONSIVE */
     @media (max-width: 768px) {
         .page-header {
@@ -348,6 +562,10 @@
         }
 
         .promotions-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-row {
             grid-template-columns: 1fr;
         }
     }
@@ -361,6 +579,12 @@
         <span class="material-icons" style="color: var(--primary-color);">local_offer</span>
         Promoções
     </h2>
+    <div class="header-actions">
+        <button class="btn btn-primary" onclick="openCreateModal()">
+            <span class="material-icons" style="font-size: 18px;">add</span>
+            Nova Promoção
+        </button>
+    </div>
 </div>
 
 <!-- STATS CARDS -->
@@ -369,7 +593,7 @@
         <div class="stat-header">
             <div>
                 <div class="stat-label">Total de Promoções</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value">{{ total_count }}</div>
             </div>
             <div class="stat-icon blue">
                 <span class="material-icons">local_offer</span>
@@ -380,7 +604,7 @@
         <div class="stat-header">
             <div>
                 <div class="stat-label">Ativas</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value">{{ active_count }}</div>
             </div>
             <div class="stat-icon green">
                 <span class="material-icons">check_circle</span>
@@ -391,7 +615,7 @@
         <div class="stat-header">
             <div>
                 <div class="stat-label">Agendadas</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value">{{ scheduled_count }}</div>
             </div>
             <div class="stat-icon orange">
                 <span class="material-icons">schedule</span>
@@ -401,11 +625,11 @@
     <div class="stat-card">
         <div class="stat-header">
             <div>
-                <div class="stat-label">Vendas com Promoções</div>
-                <div class="stat-value">R$ 0</div>
+                <div class="stat-label">Expiradas</div>
+                <div class="stat-value">{{ expired_count }}</div>
             </div>
             <div class="stat-icon red">
-                <span class="material-icons">trending_up</span>
+                <span class="material-icons">event_busy</span>
             </div>
         </div>
     </div>
@@ -413,24 +637,395 @@
 
 <!-- FILTER TABS -->
 <div class="filter-tabs">
-    <button class="filter-tab active">Todas</button>
-    <button class="filter-tab">Ativas</button>
-    <button class="filter-tab">Agendadas</button>
-    <button class="filter-tab">Expiradas</button>
+    <button class="filter-tab active" onclick="filterPromotions('all')">Todas</button>
+    <button class="filter-tab" onclick="filterPromotions('active')">Ativas</button>
+    <button class="filter-tab" onclick="filterPromotions('scheduled')">Agendadas</button>
+    <button class="filter-tab" onclick="filterPromotions('expired')">Expiradas</button>
 </div>
 
 <!-- PROMOTIONS GRID -->
 <div class="promotions-section">
-    <div class="promotions-grid">
+    <div class="promotions-grid" id="promotionsGrid">
+        {% if promotions %}
+            {% for promo in promotions %}
+            <div class="promotion-card" data-status="{{ promo.status }}" data-id="{{ promo.id }}">
+                <div class="promotion-banner {% if promo.status == 'expired' %}expired{% elif promo.status == 'scheduled' %}scheduled{% endif %}">
+                    <span class="promotion-discount">
+                        {% if promo.discount_type == 'percentage' %}
+                            {{ promo.discount_value | int }}%
+                        {% else %}
+                            R$ {{ "%.2f" | format(promo.discount_value) | replace('.', ',') }}
+                        {% endif %}
+                    </span>
+                    <span class="promotion-badge {{ promo.status }}">
+                        {% if promo.status == 'active' %}Ativa
+                        {% elif promo.status == 'scheduled' %}Agendada
+                        {% elif promo.status == 'expired' %}Expirada
+                        {% else %}Inativa{% endif %}
+                    </span>
+                </div>
+                <div class="promotion-content">
+                    <h3 class="promotion-name">{{ promo.name }}</h3>
+                    <p class="promotion-description">{{ promo.description or 'Sem descrição' }}</p>
+                    <div class="promotion-meta">
+                        <div class="meta-item">
+                            <span class="material-icons">event</span>
+                            {{ promo.start_date.strftime('%d/%m/%Y') }} - {{ promo.end_date.strftime('%d/%m/%Y') }}
+                        </div>
+                        <div class="meta-item">
+                            <span class="material-icons">category</span>
+                            {% if promo.applies_to == 'all' %}Todos os produtos
+                            {% elif promo.applies_to == 'categories' %}{{ promo.categories | length }} categoria(s)
+                            {% else %}{{ promo.products | length }} produto(s){% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="promotion-actions">
+                    <button class="btn-icon" onclick="editPromotion('{{ promo.id }}')" title="Editar">
+                        <span class="material-icons">edit</span>
+                    </button>
+                    <button class="btn-icon" onclick="togglePromotion('{{ promo.id }}')" title="{% if promo.is_active %}Desativar{% else %}Ativar{% endif %}">
+                        <span class="material-icons">{% if promo.is_active %}pause{% else %}play_arrow{% endif %}</span>
+                    </button>
+                    <button class="btn-icon danger" onclick="deletePromotion('{{ promo.id }}')" title="Excluir">
+                        <span class="material-icons">delete</span>
+                    </button>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
         <div class="empty-state">
             <span class="material-icons">local_offer</span>
             <h3>Nenhuma promoção criada</h3>
             <p>Crie promoções para aumentar suas vendas e atrair mais clientes</p>
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" onclick="openCreateModal()">
                 <span class="material-icons" style="font-size: 18px;">add</span>
                 Nova Promoção
             </button>
         </div>
+        {% endif %}
     </div>
 </div>
+
+<!-- MODAL CRIAR/EDITAR -->
+<div class="modal-overlay" id="promotionModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="modalTitle">Nova Promoção</h3>
+            <button class="modal-close" onclick="closeModal()">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <form id="promotionForm" onsubmit="savePromotion(event)">
+            <div class="modal-body">
+                <input type="hidden" id="promotionId" value="">
+                
+                <div class="form-group">
+                    <label class="form-label">Nome da Promoção *</label>
+                    <input type="text" class="form-input" id="promoName" placeholder="Ex: Black Friday 2026" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Descrição</label>
+                    <textarea class="form-textarea" id="promoDescription" placeholder="Descreva a promoção..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Tipo de Desconto *</label>
+                        <select class="form-select" id="discountType" onchange="updateDiscountLabel()">
+                            <option value="percentage">Porcentagem (%)</option>
+                            <option value="fixed">Valor Fixo (R$)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" id="discountValueLabel">Valor do Desconto (%) *</label>
+                        <input type="number" class="form-input" id="discountValue" placeholder="10" min="0" step="0.01" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Data de Início *</label>
+                        <input type="datetime-local" class="form-input" id="startDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Data de Término *</label>
+                        <input type="datetime-local" class="form-input" id="endDate" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Compra Mínima (R$)</label>
+                        <input type="number" class="form-input" id="minPurchase" placeholder="0.00" min="0" step="0.01">
+                        <p class="form-hint">Deixe 0 para sem mínimo</p>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Desconto Máximo (R$)</label>
+                        <input type="number" class="form-input" id="maxDiscount" placeholder="Sem limite" min="0" step="0.01">
+                        <p class="form-hint">Limite para descontos percentuais</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Aplicar em *</label>
+                    <select class="form-select" id="appliesTo" onchange="updateAppliesTo()">
+                        <option value="all">Todos os produtos</option>
+                        <option value="categories">Categorias específicas</option>
+                        <option value="products">Produtos específicos</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="categoriesGroup" style="display: none;">
+                    <label class="form-label">Selecione as Categorias</label>
+                    <div class="checkbox-group">
+                        {% for category in categories %}
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cat_{{ category.id }}" value="{{ category.id }}" name="categories">
+                            <label for="cat_{{ category.id }}">{{ category.name }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="form-group" id="productsGroup" style="display: none;">
+                    <label class="form-label">Selecione os Produtos</label>
+                    <div class="checkbox-group">
+                        {% for product in products %}
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="prod_{{ product.id }}" value="{{ product.id }}" name="products">
+                            <label for="prod_{{ product.id }}">{{ product.title }} - R$ {{ "%.2f" | format(product.price) | replace('.', ',') }}</label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+                <button type="submit" class="btn btn-primary" id="saveBtn">
+                    <span class="material-icons" style="font-size: 18px;">save</span>
+                    Salvar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+    <span class="material-icons" id="toastIcon">check_circle</span>
+    <span id="toastMessage">Mensagem</span>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Modal functions
+    function openCreateModal() {
+        document.getElementById('modalTitle').textContent = 'Nova Promoção';
+        document.getElementById('promotionId').value = '';
+        document.getElementById('promotionForm').reset();
+        document.getElementById('categoriesGroup').style.display = 'none';
+        document.getElementById('productsGroup').style.display = 'none';
+        document.getElementById('promotionModal').classList.add('active');
+    }
+
+    function closeModal() {
+        document.getElementById('promotionModal').classList.remove('active');
+    }
+
+    function updateDiscountLabel() {
+        const type = document.getElementById('discountType').value;
+        const label = document.getElementById('discountValueLabel');
+        label.textContent = type === 'percentage' ? 'Valor do Desconto (%) *' : 'Valor do Desconto (R$) *';
+    }
+
+    function updateAppliesTo() {
+        const value = document.getElementById('appliesTo').value;
+        document.getElementById('categoriesGroup').style.display = value === 'categories' ? 'block' : 'none';
+        document.getElementById('productsGroup').style.display = value === 'products' ? 'block' : 'none';
+    }
+
+    // Save promotion
+    async function savePromotion(event) {
+        event.preventDefault();
+        
+        const promotionId = document.getElementById('promotionId').value;
+        const isEdit = !!promotionId;
+        
+        // Coletar produtos selecionados
+        const productIds = [];
+        document.querySelectorAll('input[name="products"]:checked').forEach(cb => {
+            productIds.push(cb.value);
+        });
+        
+        // Coletar categorias selecionadas
+        const categoryIds = [];
+        document.querySelectorAll('input[name="categories"]:checked').forEach(cb => {
+            categoryIds.push(cb.value);
+        });
+        
+        const data = {
+            name: document.getElementById('promoName').value,
+            description: document.getElementById('promoDescription').value,
+            discount_type: document.getElementById('discountType').value,
+            discount_value: parseFloat(document.getElementById('discountValue').value),
+            start_date: document.getElementById('startDate').value,
+            end_date: document.getElementById('endDate').value,
+            min_purchase_amount: parseFloat(document.getElementById('minPurchase').value) || 0,
+            max_discount_amount: document.getElementById('maxDiscount').value ? parseFloat(document.getElementById('maxDiscount').value) : null,
+            applies_to: document.getElementById('appliesTo').value,
+            product_ids: productIds,
+            category_ids: categoryIds,
+            is_active: true
+        };
+        
+        try {
+            const url = isEdit ? `/admin/promotions/${promotionId}` : '/admin/promotions/create';
+            const method = isEdit ? 'PUT' : 'POST';
+            
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast(result.message, 'success');
+                closeModal();
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showToast(result.error || 'Erro ao salvar promoção', 'error');
+            }
+        } catch (error) {
+            showToast('Erro ao salvar promoção', 'error');
+            console.error(error);
+        }
+    }
+
+    // Edit promotion
+    async function editPromotion(id) {
+        try {
+            const response = await fetch(`/admin/promotions/${id}`);
+            const result = await response.json();
+            
+            if (result.success) {
+                const promo = result.promotion;
+                
+                document.getElementById('modalTitle').textContent = 'Editar Promoção';
+                document.getElementById('promotionId').value = promo.id;
+                document.getElementById('promoName').value = promo.name;
+                document.getElementById('promoDescription').value = promo.description || '';
+                document.getElementById('discountType').value = promo.discount_type;
+                document.getElementById('discountValue').value = promo.discount_value;
+                document.getElementById('startDate').value = promo.start_date.slice(0, 16);
+                document.getElementById('endDate').value = promo.end_date.slice(0, 16);
+                document.getElementById('minPurchase').value = promo.min_purchase_amount || 0;
+                document.getElementById('maxDiscount').value = promo.max_discount_amount || '';
+                document.getElementById('appliesTo').value = promo.applies_to;
+                
+                updateDiscountLabel();
+                updateAppliesTo();
+                
+                // Marcar produtos/categorias selecionados
+                if (promo.products) {
+                    promo.products.forEach(prodId => {
+                        const cb = document.getElementById(`prod_${prodId}`);
+                        if (cb) cb.checked = true;
+                    });
+                }
+                if (promo.categories) {
+                    promo.categories.forEach(catId => {
+                        const cb = document.getElementById(`cat_${catId}`);
+                        if (cb) cb.checked = true;
+                    });
+                }
+                
+                document.getElementById('promotionModal').classList.add('active');
+            } else {
+                showToast('Erro ao carregar promoção', 'error');
+            }
+        } catch (error) {
+            showToast('Erro ao carregar promoção', 'error');
+            console.error(error);
+        }
+    }
+
+    // Toggle promotion
+    async function togglePromotion(id) {
+        try {
+            const response = await fetch(`/admin/promotions/${id}/toggle`, { method: 'POST' });
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast(result.message, 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showToast(result.error || 'Erro ao alterar status', 'error');
+            }
+        } catch (error) {
+            showToast('Erro ao alterar status', 'error');
+            console.error(error);
+        }
+    }
+
+    // Delete promotion
+    async function deletePromotion(id) {
+        if (!confirm('Tem certeza que deseja excluir esta promoção?')) return;
+        
+        try {
+            const response = await fetch(`/admin/promotions/${id}`, { method: 'DELETE' });
+            const result = await response.json();
+            
+            if (result.success) {
+                showToast(result.message, 'success');
+                document.querySelector(`.promotion-card[data-id="${id}"]`).remove();
+            } else {
+                showToast(result.error || 'Erro ao excluir', 'error');
+            }
+        } catch (error) {
+            showToast('Erro ao excluir promoção', 'error');
+            console.error(error);
+        }
+    }
+
+    // Filter promotions
+    function filterPromotions(status) {
+        // Update tabs
+        document.querySelectorAll('.filter-tab').forEach(tab => tab.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        // Filter cards
+        document.querySelectorAll('.promotion-card').forEach(card => {
+            if (status === 'all' || card.dataset.status === status) {
+                card.style.display = 'block';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
+
+    // Toast
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        const icon = document.getElementById('toastIcon');
+        const msg = document.getElementById('toastMessage');
+        
+        msg.textContent = message;
+        icon.textContent = type === 'success' ? 'check_circle' : 'error';
+        toast.className = `toast show ${type}`;
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+    // Close modal on overlay click
+    document.getElementById('promotionModal').addEventListener('click', function(e) {
+        if (e.target === this) closeModal();
+    });
+</script>
 {% endblock %}

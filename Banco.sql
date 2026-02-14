@@ -206,4 +206,60 @@ CREATE TABLE IF NOT EXISTS payments (
   FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS customer_favorites (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  customer_id CHAR(36) NOT NULL,
+  product_id CHAR(36) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (customer_id, product_id),
+  INDEX idx_customer_favorites_customer (customer_id),
+  INDEX idx_customer_favorites_product (product_id),
+  FOREIGN KEY (customer_id) REFERENCES store_customers(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS promotions (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  store_id CHAR(36) NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  discount_type ENUM('percentage', 'fixed') NOT NULL DEFAULT 'percentage',
+  discount_value DECIMAL(12,2) NOT NULL,
+  min_purchase_amount DECIMAL(12,2) DEFAULT 0,
+  max_discount_amount DECIMAL(12,2),
+  start_date DATETIME NOT NULL,
+  end_date DATETIME NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  applies_to ENUM('all', 'categories', 'products') DEFAULT 'all',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX idx_promotions_store (store_id),
+  INDEX idx_promotions_dates (start_date, end_date),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS promotion_products (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  promotion_id CHAR(36) NOT NULL,
+  product_id CHAR(36) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (promotion_id, product_id),
+  INDEX idx_promotion_products_promotion (promotion_id),
+  INDEX idx_promotion_products_product (product_id),
+  FOREIGN KEY (promotion_id) REFERENCES promotions(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS promotion_categories (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  promotion_id CHAR(36) NOT NULL,
+  category_id CHAR(36) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE (promotion_id, category_id),
+  INDEX idx_promotion_categories_promotion (promotion_id),
+  INDEX idx_promotion_categories_category (category_id),
+  FOREIGN KEY (promotion_id) REFERENCES promotions(id) ON DELETE CASCADE,
+  FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+);
+
 SET FOREIGN_KEY_CHECKS = 1;
