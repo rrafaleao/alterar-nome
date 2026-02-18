@@ -1211,7 +1211,7 @@
                 <span>Total:</span>
                 <span id="cartTotal">R$ 0,00</span>
             </div>
-            <button class="btn-checkout">Finalizar Compra</button>
+            <button class="btn-checkout"><a style="text-decoration: none; color: white;" href="/purchase">Finalizar Compra</a></button>
         </div>
     </aside>
 
@@ -1223,7 +1223,6 @@
                 dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
             }
         }
-
         // Fecha o dropdown ao clicar fora
         document.addEventListener('click', function(e) {
             const wrapper = document.querySelector('.user-menu-wrapper');
