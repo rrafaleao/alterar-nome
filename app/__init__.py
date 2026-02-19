@@ -9,7 +9,7 @@ def create_app():
     # -----------------------------------------
     # CONFIGURAÇÕES BÁSICAS DO SISTEMA
     # -----------------------------------------
-    app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://zapp_buffalojoy:2e40b943ffbde6e45c9deb963bec99583e43d8db@vdmz5k.h.filess.io:61002/zapp_buffalojoy"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:@localhost:3306/sem_nome_ainda"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SECRET_KEY"] = "uma-chave-secreta-muito-segura"
     db.init_app(app)

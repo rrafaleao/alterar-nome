@@ -443,6 +443,7 @@
             overflow: hidden;
             transition: all 0.3s;
             border: 1px solid var(--gray-200);
+            position: relative;
         }
 
         .product-card:hover {
@@ -466,6 +467,16 @@
 
         .product-card:hover .product-image img {
             transform: scale(1.05);
+        }
+
+        .product-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .product-info-bottom {
+            padding: 0 20px 20px;
         }
 
         .product-placeholder {
@@ -1079,35 +1090,40 @@
                 {% set product = item.product %}
                 {% set promo = item.promo %}
                 <div class="product-card" data-product-id="{{ product.id }}">
-                    <div class="product-image">
-                        {% if product.images and product.images | length > 0 %}
-                            <img src="{{ product.images[0].url }}" alt="{{ product.title }}">
-                        {% else %}
-                            <div class="product-placeholder">
-                                <span class="material-icons">image</span>
-                                <span>Sem imagem</span>
-                            </div>
-                        {% endif %}
-                        
-                        {% if promo.has_promotion %}
-                        <div class="product-badge">-{{ promo.discount_percent }}%</div>
-                        {% endif %}
-                        
-                        <div class="product-actions">
-                            <button class="product-action-btn favorite-btn" data-product-id="{{ product.id }}" onclick="toggleFavorite('{{ product.id }}')" title="Adicionar aos favoritos">
-                                <span class="material-icons">favorite_border</span>
-                            </button>
-                            <button class="product-action-btn" title="Visualização rápida">
-                                <span class="material-icons">visibility</span>
-                            </button>
+                    <a href="{{ url_for('storefront.store_product_page', slug=store.slug, product_id=product.id) }}" class="product-link">
+                        <div class="product-image">
+                            {% if product.images and product.images | length > 0 %}
+                                <img src="{{ product.images[0].url }}" alt="{{ product.title }}">
+                            {% else %}
+                                <div class="product-placeholder">
+                                    <span class="material-icons">image</span>
+                                    <span>Sem imagem</span>
+                                </div>
+                            {% endif %}
+                            
+                            {% if promo.has_promotion %}
+                            <div class="product-badge">-{{ promo.discount_percent }}%</div>
+                            {% endif %}
                         </div>
+
+                        <div class="product-info">
+                            {% if product.category %}
+                            <p class="product-category">{{ product.category.name }}</p>
+                            {% endif %}
+                            <h3 class="product-title">{{ product.title }}</h3>
+                        </div>
+                    </a>
+                    
+                    <div class="product-actions">
+                        <button class="product-action-btn favorite-btn" data-product-id="{{ product.id }}" onclick="event.stopPropagation(); toggleFavorite('{{ product.id }}')" title="Adicionar aos favoritos">
+                            <span class="material-icons">favorite_border</span>
+                        </button>
+                        <button class="product-action-btn" title="Visualização rápida">
+                            <span class="material-icons">visibility</span>
+                        </button>
                     </div>
 
-                    <div class="product-info">
-                        {% if product.category %}
-                        <p class="product-category">{{ product.category.name }}</p>
-                        {% endif %}
-                        <h3 class="product-title">{{ product.title }}</h3>
+                    <div class="product-info-bottom">
                         
                         <div class="product-price-row">
                             <div class="product-price">
@@ -1136,32 +1152,36 @@
             <div class="products-grid">
                 {% for product in products %}
                 <div class="product-card" data-product-id="{{ product.id }}">
-                    <div class="product-image">
-                        {% if product.images and product.images | length > 0 %}
-                            <img src="{{ product.images[0].url }}" alt="{{ product.title }}">
-                        {% else %}
-                            <div class="product-placeholder">
-                                <span class="material-icons">image</span>
-                                <span>Sem imagem</span>
-                            </div>
-                        {% endif %}
-                        
-                        <div class="product-actions">
-                            <button class="product-action-btn favorite-btn" data-product-id="{{ product.id }}" onclick="toggleFavorite('{{ product.id }}')" title="Adicionar aos favoritos">
-                                <span class="material-icons">favorite_border</span>
-                            </button>
-                            <button class="product-action-btn" title="Visualização rápida">
-                                <span class="material-icons">visibility</span>
-                            </button>
+                    <a href="{{ url_for('storefront.store_product_page', slug=store.slug, product_id=product.id) }}" class="product-link">
+                        <div class="product-image">
+                            {% if product.images and product.images | length > 0 %}
+                                <img src="{{ product.images[0].url }}" alt="{{ product.title }}">
+                            {% else %}
+                                <div class="product-placeholder">
+                                    <span class="material-icons">image</span>
+                                    <span>Sem imagem</span>
+                                </div>
+                            {% endif %}
                         </div>
+
+                        <div class="product-info">
+                            {% if product.category %}
+                            <p class="product-category">{{ product.category.name }}</p>
+                            {% endif %}
+                            <h3 class="product-title">{{ product.title }}</h3>
+                        </div>
+                    </a>
+                    
+                    <div class="product-actions">
+                        <button class="product-action-btn favorite-btn" data-product-id="{{ product.id }}" onclick="event.stopPropagation(); toggleFavorite('{{ product.id }}')" title="Adicionar aos favoritos">
+                            <span class="material-icons">favorite_border</span>
+                        </button>
+                        <button class="product-action-btn" title="Visualização rápida">
+                            <span class="material-icons">visibility</span>
+                        </button>
                     </div>
 
-                    <div class="product-info">
-                        {% if product.category %}
-                        <p class="product-category">{{ product.category.name }}</p>
-                        {% endif %}
-                        <h3 class="product-title">{{ product.title }}</h3>
-                        
+                    <div class="product-info-bottom">
                         <div class="product-price-row">
                             <div class="product-price">
                                 <span class="price-current">R$ {{ "%.2f" | format(product.price) | replace('.', ',') }}</span>

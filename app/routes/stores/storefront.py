@@ -198,6 +198,47 @@ def store_product_detail(slug, product_id):
         }), 500
 
 
+@storefront.route('/<slug>/produto/<product_id>')
+def store_product_page(slug, product_id):
+    """Página de detalhes do produto com todas as imagens e informações"""
+    try:
+        store = Store.query.filter_by(slug=slug, onboarding_completed=True).first()
+        
+        if not store:
+            abort(404)
+        
+        product = Product.query.filter_by(id=product_id, store_id=store.id, active=True).first()
+        
+        if not product:
+            abort(404)
+        
+        # Buscar promoções ativas para calcular possível desconto
+        active_promotions = get_active_promotions(store.id)
+        promo_info = calculate_product_promotion(product, active_promotions)
+        
+        # Preparar dados de customização
+        customization = {
+            'primary_color': '#667eea',
+            'secondary_color': '#764ba2'
+        }
+        
+        if store.customization:
+            customization['primary_color'] = store.customization.primary_color or '#667eea'
+            customization['secondary_color'] = store.customization.secondary_color or '#764ba2'
+        
+        return render_template(
+            'stores/product_detail.html',
+            store=store,
+            product=product,
+            promo=promo_info,
+            customization=customization
+        )
+        
+    except Exception as e:
+        print(f"Erro ao carregar página do produto: {e}")
+        abort(500)
+
+
 @storefront.route('/<slug>/categories')
 def store_categories(slug):
     try:
