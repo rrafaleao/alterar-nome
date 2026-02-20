@@ -7,19 +7,21 @@ class Order(db.Model):
 
     id = db.Column(db.String(36), primary_key=True, default=uuid4_str)
     store_id = db.Column(db.String(36), db.ForeignKey("stores.id", ondelete="CASCADE"), nullable=False)
-    user_id = db.Column(db.String(36), db.ForeignKey("users.id", ondelete="SET NULL"))
+    user_id = db.Column(db.String(36), db.ForeignKey("store_customers.id", ondelete="SET NULL"))
     total_amount = db.Column(db.Numeric(12, 2), nullable=False)
     status = db.Column(db.Enum(
         "pending","paid","shipped","delivered","cancelled","refunded",
         name="order_status"
     ), default="pending", nullable=False)
     shipping_address_id = db.Column(db.String(36), db.ForeignKey("addresses.id"))
+    shipping_method = db.Column(db.String(50))
+    shipping_cost = db.Column(db.Numeric(12, 2), default=0)
     placed_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    # 'metadata' is reserved by SQLAlchemy declarative API.
-    # Use a different attribute name but keep the DB column name 'metadata' if desired.
-    metadata_ = db.Column('metadata', db.JSON)
 
+    # Relationships
+    customer = db.relationship("StoreCustomer", backref="orders", foreign_keys=[user_id])
+    shipping_address = db.relationship("Address", backref="orders", foreign_keys=[shipping_address_id])
     items = db.relationship("OrderItem", backref="order", cascade="all, delete-orphan")
     payment = db.relationship("Payment", backref="order", uselist=False, cascade="all, delete-orphan")
 

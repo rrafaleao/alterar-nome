@@ -2,6 +2,7 @@ from flask import render_template, jsonify, request, session
 from . import admin
 from .decorators import login_required, store_required
 from app.models.store_customer import StoreCustomer
+from app.models.order import Order
 from config.database import db
 from datetime import datetime, timedelta
 
@@ -11,7 +12,31 @@ from datetime import datetime, timedelta
 @store_required
 def orders_page():
     """Página de pedidos"""
-    return render_template('admin/orders.html')
+    store_id = session.get('store_id')
+    
+    # Buscar todos os pedidos da loja
+    orders = Order.query.filter_by(store_id=store_id).order_by(Order.placed_at.desc()).all()
+    
+    # Estatísticas
+    total_orders = len(orders)
+    pending_orders = sum(1 for o in orders if o.status == 'pending')
+    paid_orders = sum(1 for o in orders if o.status == 'paid')
+    shipped_orders = sum(1 for o in orders if o.status == 'shipped')
+    delivered_orders = sum(1 for o in orders if o.status == 'delivered')
+    cancelled_orders = sum(1 for o in orders if o.status == 'cancelled')
+    
+    return render_template(
+        'admin/orders.html',
+        orders=orders,
+        stats={
+            'total': total_orders,
+            'pending': pending_orders,
+            'paid': paid_orders,
+            'shipped': shipped_orders,
+            'delivered': delivered_orders,
+            'cancelled': cancelled_orders
+        }
+    )
 
 
 @admin.route('/abandoned-carts')

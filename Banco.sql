@@ -154,14 +154,16 @@ CREATE TABLE IF NOT EXISTS cart_items (
 CREATE TABLE IF NOT EXISTS addresses (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   user_id CHAR(36),
-  line1 TEXT,
-  line2 TEXT,
-  city TEXT,
-  state TEXT,
-  postal_code TEXT,
-  country TEXT,
+  cep VARCHAR(10),
+  street VARCHAR(255),
+  number VARCHAR(20),
+  complement VARCHAR(255),
+  neighborhood VARCHAR(255),
+  city VARCHAR(255),
+  state VARCHAR(2),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  INDEX idx_addresses_user (user_id),
+  FOREIGN KEY (user_id) REFERENCES store_customers(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS orders (
@@ -171,13 +173,14 @@ CREATE TABLE IF NOT EXISTS orders (
   total_amount DECIMAL(12,2) NOT NULL,
   status ENUM('pending','paid','shipped','delivered','cancelled','refunded') DEFAULT 'pending',
   shipping_address_id CHAR(36),
+  shipping_method VARCHAR(50),
+  shipping_cost DECIMAL(12,2) DEFAULT 0,
   placed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  metadata JSON,
   INDEX idx_orders_user (user_id),
   INDEX idx_orders_store_status (store_id, status),
   FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
+  FOREIGN KEY (user_id) REFERENCES store_customers(id) ON DELETE SET NULL,
   FOREIGN KEY (shipping_address_id) REFERENCES addresses(id)
 );
 
