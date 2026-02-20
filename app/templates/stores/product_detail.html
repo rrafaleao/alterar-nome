@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{{ product.title }} - {{ store.name }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -222,32 +222,55 @@
         }
 
         .main-image {
-            aspect-ratio: 1;
+            width: 100%;
+            height: 600px;
             border-radius: 16px;
             overflow: hidden;
             background: var(--gray-100);
             position: relative;
+            cursor: pointer;
         }
 
         .main-image img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transition: transform 0.5s, opacity 0.15s;
+            object-fit: contain;
+            transition: transform 0.3s, opacity 0.15s;
         }
 
         .main-image:hover img {
-            transform: scale(1.05);
+            transform: scale(1.03);
         }
 
         .thumbnail-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            display: flex;
             gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .thumbnail-grid::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .thumbnail-grid::-webkit-scrollbar-track {
+            background: var(--gray-100);
+            border-radius: 3px;
+        }
+
+        .thumbnail-grid::-webkit-scrollbar-thumb {
+            background: var(--gray-300);
+            border-radius: 3px;
+        }
+
+        .thumbnail-grid::-webkit-scrollbar-thumb:hover {
+            background: var(--gray-400);
         }
 
         .thumbnail {
-            aspect-ratio: 1;
+            flex: 0 0 auto;
+            width: 100px;
+            height: 100px;
             border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
@@ -269,6 +292,58 @@
             width: 100%;
             height: 100%;
             object-fit: cover;
+        }
+
+        /* Image Modal */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .image-modal.active {
+            display: flex;
+        }
+
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: white;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .close-modal:hover {
+            transform: scale(1.1);
         }
 
         /* Product Info */
@@ -611,6 +686,10 @@
                 padding: 24px;
             }
 
+            .main-image {
+                height: 400px;
+            }
+
             .product-title {
                 font-size: 24px;
             }
@@ -638,12 +717,17 @@
                 padding: 16px;
             }
 
+            .main-image {
+                height: 300px;
+            }
+
             .action-buttons {
                 flex-direction: column;
             }
 
-            .thumbnail-grid {
-                grid-template-columns: repeat(3, 1fr);
+            .thumbnail {
+                width: 80px;
+                height: 80px;
             }
         }
     </style>
@@ -702,7 +786,7 @@
             <div class="product-detail">
                 <!-- Image Gallery -->
                 <div class="image-gallery">
-                    <div class="main-image">
+                    <div class="main-image" onclick="openImageModal(event)">
                         {% if product.images and product.images | length > 0 %}
                             <img id="mainImage" src="{{ product.images[0].url }}" alt="{{ product.title }}">
                         {% else %}
@@ -712,11 +796,11 @@
                         {% endif %}
                     </div>
 
-                    {% if product.images and product.images | length > 1 %}
+                    {% if product.images and product.images | length > 0 %}
                     <div class="thumbnail-grid">
-                        {% for image in product.images[:4] %}
+                        {% for image in product.images %}
                         <div class="thumbnail {% if loop.first %}active{% endif %}" onclick="changeMainImage(this, '{{ image.url }}')">
-                            <img src="{{ image.url }}" alt="{{ product.title }}">
+                            <img src="{{ image.url }}" alt="{{ product.title }} - Imagem {{ loop.index }}">
                         </div>
                         {% endfor %}
                     </div>
@@ -813,6 +897,14 @@
         </div>
     </section>
 
+    <!-- Image Modal -->
+    <div class="image-modal" id="imageModal" onclick="closeImageModal(event)">
+        <button class="close-modal" onclick="closeImageModal(event)">
+            <span class="material-icons">close</span>
+        </button>
+        <img id="modalImage" src="" alt="">
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
@@ -869,6 +961,47 @@
             document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
             thumbnail.classList.add('active');
         }
+
+        // Open Image Modal
+        function openImageModal(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            const mainImg = document.getElementById('mainImage');
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            
+            if (mainImg && mainImg.src) {
+                modalImg.src = mainImg.src;
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                // Prevent page zoom
+                document.body.style.touchAction = 'none';
+            }
+        }
+
+        // Close Image Modal
+        function closeImageModal(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            const modal = document.getElementById('imageModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+            document.body.style.touchAction = 'auto';
+        }
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeImageModal();
+            }
+        });
 
         // Select Variant
         function selectVariant(element) {
