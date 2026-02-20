@@ -291,7 +291,7 @@
         display: inline-block;
     }
 
-    .status-paid {
+    .status-paid, .status-delivered {
         background: #c6f6d5;
         color: #22543d;
     }
@@ -306,14 +306,14 @@
         color: #1a365d;
     }
 
-    .status-cancelled {
+    .status-cancelled, .status-refunded {
         background: #fed7d7;
         color: #742a2a;
     }
 
     /* QUICK ACTIONS */
     .quick-actions {
-        background: rgb(112, 113, 117);
+        background: linear-gradient(135deg, #4a90e2 0%, #667eea 100%);
         padding: 32px;
         border-radius: 12px;
         color: #fff;
@@ -340,11 +340,14 @@
         cursor: pointer;
         transition: all 0.3s ease;
         border: 1px solid rgba(255, 255, 255, 0.2);
+        text-decoration: none;
+        color: #fff;
     }
 
     .action-btn:hover {
         background: rgba(255, 255, 255, 0.25);
         transform: translateY(-2px);
+        color: #fff;
     }
 
     .action-btn .material-icons {
@@ -402,14 +405,10 @@
             <div class="stat-icon blue">
                 <span class="material-icons">trending_up</span>
             </div>
-            <div class="stat-trend up">
-                <span class="material-icons" style="font-size: 16px;">arrow_upward</span>
-                12.5%
-            </div>
         </div>
         <div class="stat-label">Vendas Totais</div>
-        <div class="stat-value">R$ 48.574,00</div>
-        <div class="stat-description">Últimos 30 dias</div>
+        <div class="stat-value">R$ {{ "%.2f"|format(stats.total_sales)|replace('.', ',') }}</div>
+        <div class="stat-description">Valor total das vendas</div>
     </div>
 
     <div class="stat-card">
@@ -417,44 +416,32 @@
             <div class="stat-icon green">
                 <span class="material-icons">shopping_bag</span>
             </div>
-            <div class="stat-trend up">
-                <span class="material-icons" style="font-size: 16px;">arrow_upward</span>
-                8.2%
-            </div>
         </div>
         <div class="stat-label">Pedidos</div>
-        <div class="stat-value">342</div>
-        <div class="stat-description">156 pendentes</div>
+        <div class="stat-value">{{ stats.total_orders }}</div>
+        <div class="stat-description">{{ stats.pending_orders }} pendentes</div>
     </div>
 
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-icon orange">
-                <span class="material-icons">visibility</span>
-            </div>
-            <div class="stat-trend up">
-                <span class="material-icons" style="font-size: 16px;">arrow_upward</span>
-                23.1%
+                <span class="material-icons">inventory_2</span>
             </div>
         </div>
-        <div class="stat-label">Visitas</div>
-        <div class="stat-value">12.483</div>
-        <div class="stat-description">5.2k sessões únicas</div>
+        <div class="stat-label">Produtos</div>
+        <div class="stat-value">{{ stats.total_products }}</div>
+        <div class="stat-description">{{ stats.active_products }} ativos</div>
     </div>
 
     <div class="stat-card">
         <div class="stat-header">
             <div class="stat-icon purple">
-                <span class="material-icons">account_balance_wallet</span>
-            </div>
-            <div class="stat-trend down">
-                <span class="material-icons" style="font-size: 16px;">arrow_downward</span>
-                2.4%
+                <span class="material-icons">people</span>
             </div>
         </div>
-        <div class="stat-label">Faturamento Médio</div>
-        <div class="stat-value">R$ 142,06</div>
-        <div class="stat-description">Por pedido</div>
+        <div class="stat-label">Clientes</div>
+        <div class="stat-value">{{ stats.total_customers }}</div>
+        <div class="stat-description">Clientes cadastrados</div>
     </div>
 </div>
 
@@ -462,49 +449,22 @@
 <div class="quick-actions">
     <h3>Atalhos Rápidos</h3>
     <div class="actions-grid">
-        <div class="action-btn">
+        <a href="{{ url_for('admin.products_page') }}" class="action-btn">
             <span class="material-icons">add_box</span>
             <span>Adicionar Produto</span>
-        </div>
-        <div class="action-btn">
+        </a>
+        <a href="{{ url_for('admin.settings_page') }}" class="action-btn">
             <span class="material-icons">local_shipping</span>
             <span>Configurar Frete</span>
-        </div>
-        <div class="action-btn">
+        </a>
+        <a href="{{ url_for('admin.settings_page') }}" class="action-btn">
             <span class="material-icons">credit_card</span>
             <span>Meios de Pagamento</span>
-        </div>
-        <div class="action-btn">
+        </a>
+        <a href="{{ url_for('admin.promotions_page') }}" class="action-btn">
             <span class="material-icons">campaign</span>
             <span>Nova Promoção</span>
-        </div>
-    </div>
-</div>
-
-<!-- CHARTS -->
-<div class="charts-section">
-    <div class="chart-card">
-        <div class="chart-header">
-            <h3 class="chart-title">Vendas do Período</h3>
-            <div class="chart-filter">
-                <button class="filter-btn">7 dias</button>
-                <button class="filter-btn active">30 dias</button>
-                <button class="filter-btn">90 dias</button>
-                <button class="filter-btn">Ano</button>
-            </div>
-        </div>
-        <div class="chart-placeholder">
-            Gráfico de vendas (integrar com Chart.js ou biblioteca similar)
-        </div>
-    </div>
-
-    <div class="chart-card">
-        <div class="chart-header">
-            <h3 class="chart-title">Status dos Pedidos</h3>
-        </div>
-        <div class="chart-placeholder">
-            Gráfico de pizza (integrar com Chart.js)
-        </div>
+        </a>
     </div>
 </div>
 
@@ -512,7 +472,7 @@
 <div class="orders-section">
     <div class="orders-header">
         <h3 class="chart-title">Pedidos Recentes</h3>
-        <button class="btn btn-secondary">Ver Todos</button>
+        <a href="{{ url_for('admin.orders_page') }}" class="btn btn-secondary">Ver Todos</a>
     </div>
     <table class="orders-table">
         <thead>
@@ -525,41 +485,35 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>#10234</td>
-                <td>João Silva</td>
-                <td>28/01/2026</td>
-                <td>R$ 247,50</td>
-                <td><span class="status-badge status-paid">Pago</span></td>
-            </tr>
-            <tr>
-                <td>#10233</td>
-                <td>Maria Santos</td>
-                <td>28/01/2026</td>
-                <td>R$ 89,90</td>
-                <td><span class="status-badge status-shipped">Enviado</span></td>
-            </tr>
-            <tr>
-                <td>#10232</td>
-                <td>Pedro Oliveira</td>
-                <td>27/01/2026</td>
-                <td>R$ 356,00</td>
-                <td><span class="status-badge status-pending">Pendente</span></td>
-            </tr>
-            <tr>
-                <td>#10231</td>
-                <td>Ana Costa</td>
-                <td>27/01/2026</td>
-                <td>R$ 124,90</td>
-                <td><span class="status-badge status-paid">Pago</span></td>
-            </tr>
-            <tr>
-                <td>#10230</td>
-                <td>Carlos Ferreira</td>
-                <td>26/01/2026</td>
-                <td>R$ 445,00</td>
-                <td><span class="status-badge status-cancelled">Cancelado</span></td>
-            </tr>
+            {% if recent_orders %}
+                {% for order in recent_orders %}
+                <tr>
+                    <td>#{{ order.id[:8] }}</td>
+                    <td>{{ order.customer.full_name if order.customer else 'Cliente' }}</td>
+                    <td>{{ order.placed_at.strftime('%d/%m/%Y') if order.placed_at else '-' }}</td>
+                    <td>R$ {{ "%.2f"|format(order.total_amount)|replace('.', ',') }}</td>
+                    <td>
+                        <span class="status-badge status-{{ order.status }}">
+                            {% if order.status == 'pending' %}Pendente
+                            {% elif order.status == 'paid' %}Pago
+                            {% elif order.status == 'shipped' %}Enviado
+                            {% elif order.status == 'delivered' %}Entregue
+                            {% elif order.status == 'cancelled' %}Cancelado
+                            {% elif order.status == 'refunded' %}Reembolsado
+                            {% else %}{{ order.status }}
+                            {% endif %}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 40px; color: #718096;">
+                        <span class="material-icons" style="font-size: 48px; color: #cbd5e0;">inbox</span>
+                        <p style="margin-top: 12px;">Nenhum pedido ainda</p>
+                    </td>
+                </tr>
+            {% endif %}
         </tbody>
     </table>
 </div>

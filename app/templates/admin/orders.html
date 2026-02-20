@@ -1,4 +1,4 @@
-{% extends "/admin/base.html" %}
+﻿{% extends "/admin/base.html" %}
 
 {% block title %}Pedidos{% endblock %}
 
@@ -446,7 +446,7 @@
         <div class="stat-header">
             <div>
                 <div class="stat-label">Total de Pedidos</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value">{{ stats.total }}</div>
             </div>
             <div class="stat-icon blue">
                 <span class="material-icons">receipt_long</span>
@@ -457,7 +457,7 @@
         <div class="stat-header">
             <div>
                 <div class="stat-label">Pendentes</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value">{{ stats.pending }}</div>
             </div>
             <div class="stat-icon yellow">
                 <span class="material-icons">pending</span>
@@ -468,7 +468,7 @@
         <div class="stat-header">
             <div>
                 <div class="stat-label">Enviados</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value">{{ stats.shipped }}</div>
             </div>
             <div class="stat-icon orange">
                 <span class="material-icons">local_shipping</span>
@@ -479,7 +479,7 @@
         <div class="stat-header">
             <div>
                 <div class="stat-label">Entregues</div>
-                <div class="stat-value">0</div>
+                <div class="stat-value">{{ stats.delivered }}</div>
             </div>
             <div class="stat-icon green">
                 <span class="material-icons">check_circle</span>
@@ -528,6 +528,60 @@
                 </tr>
             </thead>
             <tbody>
+                {% if orders %}
+                    {% for order in orders %}
+                    <tr data-status="{{ order.status }}">
+                        <td>
+                            <span class="order-id">#{{ order.id[:8] }}</span>
+                        </td>
+                        <td>
+                            {% set customer = order.customer %}
+                            {% if customer %}
+                            <div class="customer-info">
+                                <div class="customer-avatar">
+                                    {{ customer.full_name[0]|upper if customer.full_name else 'C' }}
+                                </div>
+                                <div>
+                                    <div class="customer-name">{{ customer.full_name or 'Cliente' }}</div>
+                                    <div class="customer-email">{{ customer.email }}</div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="customer-info">
+                                <div class="customer-avatar">?</div>
+                                <div>
+                                    <div class="customer-name">Cliente não identificado</div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </td>
+                        <td>{{ order.placed_at.strftime('%d/%m/%Y %H:%M') if order.placed_at else '-' }}</td>
+                        <td><strong>R$ {{ "%.2f"|format(order.total_amount)|replace('.', ',') }}</strong></td>
+                        <td>
+                            <span class="status-badge {{ order.status }}">
+                                {% if order.status == 'pending' %}Pendente
+                                {% elif order.status == 'paid' %}Pago
+                                {% elif order.status == 'shipped' %}Enviado
+                                {% elif order.status == 'delivered' %}Entregue
+                                {% elif order.status == 'cancelled' %}Cancelado
+                                {% elif order.status == 'refunded' %}Reembolsado
+                                {% else %}{{ order.status }}
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions-cell">
+                                <button class="btn-icon" title="Ver detalhes" onclick="viewOrder('{{ order.id }}')">
+                                    <span class="material-icons">visibility</span>
+                                </button>
+                                <button class="btn-icon" title="Atualizar status" onclick="updateOrderStatus('{{ order.id }}')">
+                                    <span class="material-icons">edit</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                {% else %}
                 <tr>
                     <td colspan="6">
                         <div class="empty-state">
@@ -537,6 +591,7 @@
                         </div>
                     </td>
                 </tr>
+                {% endif %}
             </tbody>
         </table>
     </div>
@@ -544,7 +599,7 @@
     <!-- PAGINATION -->
     <div class="table-footer">
         <div class="pagination-info">
-            Mostrando 0-0 de 0 pedidos
+            Mostrando {{ orders|length }} pedido(s)
         </div>
         <div class="pagination-controls">
             <button class="pagination-btn" disabled>Anterior</button>
@@ -552,4 +607,62 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Filter tabs functionality
+    document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Update active state
+            document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            const filter = this.textContent.trim().toLowerCase();
+            const rows = document.querySelectorAll('.orders-table tbody tr[data-status]');
+            
+            rows.forEach(row => {
+                const status = row.dataset.status;
+                
+                if (filter === 'todos') {
+                    row.style.display = '';
+                } else if (filter === 'pendentes' && status === 'pending') {
+                    row.style.display = '';
+                } else if (filter === 'pagos' && status === 'paid') {
+                    row.style.display = '';
+                } else if (filter === 'enviados' && status === 'shipped') {
+                    row.style.display = '';
+                } else if (filter === 'entregues' && status === 'delivered') {
+                    row.style.display = '';
+                } else if (filter === 'cancelados' && (status === 'cancelled' || status === 'refunded')) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    // Search functionality
+    document.querySelector('.search-input').addEventListener('input', function() {
+        const search = this.value.toLowerCase();
+        const rows = document.querySelectorAll('.orders-table tbody tr[data-status]');
+        
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(search) ? '' : 'none';
+        });
+    });
+
+    function viewOrder(orderId) {
+        alert('Ver detalhes do pedido: #' + orderId.substring(0, 8));
+        // TODO: Implementar modal ou página de detalhes
+    }
+
+    function updateOrderStatus(orderId) {
+        const newStatus = prompt('Novo status (pending, paid, shipped, delivered, cancelled):');
+        if (newStatus) {
+            // TODO: Implementar API de atualização de status
+            alert('Atualizando status do pedido para: ' + newStatus);
+        }
+    }
+</script>
 {% endblock %}

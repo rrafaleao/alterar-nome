@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido Confirmado - {{ store.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary: {{ customization.primary_color }};
+            --secondary: {{ customization.secondary_color }};
+            --success: #10b981;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--gray-100);
+            color: var(--gray-800);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .success-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .success-header {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            padding: 48px;
+            text-align: center;
+            color: white;
+        }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+
+        .success-icon .material-icons {
+            font-size: 48px;
+        }
+
+        .success-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .success-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .order-details {
+            padding: 32px;
+        }
+
+        .order-number {
+            text-align: center;
+            padding: 20px;
+            background: var(--gray-50);
+            border-radius: 12px;
+            margin-bottom: 32px;
+        }
+
+        .order-number label {
+            font-size: 14px;
+            color: var(--gray-500);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .order-number span {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-900);
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title .material-icons {
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .info-card {
+            padding: 20px;
+            background: var(--gray-50);
+            border-radius: 12px;
+        }
+
+        .info-card label {
+            font-size: 13px;
+            color: var(--gray-500);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .info-card p {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--gray-800);
+        }
+
+        .items-list {
+            margin-bottom: 32px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .item-row:last-child {
+            border-bottom: none;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .item-qty {
+            width: 32px;
+            height: 32px;
+            background: var(--gray-100);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+
+        .item-name {
+            font-size: 15px;
+            color: var(--gray-800);
+        }
+
+        .item-price {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .totals {
+            padding: 20px;
+            background: var(--gray-50);
+            border-radius: 12px;
+            margin-bottom: 32px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .total-row:last-child {
+            margin-bottom: 0;
+            padding-top: 12px;
+            border-top: 2px solid var(--gray-200);
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .total-row .label {
+            color: var(--gray-600);
+        }
+
+        .total-row .value {
+            color: var(--gray-900);
+        }
+
+        .total-row:last-child .value {
+            color: var(--primary);
+        }
+
+        /* Payment Info */
+        .payment-info {
+            padding: 24px;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-radius: 12px;
+            margin-bottom: 32px;
+            border: 1px solid var(--primary);
+        }
+
+        .payment-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 12px;
+        }
+
+        .pix-code {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            word-break: break-all;
+            margin-bottom: 12px;
+        }
+
+        .btn-copy {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-copy:hover {
+            background: var(--secondary);
+        }
+
+        .boleto-code {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 14px;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-badge.paid {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--gray-700);
+            border: 2px solid var(--gray-200);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .success-header {
+                padding: 32px 20px;
+            }
+
+            .success-title {
+                font-size: 22px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-card">
+            <div class="success-header">
+                <div class="success-icon">
+                    <span class="material-icons">check</span>
+                </div>
+                <h1 class="success-title">Pedido Realizado com Sucesso!</h1>
+                <p class="success-subtitle">Obrigado por comprar na {{ store.name }}</p>
+            </div>
+
+            <div class="order-details">
+                <div class="order-number">
+                    <label>Número do Pedido</label>
+                    <span>{{ order.id[:8] | upper }}</span>
+                </div>
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <label>Status do Pedido</label>
+                        <p>
+                            {% if order.status == 'pending' %}
+                            <span class="status-badge pending">
+                                <span class="material-icons" style="font-size: 16px;">schedule</span>
+                                Aguardando Pagamento
+                            </span>
+                            {% elif order.status == 'paid' %}
+                            <span class="status-badge paid">
+                                <span class="material-icons" style="font-size: 16px;">check_circle</span>
+                                Pago
+                            </span>
+                            {% else %}
+                            {{ order.status }}
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="info-card">
+                        <label>Data do Pedido</label>
+                        <p>{{ order.placed_at.strftime('%d/%m/%Y às %H:%M') }}</p>
+                    </div>
+                </div>
+
+                {% if order.metadata_ and order.metadata_.customer %}
+                <div class="info-grid">
+                    <div class="info-card">
+                        <label>Nome</label>
+                        <p>{{ order.metadata_.customer.full_name }}</p>
+                    </div>
+                    <div class="info-card">
+                        <label>E-mail</label>
+                        <p>{{ order.metadata_.customer.email }}</p>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if order.metadata_ and order.metadata_.shipping and order.metadata_.shipping.address %}
+                {% set addr = order.metadata_.shipping.address %}
+                <h3 class="section-title">
+                    <span class="material-icons">location_on</span>
+                    Endereço de Entrega
+                </h3>
+                <div class="info-card" style="margin-bottom: 32px;">
+                    <p style="margin-bottom: 4px;">{{ addr.street }}, {{ addr.number }}{% if addr.complement %} - {{ addr.complement }}{% endif %}</p>
+                    <p style="margin-bottom: 4px;">{{ addr.neighborhood }} - {{ addr.city }}/{{ addr.state }}</p>
+                    <p>CEP: {{ addr.cep }}</p>
+                </div>
+                {% endif %}
+
+                <h3 class="section-title">
+                    <span class="material-icons">shopping_bag</span>
+                    Itens do Pedido
+                </h3>
+                <div class="items-list">
+                    {% for item in order.items %}
+                    <div class="item-row">
+                        <div class="item-info">
+                            <div class="item-qty">{{ item.quantity }}x</div>
+                            <span class="item-name">{{ item.title }}</span>
+                        </div>
+                        <span class="item-price">R$ {{ "%.2f" | format(item.unit_price * item.quantity) | replace('.', ',') }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="totals">
+                    {% set subtotal = order.total_amount %}
+                    {% set shipping_cost = 0 %}
+                    {% if order.metadata_ and order.metadata_.shipping and order.metadata_.shipping.cost %}
+                        {% set shipping_cost = order.metadata_.shipping.cost %}
+                        {% set subtotal = order.total_amount - shipping_cost %}
+                    {% endif %}
+                    
+                    <div class="total-row">
+                        <span class="label">Subtotal</span>
+                        <span class="value">R$ {{ "%.2f" | format(subtotal) | replace('.', ',') }}</span>
+                    </div>
+                    <div class="total-row">
+                        <span class="label">Frete</span>
+                        <span class="value">{% if shipping_cost == 0 %}Grátis{% else %}R$ {{ "%.2f" | format(shipping_cost) | replace('.', ',') }}{% endif %}</span>
+                    </div>
+                    <div class="total-row">
+                        <span class="label">Total</span>
+                        <span class="value">R$ {{ "%.2f" | format(order.total_amount) | replace('.', ',') }}</span>
+                    </div>
+                </div>
+
+                {% if order.payment %}
+                {% if order.payment.method == 'pix' and order.payment.payment_data and order.payment.payment_data.method_details %}
+                <div class="payment-info">
+                    <h4>
+                        <span class="material-icons" style="vertical-align: middle; margin-right: 8px;">qr_code</span>
+                        Pague com PIX
+                    </h4>
+                    <p style="color: var(--gray-600); margin-bottom: 16px;">Copie o código abaixo e pague pelo app do seu banco:</p>
+                    <div class="pix-code" id="pixCode">{{ order.payment.payment_data.info.pix_code if order.payment.payment_data.info else 'Código PIX não disponível' }}</div>
+                    <button class="btn-copy" onclick="copyPixCode()">
+                        <span class="material-icons">content_copy</span>
+                        Copiar Código PIX
+                    </button>
+                </div>
+                {% elif order.payment.method == 'boleto' and order.payment.payment_data and order.payment.payment_data.info %}
+                <div class="payment-info">
+                    <h4>
+                        <span class="material-icons" style="vertical-align: middle; margin-right: 8px;">receipt</span>
+                        Boleto Bancário
+                    </h4>
+                    <p style="color: var(--gray-600); margin-bottom: 16px;">Linha digitável:</p>
+                    <div class="boleto-code" id="boletoCode">{{ order.payment.payment_data.info.boleto_code }}</div>
+                    <button class="btn-copy" onclick="copyBoletoCode()">
+                        <span class="material-icons">content_copy</span>
+                        Copiar Linha Digitável
+                    </button>
+                </div>
+                {% endif %}
+                {% endif %}
+
+                <div class="actions">
+                    <a href="{{ url_for('storefront.view_store', slug=store.slug) }}" class="btn btn-primary">
+                        <span class="material-icons">store</span>
+                        Continuar Comprando
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyPixCode() {
+            const code = document.getElementById('pixCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Código PIX copiado!');
+            });
+        }
+
+        function copyBoletoCode() {
+            const code = document.getElementById('boletoCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Linha digitável copiada!');
+            });
+        }
+    </script>
+</body>
+</html>

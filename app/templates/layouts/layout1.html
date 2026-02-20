@@ -1302,7 +1302,7 @@
                 <span>Total:</span>
                 <span id="cartTotal">R$ 0,00</span>
             </div>
-            <button class="btn-checkout"><a style="text-decoration: none; color: white;" href="/purchase">Finalizar Compra</a></button>
+            <button class="btn-checkout" onclick="goToCheckout()">Finalizar Compra</button>
         </div>
     </aside>
 
@@ -1325,6 +1325,19 @@
 
         // Cart functionality
         let cart = [];
+
+        // Carregar carrinho do localStorage ao iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedCart = localStorage.getItem('cart_{{ store.slug }}');
+            if (savedCart) {
+                try {
+                    cart = JSON.parse(savedCart);
+                    updateCartUI();
+                } catch (e) {
+                    cart = [];
+                }
+            }
+        });
 
         function openCart() {
             document.getElementById('cartOverlay').classList.add('active');
@@ -1370,6 +1383,9 @@
             cartCount.textContent = totalItems;
             cartTotal.textContent = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
             
+            // Salvar carrinho no localStorage
+            localStorage.setItem('cart_{{ store.slug }}', JSON.stringify(cart));
+            
             if (cart.length === 0) {
                 cartBody.innerHTML = `
                     <div class="cart-empty">
@@ -1395,6 +1411,15 @@
                     </div>
                 `).join('');
             }
+        }
+
+        function goToCheckout() {
+            if (cart.length === 0) {
+                alert('Seu carrinho está vazio!');
+                return;
+            }
+            // Carrinho já foi salvo no localStorage pela função updateCartUI
+            window.location.href = '/{{ store.slug }}/checkout';
         }
 
         function searchProducts() {

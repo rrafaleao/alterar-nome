@@ -4,6 +4,11 @@ from .decorators import login_required, store_required
 from app.models.store import Store
 from app.models.product import Product
 from app.models.category import Category
+from app.models.order import Order
+from app.models.store_customer import StoreCustomer
+from config.database import db
+from datetime import datetime, timedelta
+from decimal import Decimal
 
 
 @admin.route('/dashboard')
@@ -11,7 +16,39 @@ from app.models.category import Category
 @store_required
 def dashboard():
     """Página principal do dashboard"""
-    return render_template('admin/dashboard.html')
+    store_id = session.get('store_id')
+    
+    # Estatísticas de vendas
+    orders = Order.query.filter_by(store_id=store_id).all()
+    total_sales = sum(float(o.total_amount) for o in orders if o.status in ['paid', 'shipped', 'delivered'])
+    total_orders = len(orders)
+    pending_orders = sum(1 for o in orders if o.status == 'pending')
+    
+    # Produtos
+    total_products = Product.query.filter_by(store_id=store_id).count()
+    active_products = Product.query.filter_by(store_id=store_id, active=True).count()
+    
+    # Clientes
+    total_customers = StoreCustomer.query.filter_by(store_id=store_id).count()
+    
+    # Pedidos recentes (últimos 5)
+    recent_orders = Order.query.filter_by(store_id=store_id)\
+        .order_by(Order.placed_at.desc())\
+        .limit(5)\
+        .all()
+    
+    return render_template(
+        'admin/dashboard.html',
+        stats={
+            'total_sales': total_sales,
+            'total_orders': total_orders,
+            'pending_orders': pending_orders,
+            'total_products': total_products,
+            'active_products': active_products,
+            'total_customers': total_customers
+        },
+        recent_orders=recent_orders
+    )
 
 
 @admin.route('/dashboard/stats', methods=['GET'])

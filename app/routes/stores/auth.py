@@ -134,6 +134,9 @@ def customer_register(slug):
         session['customer_store_id'] = store.id
         session['customer_store_slug'] = store.slug
 
+        # Verificar se há redirecionamento pendente (ex: checkout)
+        redirect_url = session.pop('checkout_redirect', None) or url_for('storefront.view_store', slug=slug)
+
         print(f"Novo cliente registrado: {customer.email} na loja {store.name}")
 
         return jsonify({
@@ -143,7 +146,7 @@ def customer_register(slug):
                 'customer_id': customer.id,
                 'customer_name': customer.full_name,
                 'customer_email': customer.email,
-                'redirect_url': url_for('storefront.view_store', slug=slug)
+                'redirect_url': redirect_url
             }
         }), 201
 
@@ -206,6 +209,9 @@ def customer_login(slug):
         session['customer_store_id'] = store.id
         session['customer_store_slug'] = store.slug
 
+        # Verificar se há redirecionamento pendente (ex: checkout)
+        redirect_url = session.pop('checkout_redirect', None) or url_for('storefront.view_store', slug=slug)
+
         print(f"Login de cliente: {customer.email} na loja {store.name}")
 
         return jsonify({
@@ -215,7 +221,7 @@ def customer_login(slug):
                 'customer_id': customer.id,
                 'customer_name': customer.full_name,
                 'customer_email': customer.email,
-                'redirect_url': url_for('storefront.view_store', slug=slug)
+                'redirect_url': redirect_url
             }
         }), 200
 
