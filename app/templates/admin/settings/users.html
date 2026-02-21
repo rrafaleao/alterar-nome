@@ -1,0 +1,752 @@
+{% extends "/admin/base.html" %}
+
+{% block title %}Usuários e Permissões{% endblock %}
+
+{% block nav_configuracoes %}active{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .header {
+        background: #fff;
+        padding: 24px 32px;
+        border-radius: 12px;
+        margin-bottom: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .back-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #f7fafc;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #718096;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .back-btn:hover {
+        background: #edf2f7;
+        color: var(--primary-color);
+    }
+
+    .header h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header h2 .material-icons {
+        font-size: 32px;
+        color: #9f7aea;
+    }
+
+    .header-subtitle {
+        color: #718096;
+        font-size: 14px;
+        margin-top: 6px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(159, 122, 234, 0.4);
+    }
+
+    .btn-secondary {
+        background: #edf2f7;
+        color: #4a5568;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    /* USERS TABLE */
+    .users-section {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+    }
+
+    .users-header {
+        padding: 24px 28px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .users-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .users-title .material-icons {
+        color: #9f7aea;
+    }
+
+    .users-count {
+        background: #9f7aea;
+        color: #fff;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .users-table thead {
+        background: #f7fafc;
+    }
+
+    .users-table th {
+        padding: 14px 20px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 600;
+        color: #718096;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .users-table td {
+        padding: 20px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .users-table tbody tr:hover {
+        background: #f7fafc;
+    }
+
+    .users-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .user-info {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+    }
+
+    .user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 600;
+        font-size: 16px;
+    }
+
+    .user-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a202c;
+    }
+
+    .user-email {
+        font-size: 13px;
+        color: #718096;
+    }
+
+    .role-badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        display: inline-block;
+    }
+
+    .role-badge.owner {
+        background: linear-gradient(135deg, #faf089 0%, #f6e05e 100%);
+        color: #744210;
+    }
+
+    .role-badge.admin {
+        background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+        color: #fff;
+    }
+
+    .role-badge.manager {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+
+    .role-badge.staff {
+        background: #e2e8f0;
+        color: #4a5568;
+    }
+
+    .status-active {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #48bb78;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .status-active::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #48bb78;
+    }
+
+    .status-pending {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #ed8936;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .status-pending::before {
+        content: '';
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #ed8936;
+    }
+
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        background: #f7fafc;
+        color: #718096;
+    }
+
+    .action-btn:hover {
+        background: #edf2f7;
+        color: var(--primary-color);
+    }
+
+    .action-btn.delete:hover {
+        background: #fed7d7;
+        color: #e53e3e;
+    }
+
+    .actions-cell {
+        display: flex;
+        gap: 8px;
+    }
+
+    /* INVITE MODAL */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal {
+        background: #fff;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        overflow: hidden;
+    }
+
+    .modal-header {
+        padding: 24px 28px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a202c;
+    }
+
+    .modal-close {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f7fafc;
+        color: #718096;
+        transition: all 0.2s;
+    }
+
+    .modal-close:hover {
+        background: #edf2f7;
+        color: #1a202c;
+    }
+
+    .modal-body {
+        padding: 28px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .form-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s;
+        background: #fff;
+        font-family: 'Instrument Sans', sans-serif;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #9f7aea;
+        box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.1);
+    }
+
+    .modal-footer {
+        padding: 20px 28px;
+        background: #f7fafc;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    /* ROLES SECTION */
+    .roles-section {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        margin-top: 24px;
+    }
+
+    .roles-header {
+        padding: 24px 28px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .roles-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .roles-title .material-icons {
+        color: #9f7aea;
+    }
+
+    .roles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        padding: 28px;
+    }
+
+    .role-card {
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        transition: all 0.2s;
+    }
+
+    .role-card:hover {
+        border-color: #9f7aea;
+        box-shadow: 0 4px 12px rgba(159, 122, 234, 0.1);
+    }
+
+    .role-card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 12px;
+    }
+
+    .role-card-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #1a202c;
+    }
+
+    .role-card-users {
+        font-size: 12px;
+        color: #718096;
+        background: #f7fafc;
+        padding: 4px 10px;
+        border-radius: 12px;
+    }
+
+    .role-card-description {
+        font-size: 14px;
+        color: #718096;
+        line-height: 1.5;
+        margin-bottom: 16px;
+    }
+
+    .role-permissions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .permission-tag {
+        font-size: 11px;
+        padding: 4px 10px;
+        background: #f7fafc;
+        color: #4a5568;
+        border-radius: 6px;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .users-table {
+            display: block;
+            overflow-x: auto;
+        }
+
+        .roles-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="header">
+    <div class="header-left">
+        <a href="{{ url_for('admin.settings_page') }}" class="back-btn">
+            <span class="material-icons">arrow_back</span>
+        </a>
+        <div>
+            <h2>
+                <span class="material-icons">manage_accounts</span>
+                Usuários e Permissões
+            </h2>
+            <p class="header-subtitle">Gerencie sua equipe e controle os níveis de acesso</p>
+        </div>
+    </div>
+    <button class="btn btn-primary" onclick="openInviteModal()">
+        <span class="material-icons" style="font-size: 18px;">person_add</span>
+        Convidar Usuário
+    </button>
+</div>
+
+<!-- Users Section -->
+<div class="users-section">
+    <div class="users-header">
+        <div class="users-title">
+            <span class="material-icons">group</span>
+            Equipe
+            <span class="users-count">3</span>
+        </div>
+    </div>
+    <table class="users-table">
+        <thead>
+            <tr>
+                <th>Usuário</th>
+                <th>Função</th>
+                <th>Status</th>
+                <th>Último Acesso</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <div class="user-info">
+                        <div class="user-avatar">RC</div>
+                        <div class="user-details">
+                            <span class="user-name">Rafael Câmpera</span>
+                            <span class="user-email">rafael@exemplo.com</span>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="role-badge owner">Proprietário</span></td>
+                <td><span class="status-active">Ativo</span></td>
+                <td style="color: #718096; font-size: 14px;">Agora</td>
+                <td>
+                    <div class="actions-cell">
+                        <button class="action-btn" title="Editar">
+                            <span class="material-icons" style="font-size: 18px;">edit</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="user-info">
+                        <div class="user-avatar" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">MS</div>
+                        <div class="user-details">
+                            <span class="user-name">Maria Silva</span>
+                            <span class="user-email">maria@exemplo.com</span>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="role-badge admin">Administrador</span></td>
+                <td><span class="status-active">Ativo</span></td>
+                <td style="color: #718096; font-size: 14px;">Há 2 horas</td>
+                <td>
+                    <div class="actions-cell">
+                        <button class="action-btn" title="Editar">
+                            <span class="material-icons" style="font-size: 18px;">edit</span>
+                        </button>
+                        <button class="action-btn delete" title="Remover">
+                            <span class="material-icons" style="font-size: 18px;">delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="user-info">
+                        <div class="user-avatar" style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);">JP</div>
+                        <div class="user-details">
+                            <span class="user-name">João Pedro</span>
+                            <span class="user-email">joao@exemplo.com</span>
+                        </div>
+                    </div>
+                </td>
+                <td><span class="role-badge staff">Vendedor</span></td>
+                <td><span class="status-pending">Convite Pendente</span></td>
+                <td style="color: #718096; font-size: 14px;">--</td>
+                <td>
+                    <div class="actions-cell">
+                        <button class="action-btn" title="Reenviar Convite">
+                            <span class="material-icons" style="font-size: 18px;">send</span>
+                        </button>
+                        <button class="action-btn delete" title="Cancelar Convite">
+                            <span class="material-icons" style="font-size: 18px;">close</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- Roles Section -->
+<div class="roles-section">
+    <div class="roles-header">
+        <div class="roles-title">
+            <span class="material-icons">admin_panel_settings</span>
+            Funções e Permissões
+        </div>
+    </div>
+    <div class="roles-grid">
+        <div class="role-card">
+            <div class="role-card-header">
+                <span class="role-card-title">Proprietário</span>
+                <span class="role-card-users">1 usuário</span>
+            </div>
+            <p class="role-card-description">Acesso total à loja. Pode gerenciar todos os aspectos incluindo faturamento e exclusão da conta.</p>
+            <div class="role-permissions">
+                <span class="permission-tag">Todas as permissões</span>
+            </div>
+        </div>
+        <div class="role-card">
+            <div class="role-card-header">
+                <span class="role-card-title">Administrador</span>
+                <span class="role-card-users">1 usuário</span>
+            </div>
+            <p class="role-card-description">Gerencia produtos, pedidos, clientes e configurações. Não pode alterar dados de faturamento.</p>
+            <div class="role-permissions">
+                <span class="permission-tag">Produtos</span>
+                <span class="permission-tag">Pedidos</span>
+                <span class="permission-tag">Clientes</span>
+                <span class="permission-tag">Relatórios</span>
+                <span class="permission-tag">Configurações</span>
+            </div>
+        </div>
+        <div class="role-card">
+            <div class="role-card-header">
+                <span class="role-card-title">Gerente</span>
+                <span class="role-card-users">0 usuários</span>
+            </div>
+            <p class="role-card-description">Gerencia produtos e pedidos. Pode ver relatórios de vendas.</p>
+            <div class="role-permissions">
+                <span class="permission-tag">Produtos</span>
+                <span class="permission-tag">Pedidos</span>
+                <span class="permission-tag">Relatórios</span>
+            </div>
+        </div>
+        <div class="role-card">
+            <div class="role-card-header">
+                <span class="role-card-title">Vendedor</span>
+                <span class="role-card-users">1 usuário</span>
+            </div>
+            <p class="role-card-description">Visualiza e processa pedidos. Acesso básico ao painel.</p>
+            <div class="role-permissions">
+                <span class="permission-tag">Pedidos</span>
+                <span class="permission-tag">Clientes</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Invite Modal -->
+<div class="modal-overlay" id="inviteModal">
+    <div class="modal">
+        <div class="modal-header">
+            <span class="modal-title">Convidar Usuário</span>
+            <button class="modal-close" onclick="closeInviteModal()">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">E-mail</label>
+                <input type="email" class="form-input" placeholder="email@exemplo.com" id="invite-email">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Nome</label>
+                <input type="text" class="form-input" placeholder="Nome do usuário" id="invite-name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Função</label>
+                <select class="form-input" id="invite-role">
+                    <option value="admin">Administrador</option>
+                    <option value="manager">Gerente</option>
+                    <option value="staff" selected>Vendedor</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeInviteModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="sendInvite()">
+                <span class="material-icons" style="font-size: 18px;">send</span>
+                Enviar Convite
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+function openInviteModal() {
+    document.getElementById('inviteModal').classList.add('active');
+}
+
+function closeInviteModal() {
+    document.getElementById('inviteModal').classList.remove('active');
+}
+
+function sendInvite() {
+    const email = document.getElementById('invite-email').value;
+    const name = document.getElementById('invite-name').value;
+    const role = document.getElementById('invite-role').value;
+    
+    if (!email || !name) {
+        alert('Preencha todos os campos');
+        return;
+    }
+    
+    // TODO: Implementar envio de convite via API
+    alert(`Convite enviado para ${email}!`);
+    closeInviteModal();
+}
+
+// Fechar modal ao clicar fora
+document.getElementById('inviteModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeInviteModal();
+    }
+});
+</script>
+{% endblock %}

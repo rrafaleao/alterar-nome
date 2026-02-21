@@ -1,0 +1,664 @@
+{% extends "/admin/base.html" %}
+
+{% block title %}Meios de Pagamento{% endblock %}
+
+{% block nav_configuracoes %}active{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .header {
+        background: #fff;
+        padding: 24px 32px;
+        border-radius: 12px;
+        margin-bottom: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .back-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #f7fafc;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #718096;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .back-btn:hover {
+        background: #edf2f7;
+        color: var(--primary-color);
+    }
+
+    .header h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header h2 .material-icons {
+        font-size: 32px;
+        color: var(--primary-color);
+    }
+
+    .header-subtitle {
+        color: #718096;
+        font-size: 14px;
+        margin-top: 6px;
+    }
+
+    /* PAYMENT METHODS */
+    .payment-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .payment-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .payment-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .payment-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 24px 28px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .payment-card-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .payment-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+
+    .payment-icon.pix {
+        background: linear-gradient(135deg, #32bcad15 0%, #00a89515 100%);
+        color: #00a895;
+    }
+
+    .payment-icon.credit {
+        background: linear-gradient(135deg, #4A90E215 0%, #357ABD15 100%);
+        color: var(--primary-color);
+    }
+
+    .payment-icon.debit {
+        background: linear-gradient(135deg, #9f7aea15 0%, #805ad515 100%);
+        color: #9f7aea;
+    }
+
+    .payment-icon.boleto {
+        background: linear-gradient(135deg, #ed8a3615 0%, #dd6b2015 100%);
+        color: #ed8936;
+    }
+
+    .payment-details h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 4px;
+    }
+
+    .payment-details p {
+        font-size: 14px;
+        color: #718096;
+    }
+
+    .payment-card-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+        position: relative;
+        width: 52px;
+        height: 28px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #cbd5e0;
+        transition: 0.3s;
+        border-radius: 28px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+        background: var(--primary-gradient);
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(24px);
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-badge.active {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+
+    .status-badge.inactive {
+        background: #e2e8f0;
+        color: #718096;
+    }
+
+    .btn-configure {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #4a5568;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-configure:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+
+    /* Payment Card Body */
+    .payment-card-body {
+        padding: 24px 28px;
+        background: #f7fafc;
+        display: none;
+    }
+
+    .payment-card-body.active {
+        display: block;
+    }
+
+    .config-section {
+        margin-bottom: 20px;
+    }
+
+    .config-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .config-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .config-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s;
+        background: #fff;
+    }
+
+    .config-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .config-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: var(--primary-gradient);
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+    }
+
+    .btn-secondary {
+        background: #edf2f7;
+        color: #4a5568;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .config-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    /* Info Box */
+    .info-box {
+        background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+        padding: 16px 20px;
+        border-radius: 10px;
+        border: 1px solid #90cdf4;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 32px;
+    }
+
+    .info-box .material-icons {
+        color: #3182ce;
+        font-size: 22px;
+    }
+
+    .info-box-content {
+        flex: 1;
+    }
+
+    .info-box-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #2c5282;
+        margin-bottom: 4px;
+    }
+
+    .info-box-text {
+        font-size: 13px;
+        color: #2b6cb0;
+        line-height: 1.5;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .payment-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .payment-card-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .config-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="header">
+    <div class="header-left">
+        <a href="{{ url_for('admin.settings_page') }}" class="back-btn">
+            <span class="material-icons">arrow_back</span>
+        </a>
+        <div>
+            <h2>
+                <span class="material-icons">credit_card</span>
+                Meios de Pagamento
+            </h2>
+            <p class="header-subtitle">Configure os métodos de pagamento aceitos pela sua loja</p>
+        </div>
+    </div>
+</div>
+
+<!-- Info Box -->
+<div class="info-box">
+    <span class="material-icons">info</span>
+    <div class="info-box-content">
+        <div class="info-box-title">Dica de configuração</div>
+        <div class="info-box-text">Ative os métodos de pagamento que deseja oferecer aos seus clientes. Para métodos como PIX e cartão, você precisará integrar com um provedor de pagamentos.</div>
+    </div>
+</div>
+
+<!-- Payment Methods -->
+<div class="payment-methods">
+    <!-- PIX -->
+    <div class="payment-card" data-method="pix">
+        <div class="payment-card-header">
+            <div class="payment-card-info">
+                <div class="payment-icon pix">
+                    <span class="material-icons">qr_code_2</span>
+                </div>
+                <div class="payment-details">
+                    <h3>PIX</h3>
+                    <p>Pagamento instantâneo via QR Code ou chave PIX</p>
+                </div>
+            </div>
+            <div class="payment-card-actions">
+                <span class="status-badge inactive" id="pix-status">Inativo</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="pix-toggle" onchange="togglePaymentMethod('pix')">
+                    <span class="toggle-slider"></span>
+                </label>
+                <button class="btn-configure" onclick="toggleConfig('pix')">
+                    <span class="material-icons" style="font-size: 18px;">settings</span>
+                    Configurar
+                </button>
+            </div>
+        </div>
+        <div class="payment-card-body" id="pix-config">
+            <div class="config-section">
+                <label class="config-label">Chave PIX</label>
+                <input type="text" class="config-input" placeholder="CPF, CNPJ, E-mail ou Chave aleatória" id="pix-key">
+            </div>
+            <div class="config-section">
+                <label class="config-label">Nome do Beneficiário</label>
+                <input type="text" class="config-input" placeholder="Nome que aparecerá no comprovante" id="pix-name">
+            </div>
+            <div class="config-actions">
+                <button class="btn btn-primary" onclick="savePaymentConfig('pix')">
+                    <span class="material-icons" style="font-size: 18px;">save</span>
+                    Salvar Configuração
+                </button>
+                <button class="btn btn-secondary" onclick="toggleConfig('pix')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cartão de Crédito -->
+    <div class="payment-card" data-method="credit_card">
+        <div class="payment-card-header">
+            <div class="payment-card-info">
+                <div class="payment-icon credit">
+                    <span class="material-icons">credit_card</span>
+                </div>
+                <div class="payment-details">
+                    <h3>Cartão de Crédito</h3>
+                    <p>Aceite Visa, Mastercard, Elo e outras bandeiras</p>
+                </div>
+            </div>
+            <div class="payment-card-actions">
+                <span class="status-badge inactive" id="credit_card-status">Inativo</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="credit_card-toggle" onchange="togglePaymentMethod('credit_card')">
+                    <span class="toggle-slider"></span>
+                </label>
+                <button class="btn-configure" onclick="toggleConfig('credit_card')">
+                    <span class="material-icons" style="font-size: 18px;">settings</span>
+                    Configurar
+                </button>
+            </div>
+        </div>
+        <div class="payment-card-body" id="credit_card-config">
+            <div class="config-section">
+                <label class="config-label">Provedor de Pagamento</label>
+                <select class="config-input" id="credit_card-provider">
+                    <option value="">Selecione um provedor</option>
+                    <option value="mercadopago">Mercado Pago</option>
+                    <option value="pagseguro">PagSeguro</option>
+                    <option value="stripe">Stripe</option>
+                    <option value="pagarme">Pagar.me</option>
+                </select>
+            </div>
+            <div class="config-row">
+                <div class="config-section">
+                    <label class="config-label">Chave Pública (API Key)</label>
+                    <input type="text" class="config-input" placeholder="pk_live_..." id="credit_card-public-key">
+                </div>
+                <div class="config-section">
+                    <label class="config-label">Chave Secreta (Secret Key)</label>
+                    <input type="password" class="config-input" placeholder="sk_live_..." id="credit_card-secret-key">
+                </div>
+            </div>
+            <div class="config-section">
+                <label class="config-label">Parcelamento Máximo</label>
+                <select class="config-input" id="credit_card-installments">
+                    <option value="1">À vista</option>
+                    <option value="3">Até 3x</option>
+                    <option value="6">Até 6x</option>
+                    <option value="12" selected>Até 12x</option>
+                </select>
+            </div>
+            <div class="config-actions">
+                <button class="btn btn-primary" onclick="savePaymentConfig('credit_card')">
+                    <span class="material-icons" style="font-size: 18px;">save</span>
+                    Salvar Configuração
+                </button>
+                <button class="btn btn-secondary" onclick="toggleConfig('credit_card')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cartão de Débito -->
+    <div class="payment-card" data-method="debit_card">
+        <div class="payment-card-header">
+            <div class="payment-card-info">
+                <div class="payment-icon debit">
+                    <span class="material-icons">payment</span>
+                </div>
+                <div class="payment-details">
+                    <h3>Cartão de Débito</h3>
+                    <p>Débito instantâneo na conta do cliente</p>
+                </div>
+            </div>
+            <div class="payment-card-actions">
+                <span class="status-badge inactive" id="debit_card-status">Inativo</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="debit_card-toggle" onchange="togglePaymentMethod('debit_card')">
+                    <span class="toggle-slider"></span>
+                </label>
+                <button class="btn-configure" onclick="toggleConfig('debit_card')">
+                    <span class="material-icons" style="font-size: 18px;">settings</span>
+                    Configurar
+                </button>
+            </div>
+        </div>
+        <div class="payment-card-body" id="debit_card-config">
+            <div class="config-section">
+                <label class="config-label">Provedor de Pagamento</label>
+                <select class="config-input" id="debit_card-provider">
+                    <option value="">Selecione um provedor</option>
+                    <option value="mercadopago">Mercado Pago</option>
+                    <option value="pagseguro">PagSeguro</option>
+                    <option value="stripe">Stripe</option>
+                </select>
+            </div>
+            <div class="config-actions">
+                <button class="btn btn-primary" onclick="savePaymentConfig('debit_card')">
+                    <span class="material-icons" style="font-size: 18px;">save</span>
+                    Salvar Configuração
+                </button>
+                <button class="btn btn-secondary" onclick="toggleConfig('debit_card')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Boleto -->
+    <div class="payment-card" data-method="boleto">
+        <div class="payment-card-header">
+            <div class="payment-card-info">
+                <div class="payment-icon boleto">
+                    <span class="material-icons">receipt_long</span>
+                </div>
+                <div class="payment-details">
+                    <h3>Boleto Bancário</h3>
+                    <p>Pagamento via boleto com vencimento configurável</p>
+                </div>
+            </div>
+            <div class="payment-card-actions">
+                <span class="status-badge inactive" id="boleto-status">Inativo</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="boleto-toggle" onchange="togglePaymentMethod('boleto')">
+                    <span class="toggle-slider"></span>
+                </label>
+                <button class="btn-configure" onclick="toggleConfig('boleto')">
+                    <span class="material-icons" style="font-size: 18px;">settings</span>
+                    Configurar
+                </button>
+            </div>
+        </div>
+        <div class="payment-card-body" id="boleto-config">
+            <div class="config-row">
+                <div class="config-section">
+                    <label class="config-label">Dias para Vencimento</label>
+                    <input type="number" class="config-input" placeholder="3" value="3" id="boleto-days">
+                </div>
+                <div class="config-section">
+                    <label class="config-label">Desconto à Vista (%)</label>
+                    <input type="number" class="config-input" placeholder="5" value="0" id="boleto-discount">
+                </div>
+            </div>
+            <div class="config-section">
+                <label class="config-label">Instruções no Boleto</label>
+                <input type="text" class="config-input" placeholder="Não receber após o vencimento" id="boleto-instructions">
+            </div>
+            <div class="config-actions">
+                <button class="btn btn-primary" onclick="savePaymentConfig('boleto')">
+                    <span class="material-icons" style="font-size: 18px;">save</span>
+                    Salvar Configuração
+                </button>
+                <button class="btn btn-secondary" onclick="toggleConfig('boleto')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadPaymentMethods();
+});
+
+async function loadPaymentMethods() {
+    try {
+        const response = await fetch('/admin/settings/store');
+        const data = await response.json();
+        
+        if (data.success && data.data.payment_methods) {
+            data.data.payment_methods.forEach(pm => {
+                const toggle = document.getElementById(`${pm.method}-toggle`);
+                const status = document.getElementById(`${pm.method}-status`);
+                
+                if (toggle && pm.is_enabled) {
+                    toggle.checked = true;
+                    status.textContent = 'Ativo';
+                    status.className = 'status-badge active';
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Erro ao carregar métodos de pagamento:', error);
+    }
+}
+
+function toggleConfig(method) {
+    const config = document.getElementById(`${method}-config`);
+    config.classList.toggle('active');
+}
+
+function togglePaymentMethod(method) {
+    const toggle = document.getElementById(`${method}-toggle`);
+    const status = document.getElementById(`${method}-status`);
+    
+    if (toggle.checked) {
+        status.textContent = 'Ativo';
+        status.className = 'status-badge active';
+    } else {
+        status.textContent = 'Inativo';
+        status.className = 'status-badge inactive';
+    }
+    
+    // TODO: Fazer chamada API para salvar
+}
+
+function savePaymentConfig(method) {
+    // TODO: Implementar salvamento via API
+    alert(`Configuração do método ${method} salva com sucesso!`);
+    toggleConfig(method);
+}
+</script>
+{% endblock %}

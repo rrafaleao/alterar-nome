@@ -9,7 +9,7 @@ from app.models.store import Store
 @store_required
 def settings_page():
     """Página principal de configurações"""
-    return render_template('admin/settings.html')
+    return render_template('admin/settings/index.html')
 
 
 @admin.route('/settings/payments')
@@ -101,6 +101,15 @@ def my_store_info():
                 'error': 'Loja não encontrada'
             }), 404
         
+        # Contar meios de pagamento e envio ativos
+        payment_count = len([pm for pm in store.payment_methods if pm.is_enabled])
+        shipping_count = len([sm for sm in store.shipping_methods if sm.is_enabled])
+        
+        # Obter URL do logo se existir customização
+        logo_url = None
+        if store.customization and store.customization.logo:
+            logo_url = store.customization.logo
+        
         return jsonify({
             'success': True,
             'data': {
@@ -108,9 +117,11 @@ def my_store_info():
                 'name': store.name,
                 'slug': store.slug,
                 'description': store.description,
-                'logo_url': store.logo_url,
+                'logo_url': logo_url,
                 'is_published': store.is_published,
-                'public_url': f'/{store.slug}'
+                'public_url': f'/{store.slug}',
+                'payment_count': payment_count,
+                'shipping_count': shipping_count
             }
         }), 200
         

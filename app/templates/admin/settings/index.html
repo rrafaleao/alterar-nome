@@ -1,0 +1,650 @@
+{% extends "/admin/base.html" %}
+
+{% block title %}Configurações{% endblock %}
+
+{% block nav_configuracoes %}active{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .header {
+        background: #fff;
+        padding: 24px 32px;
+        border-radius: 12px;
+        margin-bottom: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header h2 .material-icons {
+        font-size: 32px;
+        color: var(--primary-color);
+    }
+
+    .header-subtitle {
+        color: #718096;
+        font-size: 14px;
+        margin-top: 6px;
+    }
+
+    /* SETTINGS GRID */
+    .settings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+        margin-bottom: 32px;
+    }
+
+    .settings-card {
+        background: #fff;
+        padding: 28px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        text-decoration: none;
+        display: block;
+    }
+
+    .settings-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--primary-gradient-vertical);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .settings-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    }
+
+    .settings-card:hover::before {
+        opacity: 1;
+    }
+
+    .settings-card-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .settings-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        flex-shrink: 0;
+    }
+
+    .settings-icon.blue {
+        background: var(--primary-color-light);
+        color: var(--primary-color);
+    }
+
+    .settings-icon.green {
+        background: linear-gradient(135deg, #48bb7815 0%, #34a85315 100%);
+        color: #48bb78;
+    }
+
+    .settings-icon.orange {
+        background: linear-gradient(135deg, #ed8a3615 0%, #dd6b2015 100%);
+        color: #ed8936;
+    }
+
+    .settings-icon.purple {
+        background: linear-gradient(135deg, #9f7aea15 0%, #805ad515 100%);
+        color: #9f7aea;
+    }
+
+    .settings-icon.red {
+        background: linear-gradient(135deg, #fc818115 0%, #e5393515 100%);
+        color: #e53935;
+    }
+
+    .settings-icon.teal {
+        background: linear-gradient(135deg, #38b2ac15 0%, #31979115 100%);
+        color: #38b2ac;
+    }
+
+    .settings-card-info {
+        flex: 1;
+    }
+
+    .settings-card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 6px;
+    }
+
+    .settings-card-description {
+        font-size: 14px;
+        color: #718096;
+        line-height: 1.5;
+    }
+
+    .settings-card-arrow {
+        position: absolute;
+        right: 24px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #cbd5e0;
+        transition: all 0.3s ease;
+    }
+
+    .settings-card:hover .settings-card-arrow {
+        color: var(--primary-color);
+        transform: translateY(-50%) translateX(4px);
+    }
+
+    /* QUICK INFO SECTION */
+    .quick-info-section {
+        background: #fff;
+        padding: 28px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        margin-bottom: 32px;
+    }
+
+    .quick-info-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .quick-info-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .quick-info-title .material-icons {
+        color: var(--primary-color);
+    }
+
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px;
+        background: #f7fafc;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+    }
+
+    .info-item:hover {
+        background: #edf2f7;
+    }
+
+    .info-item-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        color: var(--primary-color);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    }
+
+    .info-item-content {
+        flex: 1;
+    }
+
+    .info-item-label {
+        font-size: 12px;
+        color: #718096;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+    }
+
+    .info-item-value {
+        font-size: 15px;
+        font-weight: 600;
+        color: #1a202c;
+    }
+
+    /* STORE STATUS */
+    .store-status {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+        padding: 20px 24px;
+        background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+        border-radius: 12px;
+        margin-bottom: 32px;
+        border: 1px solid #9ae6b4;
+    }
+
+    .store-status.offline {
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        border-color: #feb2b2;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .status-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: #48bb78;
+        animation: pulse 2s infinite;
+    }
+
+    .store-status.offline .status-dot {
+        background: #e53935;
+        animation: none;
+    }
+
+    @keyframes pulse {
+        0%, 100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+        50% {
+            opacity: 0.6;
+            transform: scale(1.1);
+        }
+    }
+
+    .status-text {
+        font-size: 16px;
+        font-weight: 600;
+        color: #22543d;
+    }
+
+    .store-status.offline .status-text {
+        color: #742a2a;
+    }
+
+    .status-description {
+        font-size: 14px;
+        color: #276749;
+        flex: 1;
+    }
+
+    .store-status.offline .status-description {
+        color: #9b2c2c;
+    }
+
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: var(--primary-gradient);
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);
+    }
+
+    .btn-outline {
+        background: #fff;
+        color: #22543d;
+        border: 1px solid #9ae6b4;
+    }
+
+    .store-status.offline .btn-outline {
+        color: #742a2a;
+        border-color: #feb2b2;
+    }
+
+    .btn-outline:hover {
+        background: #f0fff4;
+    }
+
+    .store-status.offline .btn-outline:hover {
+        background: #fff5f5;
+    }
+
+    /* HELP SECTION */
+    .help-section {
+        background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+        padding: 24px 28px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        border: 1px solid #90cdf4;
+    }
+
+    .help-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        background: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #3182ce;
+        font-size: 28px;
+        box-shadow: 0 4px 12px rgba(49, 130, 206, 0.2);
+    }
+
+    .help-content {
+        flex: 1;
+    }
+
+    .help-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #2c5282;
+        margin-bottom: 4px;
+    }
+
+    .help-description {
+        font-size: 14px;
+        color: #2b6cb0;
+    }
+
+    .help-link {
+        color: #3182ce;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: color 0.2s;
+    }
+
+    .help-link:hover {
+        color: #2c5282;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .settings-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .store-status {
+            flex-direction: column;
+            text-align: center;
+            gap: 16px;
+        }
+
+        .help-section {
+            flex-direction: column;
+            text-align: center;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="header">
+    <div>
+        <h2>
+            <span class="material-icons">settings</span>
+            Configurações
+        </h2>
+        <p class="header-subtitle">Gerencie todas as configurações da sua loja</p>
+    </div>
+</div>
+
+<!-- Store Status -->
+<div class="store-status" id="storeStatus">
+    <div class="status-indicator">
+        <div class="status-dot"></div>
+        <span class="status-text">Loja Online</span>
+    </div>
+    <span class="status-description">Sua loja está publicada e acessível para os clientes</span>
+    <a href="#" class="btn btn-outline" id="toggleStore">
+        <span class="material-icons" style="font-size: 18px;">visibility</span>
+        Ver Loja
+    </a>
+</div>
+
+<!-- Quick Info -->
+<div class="quick-info-section">
+    <div class="quick-info-header">
+        <h3 class="quick-info-title">
+            <span class="material-icons">info</span>
+            Informações Rápidas
+        </h3>
+    </div>
+    <div class="info-grid">
+        <div class="info-item">
+            <div class="info-item-icon">
+                <span class="material-icons">store</span>
+            </div>
+            <div class="info-item-content">
+                <div class="info-item-label">Nome da Loja</div>
+                <div class="info-item-value" id="storeName">Carregando...</div>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-item-icon">
+                <span class="material-icons">link</span>
+            </div>
+            <div class="info-item-content">
+                <div class="info-item-label">URL da Loja</div>
+                <div class="info-item-value" id="storeUrl">Carregando...</div>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-item-icon">
+                <span class="material-icons">payments</span>
+            </div>
+            <div class="info-item-content">
+                <div class="info-item-label">Meios de Pagamento</div>
+                <div class="info-item-value" id="paymentCount">--</div>
+            </div>
+        </div>
+        <div class="info-item">
+            <div class="info-item-icon">
+                <span class="material-icons">local_shipping</span>
+            </div>
+            <div class="info-item-content">
+                <div class="info-item-label">Meios de Envio</div>
+                <div class="info-item-value" id="shippingCount">--</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Grid -->
+<div class="settings-grid">
+    <!-- Meios de Pagamento -->
+    <a href="{{ url_for('admin.payment_methods_page') }}" class="settings-card">
+        <div class="settings-card-header">
+            <div class="settings-icon blue">
+                <span class="material-icons">credit_card</span>
+            </div>
+            <div class="settings-card-info">
+                <h3 class="settings-card-title">Meios de Pagamento</h3>
+                <p class="settings-card-description">Configure cartões, PIX, boleto e outros métodos de pagamento aceitos</p>
+            </div>
+        </div>
+        <span class="material-icons settings-card-arrow">chevron_right</span>
+    </a>
+
+    <!-- Meios de Envio -->
+    <a href="{{ url_for('admin.shipping_methods_page') }}" class="settings-card">
+        <div class="settings-card-header">
+            <div class="settings-icon green">
+                <span class="material-icons">local_shipping</span>
+            </div>
+            <div class="settings-card-info">
+                <h3 class="settings-card-title">Meios de Envio</h3>
+                <p class="settings-card-description">Defina opções de frete, retirada na loja e entregas</p>
+            </div>
+        </div>
+        <span class="material-icons settings-card-arrow">chevron_right</span>
+    </a>
+
+    <!-- Dados do Negócio -->
+    <a href="{{ url_for('admin.business_data_page') }}" class="settings-card">
+        <div class="settings-card-header">
+            <div class="settings-icon orange">
+                <span class="material-icons">business</span>
+            </div>
+            <div class="settings-card-info">
+                <h3 class="settings-card-title">Dados do Negócio</h3>
+                <p class="settings-card-description">Informações da empresa, endereço, CNPJ e contato</p>
+            </div>
+        </div>
+        <span class="material-icons settings-card-arrow">chevron_right</span>
+    </a>
+
+    <!-- Usuários e Permissões -->
+    <a href="{{ url_for('admin.users_permissions_page') }}" class="settings-card">
+        <div class="settings-card-header">
+            <div class="settings-icon purple">
+                <span class="material-icons">manage_accounts</span>
+            </div>
+            <div class="settings-card-info">
+                <h3 class="settings-card-title">Usuários e Permissões</h3>
+                <p class="settings-card-description">Gerencie equipe, funções e níveis de acesso ao painel</p>
+            </div>
+        </div>
+        <span class="material-icons settings-card-arrow">chevron_right</span>
+    </a>
+
+    <!-- Domínios -->
+    <a href="{{ url_for('admin.domains_page') }}" class="settings-card">
+        <div class="settings-card-header">
+            <div class="settings-icon teal">
+                <span class="material-icons">language</span>
+            </div>
+            <div class="settings-card-info">
+                <h3 class="settings-card-title">Domínios</h3>
+                <p class="settings-card-description">Configure domínio personalizado e SSL para sua loja</p>
+            </div>
+        </div>
+        <span class="material-icons settings-card-arrow">chevron_right</span>
+    </a>
+
+    <!-- Notificações -->
+    <a href="#" class="settings-card">
+        <div class="settings-card-header">
+            <div class="settings-icon red">
+                <span class="material-icons">notifications</span>
+            </div>
+            <div class="settings-card-info">
+                <h3 class="settings-card-title">Notificações</h3>
+                <p class="settings-card-description">Configure alertas de pedidos, estoque e comunicações</p>
+            </div>
+        </div>
+        <span class="material-icons settings-card-arrow">chevron_right</span>
+    </a>
+</div>
+
+<!-- Help Section -->
+<div class="help-section">
+    <div class="help-icon">
+        <span class="material-icons">help</span>
+    </div>
+    <div class="help-content">
+        <h4 class="help-title">Precisa de ajuda?</h4>
+        <p class="help-description">Nossa central de ajuda tem tutoriais e guias para todas as configurações</p>
+    </div>
+    <a href="#" class="help-link">
+        Acessar Central de Ajuda
+        <span class="material-icons" style="font-size: 18px;">open_in_new</span>
+    </a>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadStoreInfo();
+});
+
+async function loadStoreInfo() {
+    try {
+        const response = await fetch('/admin/my-store');
+        const data = await response.json();
+        
+        if (data.success) {
+            const store = data.data;
+            
+            document.getElementById('storeName').textContent = store.name || 'Não definido';
+            document.getElementById('storeUrl').textContent = window.location.origin + store.public_url;
+            
+            document.getElementById('paymentCount').textContent = store.payment_count > 0 
+                ? `${store.payment_count} ativo${store.payment_count > 1 ? 's' : ''}` 
+                : 'Nenhum configurado';
+            document.getElementById('shippingCount').textContent = store.shipping_count > 0 
+                ? `${store.shipping_count} ativo${store.shipping_count > 1 ? 's' : ''}` 
+                : 'Nenhum configurado';
+            
+            document.getElementById('toggleStore').href = store.public_url;
+            
+            const statusEl = document.getElementById('storeStatus');
+            if (!store.is_published) {
+                statusEl.classList.add('offline');
+                statusEl.querySelector('.status-text').textContent = 'Loja Offline';
+                statusEl.querySelector('.status-description').textContent = 'Sua loja não está visível para os clientes';
+            }
+        }
+    } catch (error) {
+        console.error('Erro ao carregar informações da loja:', error);
+        document.getElementById('storeName').textContent = 'Erro ao carregar';
+        document.getElementById('storeUrl').textContent = 'Erro ao carregar';
+    }
+}
+</script>
+{% endblock %}

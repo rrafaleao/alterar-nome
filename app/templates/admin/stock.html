@@ -1,4 +1,4 @@
-{% extends "/admin/base.html" %}
+﻿{% extends "/admin/base.html" %}
 
 {% block title %}Gestão de Estoque{% endblock %}
 
@@ -83,6 +83,98 @@
     .btn-icon:hover {
         background: #f7fafc;
         color: var(--primary-color);
+    }
+
+    /* LOADING */
+    .loading-spinner {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 60px;
+    }
+
+    .spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid #e2e8f0;
+        border-top-color: var(--primary-color);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #718096;
+    }
+
+    .empty-state .material-icons {
+        font-size: 64px;
+        margin-bottom: 16px;
+        opacity: 0.5;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: none;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    .modal {
+        background: #fff;
+        border-radius: 16px;
+        width: 100%;
+        max-width: 450px;
+        padding: 32px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .modal-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1a202c;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #718096;
+        font-size: 24px;
+        line-height: 1;
+    }
+
+    .modal-body {
+        margin-bottom: 24px;
+    }
+
+    .modal-footer {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
     }
 
     /* STATS CARDS */
@@ -530,7 +622,7 @@
             </div>
         </div>
         <div class="stat-label">Total em Estoque</div>
-        <div class="stat-value">2.847</div>
+        <div class="stat-value" id="stat-total">-</div>
     </div>
 
     <div class="stat-card">
@@ -540,7 +632,7 @@
             </div>
         </div>
         <div class="stat-label">Sem Estoque</div>
-        <div class="stat-value">12</div>
+        <div class="stat-value" id="stat-out">-</div>
     </div>
 
     <div class="stat-card">
@@ -550,7 +642,7 @@
             </div>
         </div>
         <div class="stat-label">Estoque Baixo</div>
-        <div class="stat-value">23</div>
+        <div class="stat-value" id="stat-low">-</div>
     </div>
 
     <div class="stat-card">
@@ -560,28 +652,28 @@
             </div>
         </div>
         <div class="stat-label">Valor em Estoque</div>
-        <div class="stat-value">R$ 186k</div>
+        <div class="stat-value" id="stat-value">-</div>
     </div>
 </div>
 
 <!-- FILTERS -->
 <div class="filters-section">
-    <div class="filter-tabs">
-        <button class="filter-tab active">
+    <div class="filter-tabs" id="filter-tabs">
+        <button class="filter-tab active" data-status="all">
             Todos
-            <span class="badge">248</span>
+            <span class="badge" id="badge-all">0</span>
         </button>
-        <button class="filter-tab">
+        <button class="filter-tab" data-status="out_of_stock">
             Sem Estoque
-            <span class="badge">12</span>
+            <span class="badge" id="badge-out">0</span>
         </button>
-        <button class="filter-tab">
+        <button class="filter-tab" data-status="low">
             Estoque Baixo
-            <span class="badge">23</span>
+            <span class="badge" id="badge-low">0</span>
         </button>
-        <button class="filter-tab">
+        <button class="filter-tab" data-status="ok">
             Estoque OK
-            <span class="badge">213</span>
+            <span class="badge" id="badge-ok">0</span>
         </button>
     </div>
 
@@ -590,24 +682,20 @@
             <label class="form-label">Buscar</label>
             <div class="search-input-wrapper">
                 <span class="material-icons">search</span>
-                <input type="text" class="form-input" placeholder="Buscar por produto ou SKU...">
+                <input type="text" class="form-input" id="search-input" placeholder="Buscar por produto ou SKU...">
             </div>
         </div>
 
         <div class="form-group">
             <label class="form-label">Categoria</label>
-            <select class="form-select">
+            <select class="form-select" id="category-select">
                 <option value="">Todas</option>
-                <option value="eletronicos">Eletrônicos</option>
-                <option value="roupas">Roupas</option>
-                <option value="acessorios">Acessórios</option>
-                <option value="casa">Casa & Decoração</option>
             </select>
         </div>
 
         <div class="form-group">
             <label class="form-label">Ordenar por</label>
-            <select class="form-select">
+            <select class="form-select" id="sort-select">
                 <option value="recent">Mais recentes</option>
                 <option value="stock_asc">Menor estoque</option>
                 <option value="stock_desc">Maior estoque</option>
@@ -636,243 +724,11 @@
                     <th style="text-align: center;">Ações</th>
                 </tr>
             </thead>
-            <tbody>
-                <!-- Stock Row 1 - OK -->
+            <tbody id="stock-table-body">
                 <tr>
-                    <td>
-                        <div class="product-info">
-                            <span class="product-title">Smartphone Galaxy S23</span>
-                        </div>
-                    </td>
-                    <td>SMRT-001</td>
-                    <td>
-                        <div class="stock-level">
-                            <span class="stock-badge ok">45 unid.</span>
-                            <div class="stock-progress">
-                                <div class="stock-progress-bar ok" style="width: 90%;"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="stock-badge reserved">3 unid.</span>
-                    </td>
-                    <td><span class="stock-badge ok">OK</span></td>
-                    <td><span class="last-update">28/01/2026 14:32</span></td>
-                    <td>
-                        <div class="actions-cell" style="justify-content: center;">
-                            <button class="btn-icon" title="Ajustar Estoque">
-                                <span class="material-icons">edit</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Stock Row 2 - LOW -->
-                <tr>
-                    <td>
-                        <div class="product-info">
-                            <span class="product-title">Notebook Dell Inspiron 15</span>
-                        </div>
-                    </td>
-                    <td>NOTE-002</td>
-                    <td>
-                        <div class="stock-level">
-                            <span class="stock-badge low">8 unid.</span>
-                            <div class="stock-progress">
-                                <div class="stock-progress-bar low" style="width: 40%;"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="stock-badge reserved">2 unid.</span>
-                    </td>
-                    <td><span class="stock-badge low">Baixo</span></td>
-                    <td><span class="last-update">27/01/2026 10:15</span></td>
-                    <td>
-                        <div class="actions-cell" style="justify-content: center;">
-                            <button class="btn-icon" title="Ajustar Estoque">
-                                <span class="material-icons">edit</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Stock Row 3 - CRITICAL -->
-                <tr>
-                    <td>
-                        <div class="product-info">
-                            <span class="product-title">Fone de Ouvido Bluetooth JBL</span>
-                        </div>
-                    </td>
-                    <td>FONE-003</td>
-                    <td>
-                        <div class="stock-level">
-                            <span class="stock-badge critical">0 unid.</span>
-                            <div class="stock-progress">
-                                <div class="stock-progress-bar critical" style="width: 0%;"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="stock-badge reserved">0 unid.</span>
-                    </td>
-                    <td><span class="stock-badge critical">Sem Estoque</span></td>
-                    <td><span class="last-update">26/01/2026 16:47</span></td>
-                    <td>
-                        <div class="actions-cell" style="justify-content: center;">
-                            <button class="btn-icon" title="Ajustar Estoque">
-                                <span class="material-icons">edit</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Stock Row 4 - OK -->
-                <tr>
-                    <td>
-                        <div class="product-info">
-                            <span class="product-title">Camiseta Básica Algodão</span>
-                        </div>
-                    </td>
-                    <td>CAM-004</td>
-                    <td>
-                        <div class="stock-level">
-                            <span class="stock-badge ok">120 unid.</span>
-                            <div class="stock-progress">
-                                <div class="stock-progress-bar ok" style="width: 100%;"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="stock-badge reserved">15 unid.</span>
-                    </td>
-                    <td><span class="stock-badge ok">OK</span></td>
-                    <td><span class="last-update">28/01/2026 09:21</span></td>
-                    <td>
-                        <div class="actions-cell" style="justify-content: center;">
-                            <button class="btn-icon" title="Ajustar Estoque">
-                                <span class="material-icons">edit</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Stock Row 5 - OK -->
-                <tr>
-                    <td>
-                        <div class="product-info">
-                            <span class="product-title">Mouse Gamer RGB</span>
-                        </div>
-                    </td>
-                    <td>MOUS-005</td>
-                    <td>
-                        <div class="stock-level">
-                            <span class="stock-badge ok">32 unid.</span>
-                            <div class="stock-progress">
-                                <div class="stock-progress-bar ok" style="width: 75%;"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="stock-badge reserved">5 unid.</span>
-                    </td>
-                    <td><span class="stock-badge ok">OK</span></td>
-                    <td><span class="last-update">27/01/2026 18:33</span></td>
-                    <td>
-                        <div class="actions-cell" style="justify-content: center;">
-                            <button class="btn-icon" title="Ajustar Estoque">
-                                <span class="material-icons">edit</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Stock Row 6 - LOW -->
-                <tr>
-                    <td>
-                        <div class="product-info">
-                            <span class="product-title">Luminária LED Mesa</span>
-                        </div>
-                    </td>
-                    <td>LUM-006</td>
-                    <td>
-                        <div class="stock-level">
-                            <span class="stock-badge low">5 unid.</span>
-                            <div class="stock-progress">
-                                <div class="stock-progress-bar low" style="width: 25%;"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="stock-badge reserved">1 unid.</span>
-                    </td>
-                    <td><span class="stock-badge low">Baixo</span></td>
-                    <td><span class="last-update">25/01/2026 11:05</span></td>
-                    <td>
-                        <div class="actions-cell" style="justify-content: center;">
-                            <button class="btn-icon" title="Ajustar Estoque">
-                                <span class="material-icons">edit</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Stock Row 7 - OK -->
-                <tr>
-                    <td>
-                        <div class="product-info">
-                            <span class="product-title">Teclado Mecânico RGB</span>
-                        </div>
-                    </td>
-                    <td>TEC-007</td>
-                    <td>
-                        <div class="stock-level">
-                            <span class="stock-badge ok">28 unid.</span>
-                            <div class="stock-progress">
-                                <div class="stock-progress-bar ok" style="width: 70%;"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="stock-badge reserved">4 unid.</span>
-                    </td>
-                    <td><span class="stock-badge ok">OK</span></td>
-                    <td><span class="last-update">28/01/2026 15:12</span></td>
-                    <td>
-                        <div class="actions-cell" style="justify-content: center;">
-                            <button class="btn-icon" title="Ajustar Estoque">
-                                <span class="material-icons">edit</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-
-                <!-- Stock Row 8 - LOW -->
-                <tr>
-                    <td>
-                        <div class="product-info">
-                            <span class="product-title">Webcam Full HD 1080p</span>
-                        </div>
-                    </td>
-                    <td>WEB-008</td>
-                    <td>
-                        <div class="stock-level">
-                            <span class="stock-badge low">6 unid.</span>
-                            <div class="stock-progress">
-                                <div class="stock-progress-bar low" style="width: 30%;"></div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <span class="stock-badge reserved">2 unid.</span>
-                    </td>
-                    <td><span class="stock-badge low">Baixo</span></td>
-                    <td><span class="last-update">26/01/2026 13:28</span></td>
-                    <td>
-                        <div class="actions-cell" style="justify-content: center;">
-                            <button class="btn-icon" title="Ajustar Estoque">
-                                <span class="material-icons">edit</span>
-                            </button>
+                    <td colspan="7">
+                        <div class="loading-spinner">
+                            <div class="spinner"></div>
                         </div>
                     </td>
                 </tr>
@@ -882,22 +738,408 @@
 
     <!-- PAGINATION -->
     <div class="pagination">
-        <div class="pagination-info">
-            Mostrando 1-8 de 248 produtos
+        <div class="pagination-info" id="pagination-info">
+            Carregando...
         </div>
-        <div class="pagination-controls">
-            <button class="pagination-btn" disabled>
-                <span class="material-icons" style="font-size: 18px;">chevron_left</span>
-            </button>
-            <button class="pagination-btn active">1</button>
-            <button class="pagination-btn">2</button>
-            <button class="pagination-btn">3</button>
-            <button class="pagination-btn">...</button>
-            <button class="pagination-btn">31</button>
-            <button class="pagination-btn">
-                <span class="material-icons" style="font-size: 18px;">chevron_right</span>
+        <div class="pagination-controls" id="pagination-controls">
+        </div>
+    </div>
+</div>
+
+<!-- MODAL EDITAR ESTOQUE -->
+<div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 class="modal-title">Ajustar Estoque</h3>
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="color: #718096; margin-bottom: 20px;" id="edit-product-name"></p>
+            
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label class="form-label">Quantidade em Estoque</label>
+                <input type="number" class="form-input" id="edit-quantity" min="0" placeholder="0">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Quantidade Reservada</label>
+                <input type="number" class="form-input" id="edit-reserved" min="0" placeholder="0">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeEditModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="saveStock()">
+                <span class="material-icons">save</span>
+                Salvar
             </button>
         </div>
     </div>
 </div>
+
+<script>
+    // Estado
+    let currentPage = 1;
+    let currentStatus = 'all';
+    let currentSearch = '';
+    let currentCategory = '';
+    let currentSort = 'recent';
+    let editingProductId = null;
+    let debounceTimer = null;
+    let productsData = {}; // Armazenar dados dos produtos para edição
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+        loadStats();
+        loadStock();
+        loadCategories();
+        setupEventListeners();
+    });
+
+    function setupEventListeners() {
+        // Tabs de filtro
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentStatus = this.dataset.status;
+                currentPage = 1;
+                loadStock();
+            });
+        });
+
+        // Busca
+        document.getElementById('search-input').addEventListener('input', function() {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                currentSearch = this.value;
+                currentPage = 1;
+                loadStock();
+            }, 300);
+        });
+
+        // Categoria
+        document.getElementById('category-select').addEventListener('change', function() {
+            currentCategory = this.value;
+            currentPage = 1;
+            loadStock();
+        });
+
+        // Ordenação
+        document.getElementById('sort-select').addEventListener('change', function() {
+            currentSort = this.value;
+            currentPage = 1;
+            loadStock();
+        });
+    }
+
+    async function loadStats() {
+        try {
+            const response = await fetch('/admin/api/stock/stats');
+            const result = await response.json();
+
+            if (result.success) {
+                const data = result.data;
+                
+                document.getElementById('stat-total').textContent = formatNumber(data.total_stock);
+                document.getElementById('stat-out').textContent = data.out_of_stock;
+                document.getElementById('stat-low').textContent = data.low_stock;
+                document.getElementById('stat-value').textContent = formatCurrency(data.inventory_value);
+                
+                // Atualizar badges
+                document.getElementById('badge-all').textContent = data.total_products;
+                document.getElementById('badge-out').textContent = data.out_of_stock;
+                document.getElementById('badge-low').textContent = data.low_stock;
+                document.getElementById('badge-ok').textContent = data.ok_stock;
+            }
+        } catch (error) {
+            console.error('Erro ao carregar estatísticas:', error);
+        }
+    }
+
+    async function loadStock() {
+        const tbody = document.getElementById('stock-table-body');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7">
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                </td>
+            </tr>
+        `;
+
+        try {
+            const params = new URLSearchParams({
+                page: currentPage,
+                per_page: 10,
+                status: currentStatus,
+                search: currentSearch,
+                category_id: currentCategory,
+                sort: currentSort
+            });
+
+            const response = await fetch(`/admin/api/stock?${params}`);
+            const result = await response.json();
+
+            if (result.success) {
+                renderStockTable(result.data.products);
+                renderPagination(result.data.pagination);
+            } else {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7">
+                            <div class="empty-state">
+                                <span class="material-icons">error_outline</span>
+                                <p>Erro ao carregar estoque</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+        } catch (error) {
+            console.error('Erro ao carregar estoque:', error);
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <span class="material-icons">error_outline</span>
+                            <p>Erro ao carregar estoque</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    async function loadCategories() {
+        try {
+            const response = await fetch('/admin/api/categories');
+            const result = await response.json();
+
+            if (result.success) {
+                const select = document.getElementById('category-select');
+                result.data.categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.id;
+                    option.textContent = cat.name;
+                    select.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Erro ao carregar categorias:', error);
+        }
+    }
+
+    function renderStockTable(products) {
+        const tbody = document.getElementById('stock-table-body');
+
+        if (products.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7">
+                        <div class="empty-state">
+                            <span class="material-icons">inventory_2</span>
+                            <p>Nenhum produto encontrado</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
+        // Armazenar dados dos produtos para referência na edição
+        products.forEach(p => {
+            productsData[String(p.id)] = p;
+        });
+
+        tbody.innerHTML = products.map(product => {
+            const statusClass = product.status === 'out_of_stock' ? 'critical' : product.status;
+            
+            return `
+                <tr>
+                    <td>
+                        <div class="product-info">
+                            <span class="product-title">${escapeHtml(product.title)}</span>
+                        </div>
+                    </td>
+                    <td>${escapeHtml(product.sku)}</td>
+                    <td>
+                        <div class="stock-level">
+                            <span class="stock-badge ${statusClass}">${product.quantity} unid.</span>
+                            <div class="stock-progress">
+                                <div class="stock-progress-bar ${statusClass}" style="width: ${product.progress}%;"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="stock-badge reserved">${product.reserved_quantity} unid.</span>
+                    </td>
+                    <td><span class="stock-badge ${statusClass}">${product.status_label}</span></td>
+                    <td><span class="last-update">${product.last_updated || '-'}</span></td>
+                    <td>
+                        <div class="actions-cell" style="justify-content: center;">
+                            <button class="btn-icon" title="Ajustar Estoque" onclick="openEditModal('${product.id}')">
+                                <span class="material-icons">edit</span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function renderPagination(pagination) {
+        const info = document.getElementById('pagination-info');
+        const controls = document.getElementById('pagination-controls');
+
+        const start = ((pagination.page - 1) * pagination.per_page) + 1;
+        const end = Math.min(pagination.page * pagination.per_page, pagination.total);
+        
+        info.textContent = `Mostrando ${pagination.total > 0 ? start : 0}-${end} de ${pagination.total} produtos`;
+
+        if (pagination.pages <= 1) {
+            controls.innerHTML = '';
+            return;
+        }
+
+        let html = `
+            <button class="pagination-btn" ${!pagination.has_prev ? 'disabled' : ''} onclick="goToPage(${pagination.page - 1})">
+                <span class="material-icons" style="font-size: 18px;">chevron_left</span>
+            </button>
+        `;
+
+        // Gerar botões de página
+        const maxButtons = 5;
+        let startPage = Math.max(1, pagination.page - Math.floor(maxButtons / 2));
+        let endPage = Math.min(pagination.pages, startPage + maxButtons - 1);
+        
+        if (endPage - startPage < maxButtons - 1) {
+            startPage = Math.max(1, endPage - maxButtons + 1);
+        }
+
+        if (startPage > 1) {
+            html += `<button class="pagination-btn" onclick="goToPage(1)">1</button>`;
+            if (startPage > 2) {
+                html += `<button class="pagination-btn" disabled>...</button>`;
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            html += `<button class="pagination-btn ${i === pagination.page ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        }
+
+        if (endPage < pagination.pages) {
+            if (endPage < pagination.pages - 1) {
+                html += `<button class="pagination-btn" disabled>...</button>`;
+            }
+            html += `<button class="pagination-btn" onclick="goToPage(${pagination.pages})">${pagination.pages}</button>`;
+        }
+
+        html += `
+            <button class="pagination-btn" ${!pagination.has_next ? 'disabled' : ''} onclick="goToPage(${pagination.page + 1})">
+                <span class="material-icons" style="font-size: 18px;">chevron_right</span>
+            </button>
+        `;
+
+        controls.innerHTML = html;
+    }
+
+    function goToPage(page) {
+        currentPage = page;
+        loadStock();
+    }
+
+    function openEditModal(productId) {
+        const product = productsData[String(productId)];
+        if (!product) {
+            console.error('Produto não encontrado:', productId);
+            return;
+        }
+        
+        editingProductId = productId;
+        document.getElementById('edit-product-name').textContent = product.title;
+        document.getElementById('edit-quantity').value = product.quantity;
+        document.getElementById('edit-reserved').value = product.reserved_quantity;
+        document.getElementById('edit-modal').classList.add('active');
+    }
+
+    function closeEditModal() {
+        editingProductId = null;
+        document.getElementById('edit-modal').classList.remove('active');
+    }
+
+    async function saveStock() {
+        if (!editingProductId) return;
+
+        const quantity = parseInt(document.getElementById('edit-quantity').value) || 0;
+        const reserved = parseInt(document.getElementById('edit-reserved').value) || 0;
+
+        if (quantity < 0) {
+            alert('A quantidade não pode ser negativa');
+            return;
+        }
+
+        if (reserved > quantity) {
+            alert('A quantidade reservada não pode ser maior que o estoque');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/admin/api/stock/${editingProductId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    quantity: quantity,
+                    reserved_quantity: reserved
+                })
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                closeEditModal();
+                loadStats();
+                loadStock();
+            } else {
+                alert(result.error || 'Erro ao atualizar estoque');
+            }
+        } catch (error) {
+            console.error('Erro ao atualizar estoque:', error);
+            alert('Erro ao atualizar estoque');
+        }
+    }
+
+    // Utilitários
+    function formatNumber(num) {
+        return new Intl.NumberFormat('pt-BR').format(num);
+    }
+
+    function formatCurrency(value) {
+        if (value >= 1000000) {
+            return 'R$ ' + (value / 1000000).toFixed(1) + 'M';
+        } else if (value >= 1000) {
+            return 'R$ ' + (value / 1000).toFixed(1) + 'k';
+        }
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(value);
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Fechar modal ao clicar fora
+    document.getElementById('edit-modal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+</script>
 {% endblock %}

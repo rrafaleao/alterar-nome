@@ -1,0 +1,805 @@
+{% extends "/admin/base.html" %}
+
+{% block title %}Meios de Envio{% endblock %}
+
+{% block nav_configuracoes %}active{% endblock %}
+
+{% block extra_styles %}
+<style>
+    .header {
+        background: #fff;
+        padding: 24px 32px;
+        border-radius: 12px;
+        margin-bottom: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .back-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #f7fafc;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #718096;
+        transition: all 0.2s;
+        text-decoration: none;
+    }
+
+    .back-btn:hover {
+        background: #edf2f7;
+        color: var(--primary-color);
+    }
+
+    .header h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a202c;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .header h2 .material-icons {
+        font-size: 32px;
+        color: #48bb78;
+    }
+
+    .header-subtitle {
+        color: #718096;
+        font-size: 14px;
+        margin-top: 6px;
+    }
+
+    /* SHIPPING METHODS */
+    .shipping-methods {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .shipping-card {
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .shipping-card:hover {
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .shipping-card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 24px 28px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .shipping-card-info {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .shipping-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+
+    .shipping-icon.correios {
+        background: linear-gradient(135deg, #ffc10715 0%, #ffb30015 100%);
+        color: #f59e0b;
+    }
+
+    .shipping-icon.fixed {
+        background: linear-gradient(135deg, #48bb7815 0%, #34a85315 100%);
+        color: #48bb78;
+    }
+
+    .shipping-icon.pickup {
+        background: linear-gradient(135deg, #9f7aea15 0%, #805ad515 100%);
+        color: #9f7aea;
+    }
+
+    .shipping-icon.custom {
+        background: linear-gradient(135deg, #4A90E215 0%, #357ABD15 100%);
+        color: var(--primary-color);
+    }
+
+    .shipping-details h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 4px;
+    }
+
+    .shipping-details p {
+        font-size: 14px;
+        color: #718096;
+    }
+
+    .shipping-card-actions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+    }
+
+    /* Toggle Switch */
+    .toggle-switch {
+        position: relative;
+        width: 52px;
+        height: 28px;
+    }
+
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #cbd5e0;
+        transition: 0.3s;
+        border-radius: 28px;
+    }
+
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 22px;
+        width: 22px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: 0.3s;
+        border-radius: 50%;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-switch input:checked + .toggle-slider {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    }
+
+    .toggle-switch input:checked + .toggle-slider:before {
+        transform: translateX(24px);
+    }
+
+    .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-badge.active {
+        background: #c6f6d5;
+        color: #22543d;
+    }
+
+    .status-badge.inactive {
+        background: #e2e8f0;
+        color: #718096;
+    }
+
+    .btn-configure {
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+        color: #4a5568;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .btn-configure:hover {
+        border-color: #48bb78;
+        color: #48bb78;
+    }
+
+    /* Shipping Card Body */
+    .shipping-card-body {
+        padding: 24px 28px;
+        background: #f7fafc;
+        display: none;
+    }
+
+    .shipping-card-body.active {
+        display: block;
+    }
+
+    .config-section {
+        margin-bottom: 20px;
+    }
+
+    .config-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .config-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .config-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s;
+        background: #fff;
+    }
+
+    .config-input:focus {
+        outline: none;
+        border-color: #48bb78;
+        box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+    }
+
+    .config-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+
+    .config-row-3 {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 16px;
+    }
+
+    .btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        font-family: 'Instrument Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+    }
+
+    .btn-secondary {
+        background: #edf2f7;
+        color: #4a5568;
+    }
+
+    .btn-secondary:hover {
+        background: #e2e8f0;
+    }
+
+    .config-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    /* Info Box */
+    .info-box {
+        background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+        padding: 16px 20px;
+        border-radius: 10px;
+        border: 1px solid #9ae6b4;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 32px;
+    }
+
+    .info-box .material-icons {
+        color: #38a169;
+        font-size: 22px;
+    }
+
+    .info-box-content {
+        flex: 1;
+    }
+
+    .info-box-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #276749;
+        margin-bottom: 4px;
+    }
+
+    .info-box-text {
+        font-size: 13px;
+        color: #2f855a;
+        line-height: 1.5;
+    }
+
+    /* Shipping Zones */
+    .shipping-zones {
+        margin-top: 20px;
+    }
+
+    .zone-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: #fff;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .zone-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .zone-name {
+        font-weight: 600;
+        color: #1a202c;
+    }
+
+    .zone-price {
+        color: #48bb78;
+        font-weight: 600;
+    }
+
+    .zone-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .zone-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+    }
+
+    .zone-btn.edit {
+        background: #edf2f7;
+        color: #718096;
+    }
+
+    .zone-btn.edit:hover {
+        background: #e2e8f0;
+        color: var(--primary-color);
+    }
+
+    .zone-btn.delete {
+        background: #fed7d7;
+        color: #e53e3e;
+    }
+
+    .zone-btn.delete:hover {
+        background: #feb2b2;
+    }
+
+    .add-zone-btn {
+        width: 100%;
+        padding: 12px;
+        border: 2px dashed #cbd5e0;
+        border-radius: 8px;
+        background: transparent;
+        color: #718096;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.2s;
+    }
+
+    .add-zone-btn:hover {
+        border-color: #48bb78;
+        color: #48bb78;
+    }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .shipping-card-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .shipping-card-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .config-row, .config-row-3 {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<div class="header">
+    <div class="header-left">
+        <a href="{{ url_for('admin.settings_page') }}" class="back-btn">
+            <span class="material-icons">arrow_back</span>
+        </a>
+        <div>
+            <h2>
+                <span class="material-icons">local_shipping</span>
+                Meios de Envio
+            </h2>
+            <p class="header-subtitle">Configure as opções de entrega para seus clientes</p>
+        </div>
+    </div>
+</div>
+
+<!-- Info Box -->
+<div class="info-box">
+    <span class="material-icons">info</span>
+    <div class="info-box-content">
+        <div class="info-box-title">Configuração de Frete</div>
+        <div class="info-box-text">Configure os métodos de envio disponíveis. Você pode usar os Correios para cálculo automático ou definir valores fixos por região.</div>
+    </div>
+</div>
+
+<!-- Shipping Methods -->
+<div class="shipping-methods">
+    <!-- Correios -->
+    <div class="shipping-card" data-method="correios">
+        <div class="shipping-card-header">
+            <div class="shipping-card-info">
+                <div class="shipping-icon correios">
+                    <span class="material-icons">mail</span>
+                </div>
+                <div class="shipping-details">
+                    <h3>Correios</h3>
+                    <p>Cálculo automático via API dos Correios (PAC, SEDEX)</p>
+                </div>
+            </div>
+            <div class="shipping-card-actions">
+                <span class="status-badge inactive" id="correios-status">Inativo</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="correios-toggle" onchange="toggleShippingMethod('correios')">
+                    <span class="toggle-slider"></span>
+                </label>
+                <button class="btn-configure" onclick="toggleConfig('correios')">
+                    <span class="material-icons" style="font-size: 18px;">settings</span>
+                    Configurar
+                </button>
+            </div>
+        </div>
+        <div class="shipping-card-body" id="correios-config">
+            <div class="config-row">
+                <div class="config-section">
+                    <label class="config-label">CEP de Origem</label>
+                    <input type="text" class="config-input" placeholder="00000-000" id="correios-cep">
+                </div>
+                <div class="config-section">
+                    <label class="config-label">Prazo Adicional (dias)</label>
+                    <input type="number" class="config-input" placeholder="0" value="0" id="correios-extra-days">
+                </div>
+            </div>
+            <div class="config-section">
+                <label class="config-label">Serviços Disponíveis</label>
+                <div style="display: flex; gap: 16px; margin-top: 8px;">
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="correios-pac" checked>
+                        <span>PAC</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="correios-sedex" checked>
+                        <span>SEDEX</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="correios-sedex10">
+                        <span>SEDEX 10</span>
+                    </label>
+                </div>
+            </div>
+            <div class="config-actions">
+                <button class="btn btn-primary" onclick="saveShippingConfig('correios')">
+                    <span class="material-icons" style="font-size: 18px;">save</span>
+                    Salvar Configuração
+                </button>
+                <button class="btn btn-secondary" onclick="toggleConfig('correios')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frete Fixo -->
+    <div class="shipping-card" data-method="fixed">
+        <div class="shipping-card-header">
+            <div class="shipping-card-info">
+                <div class="shipping-icon fixed">
+                    <span class="material-icons">attach_money</span>
+                </div>
+                <div class="shipping-details">
+                    <h3>Frete Fixo</h3>
+                    <p>Defina valores fixos por região ou faixa de CEP</p>
+                </div>
+            </div>
+            <div class="shipping-card-actions">
+                <span class="status-badge inactive" id="fixed-status">Inativo</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="fixed-toggle" onchange="toggleShippingMethod('fixed')">
+                    <span class="toggle-slider"></span>
+                </label>
+                <button class="btn-configure" onclick="toggleConfig('fixed')">
+                    <span class="material-icons" style="font-size: 18px;">settings</span>
+                    Configurar
+                </button>
+            </div>
+        </div>
+        <div class="shipping-card-body" id="fixed-config">
+            <div class="config-row-3">
+                <div class="config-section">
+                    <label class="config-label">Valor Padrão (R$)</label>
+                    <input type="number" class="config-input" placeholder="15.00" id="fixed-default-price" step="0.01">
+                </div>
+                <div class="config-section">
+                    <label class="config-label">Frete Grátis a partir de (R$)</label>
+                    <input type="number" class="config-input" placeholder="150.00" id="fixed-free-above" step="0.01">
+                </div>
+                <div class="config-section">
+                    <label class="config-label">Prazo de Entrega (dias)</label>
+                    <input type="number" class="config-input" placeholder="5" id="fixed-delivery-days">
+                </div>
+            </div>
+            <div class="shipping-zones">
+                <label class="config-label">Zonas de Entrega</label>
+                <div class="zone-item">
+                    <div class="zone-info">
+                        <span class="zone-name">São Paulo - Capital</span>
+                        <span class="zone-price">R$ 12,00</span>
+                    </div>
+                    <div class="zone-actions">
+                        <button class="zone-btn edit">
+                            <span class="material-icons" style="font-size: 16px;">edit</span>
+                        </button>
+                        <button class="zone-btn delete">
+                            <span class="material-icons" style="font-size: 16px;">delete</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="zone-item">
+                    <div class="zone-info">
+                        <span class="zone-name">São Paulo - Interior</span>
+                        <span class="zone-price">R$ 18,00</span>
+                    </div>
+                    <div class="zone-actions">
+                        <button class="zone-btn edit">
+                            <span class="material-icons" style="font-size: 16px;">edit</span>
+                        </button>
+                        <button class="zone-btn delete">
+                            <span class="material-icons" style="font-size: 16px;">delete</span>
+                        </button>
+                    </div>
+                </div>
+                <button class="add-zone-btn">
+                    <span class="material-icons" style="font-size: 18px;">add</span>
+                    Adicionar Zona
+                </button>
+            </div>
+            <div class="config-actions">
+                <button class="btn btn-primary" onclick="saveShippingConfig('fixed')">
+                    <span class="material-icons" style="font-size: 18px;">save</span>
+                    Salvar Configuração
+                </button>
+                <button class="btn btn-secondary" onclick="toggleConfig('fixed')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Retirada na Loja -->
+    <div class="shipping-card" data-method="pickup">
+        <div class="shipping-card-header">
+            <div class="shipping-card-info">
+                <div class="shipping-icon pickup">
+                    <span class="material-icons">storefront</span>
+                </div>
+                <div class="shipping-details">
+                    <h3>Retirada na Loja</h3>
+                    <p>Cliente retira o pedido em um ponto físico</p>
+                </div>
+            </div>
+            <div class="shipping-card-actions">
+                <span class="status-badge inactive" id="pickup-status">Inativo</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="pickup-toggle" onchange="toggleShippingMethod('pickup')">
+                    <span class="toggle-slider"></span>
+                </label>
+                <button class="btn-configure" onclick="toggleConfig('pickup')">
+                    <span class="material-icons" style="font-size: 18px;">settings</span>
+                    Configurar
+                </button>
+            </div>
+        </div>
+        <div class="shipping-card-body" id="pickup-config">
+            <div class="config-section">
+                <label class="config-label">Nome do Ponto de Retirada</label>
+                <input type="text" class="config-input" placeholder="Loja Principal" id="pickup-name">
+            </div>
+            <div class="config-section">
+                <label class="config-label">Endereço Completo</label>
+                <input type="text" class="config-input" placeholder="Rua, número, bairro, cidade - UF" id="pickup-address">
+            </div>
+            <div class="config-row">
+                <div class="config-section">
+                    <label class="config-label">Horário de Funcionamento</label>
+                    <input type="text" class="config-input" placeholder="Seg-Sex: 9h às 18h" id="pickup-hours">
+                </div>
+                <div class="config-section">
+                    <label class="config-label">Prazo para Retirada (dias)</label>
+                    <input type="number" class="config-input" placeholder="1" value="1" id="pickup-days">
+                </div>
+            </div>
+            <div class="config-actions">
+                <button class="btn btn-primary" onclick="saveShippingConfig('pickup')">
+                    <span class="material-icons" style="font-size: 18px;">save</span>
+                    Salvar Configuração
+                </button>
+                <button class="btn btn-secondary" onclick="toggleConfig('pickup')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Entrega Própria -->
+    <div class="shipping-card" data-method="custom">
+        <div class="shipping-card-header">
+            <div class="shipping-card-info">
+                <div class="shipping-icon custom">
+                    <span class="material-icons">delivery_dining</span>
+                </div>
+                <div class="shipping-details">
+                    <h3>Entrega Própria</h3>
+                    <p>Entrega realizada pela sua equipe</p>
+                </div>
+            </div>
+            <div class="shipping-card-actions">
+                <span class="status-badge inactive" id="custom-status">Inativo</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="custom-toggle" onchange="toggleShippingMethod('custom')">
+                    <span class="toggle-slider"></span>
+                </label>
+                <button class="btn-configure" onclick="toggleConfig('custom')">
+                    <span class="material-icons" style="font-size: 18px;">settings</span>
+                    Configurar
+                </button>
+            </div>
+        </div>
+        <div class="shipping-card-body" id="custom-config">
+            <div class="config-row">
+                <div class="config-section">
+                    <label class="config-label">Valor da Entrega (R$)</label>
+                    <input type="number" class="config-input" placeholder="10.00" id="custom-price" step="0.01">
+                </div>
+                <div class="config-section">
+                    <label class="config-label">Prazo de Entrega</label>
+                    <input type="text" class="config-input" placeholder="Mesmo dia" id="custom-deadline">
+                </div>
+            </div>
+            <div class="config-section">
+                <label class="config-label">Área de Cobertura</label>
+                <input type="text" class="config-input" placeholder="Ex: Raio de 10km do centro" id="custom-area">
+            </div>
+            <div class="config-actions">
+                <button class="btn btn-primary" onclick="saveShippingConfig('custom')">
+                    <span class="material-icons" style="font-size: 18px;">save</span>
+                    Salvar Configuração
+                </button>
+                <button class="btn btn-secondary" onclick="toggleConfig('custom')">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    loadShippingMethods();
+});
+
+async function loadShippingMethods() {
+    try {
+        const response = await fetch('/admin/settings/store');
+        const data = await response.json();
+        
+        if (data.success && data.data.shipping_methods) {
+            data.data.shipping_methods.forEach(sm => {
+                const toggle = document.getElementById(`${sm.method}-toggle`);
+                const status = document.getElementById(`${sm.method}-status`);
+                
+                if (toggle && sm.is_enabled) {
+                    toggle.checked = true;
+                    status.textContent = 'Ativo';
+                    status.className = 'status-badge active';
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Erro ao carregar métodos de envio:', error);
+    }
+}
+
+function toggleConfig(method) {
+    const config = document.getElementById(`${method}-config`);
+    config.classList.toggle('active');
+}
+
+function toggleShippingMethod(method) {
+    const toggle = document.getElementById(`${method}-toggle`);
+    const status = document.getElementById(`${method}-status`);
+    
+    if (toggle.checked) {
+        status.textContent = 'Ativo';
+        status.className = 'status-badge active';
+    } else {
+        status.textContent = 'Inativo';
+        status.className = 'status-badge inactive';
+    }
+}
+
+function saveShippingConfig(method) {
+    alert(`Configuração do método ${method} salva com sucesso!`);
+    toggleConfig(method);
+}
+</script>
+{% endblock %}
