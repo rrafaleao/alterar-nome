@@ -18,6 +18,7 @@ class Product(db.Model):
 
     images = db.relationship("ProductImage", backref="product", cascade="all, delete-orphan")
     stock = db.relationship("ProductStock", backref="product", uselist=False, cascade="all, delete-orphan")
+    size_stocks = db.relationship("ProductSizeStock", backref="product", cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
@@ -31,7 +32,8 @@ class Product(db.Model):
             'active': self.active,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
-            'images': [img.to_dict() for img in self.images] if self.images else []
+            'images': [img.to_dict() for img in self.images] if self.images else [],
+            'size_stocks': [ss.to_dict() for ss in self.size_stocks] if self.size_stocks else []
         }
 
 class ProductImage(db.Model):
@@ -60,3 +62,29 @@ class ProductStock(db.Model):
     quantity = db.Column(db.Integer, default=0, nullable=False)
     reserved_quantity = db.Column(db.Integer, default=0, nullable=False)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class ProductSizeStock(db.Model):
+    __tablename__ = "product_size_stocks"
+
+    id = db.Column(db.String(36), primary_key=True, default=uuid4_str)
+    product_id = db.Column(db.String(36), db.ForeignKey("products.id", ondelete="CASCADE"), nullable=False)
+    size = db.Column(db.String(10), nullable=False)
+    quantity = db.Column(db.Integer, default=0, nullable=False)
+    reserved_quantity = db.Column(db.Integer, default=0, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (
+        db.UniqueConstraint("product_id", "size"),
+    )
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'product_id': self.product_id,
+            'size': self.size,
+            'quantity': self.quantity,
+            'reserved_quantity': self.reserved_quantity,
+            'available': self.quantity - self.reserved_quantity
+        }

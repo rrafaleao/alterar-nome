@@ -10,6 +10,7 @@ class Category(db.Model):
     name = db.Column(db.String(255), nullable=False)
     slug = db.Column(db.String(255), nullable=False)
     parent_id = db.Column(db.String(36), db.ForeignKey("categories.id", ondelete="SET NULL"))
+    has_size = db.Column(db.Boolean, default=False, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -27,6 +28,7 @@ class Category(db.Model):
             'name': self.name,
             'slug': self.slug,
             'parent_id': self.parent_id,
+            'has_size': self.has_size,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None
         }

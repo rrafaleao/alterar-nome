@@ -1135,11 +1135,11 @@
                                 {% endif %}
                             </div>
                             {% if promo.has_promotion %}
-                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ promo.promo_price }})" title="Adicionar ao carrinho">
+                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ promo.promo_price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')" title="Adicionar ao carrinho">
                                 <span class="material-icons">add_shopping_cart</span>
                             </button>
                             {% else %}
-                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }})" title="Adicionar ao carrinho">
+                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')" title="Adicionar ao carrinho">
                                 <span class="material-icons">add_shopping_cart</span>
                             </button>
                             {% endif %}
@@ -1186,7 +1186,7 @@
                             <div class="product-price">
                                 <span class="price-current">R$ {{ "%.2f" | format(product.price) | replace('.', ',') }}</span>
                             </div>
-                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }})" title="Adicionar ao carrinho">
+                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')" title="Adicionar ao carrinho">
                                 <span class="material-icons">add_shopping_cart</span>
                             </button>
                         </div>
@@ -1349,7 +1349,7 @@
             document.getElementById('cartSidebar').classList.remove('active');
         }
 
-        function addToCart(productId, productTitle, productPrice) {
+        function addToCart(productId, productTitle, productPrice, productImage) {
             const existingItem = cart.find(item => item.id === productId);
             
             if (existingItem) {
@@ -1359,6 +1359,7 @@
                     id: productId,
                     title: productTitle,
                     price: productPrice,
+                    image: productImage || '',
                     quantity: 1
                 });
             }
@@ -1397,8 +1398,11 @@
             } else {
                 cartBody.innerHTML = cart.map(item => `
                     <div style="display: flex; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--gray-200);">
-                        <div style="width: 70px; height: 70px; background: var(--gray-100); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-icons" style="color: var(--gray-400);">image</span>
+                        <div style="width: 70px; height: 70px; background: var(--gray-100); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            ${item.image ? 
+                                `<img src="${item.image}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                `<span class="material-icons" style="color: var(--gray-400);">image</span>`
+                            }
                         </div>
                         <div style="flex: 1;">
                             <h4 style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">${item.title}</h4>

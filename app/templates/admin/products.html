@@ -798,44 +798,84 @@
 <div class="modal-overlay" id="productModal">
     <div class="modal">
         <div class="modal-header">
-            <h3 class="modal-title">Adicionar Novo Produto</h3>
+            <h3 class="modal-title" id="modalTitle">Adicionar Novo Produto</h3>
             <button class="modal-close" onclick="closeProductModal()">
                 <span class="material-icons">close</span>
             </button>
         </div>
         <form id="productForm" onsubmit="handleSubmit(event)">
+            <input type="hidden" name="product_id" id="productId">
             <div class="modal-body">
                 <div class="form-group">
                     <label class="form-label">Título *</label>
-                    <input type="text" class="form-input" name="title" required>
+                    <input type="text" class="form-input" name="title" id="productTitle" required>
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Descrição</label>
-                    <textarea class="form-textarea" name="description"></textarea>
+                    <textarea class="form-textarea" name="description" id="productDescription"></textarea>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">SKU</label>
-                        <input type="text" class="form-input" name="sku">
+                        <input type="text" class="form-input" name="sku" id="productSku">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Preço (R$) *</label>
-                        <input type="number" class="form-input" name="price" step="0.01" min="0" required>
+                        <input type="number" class="form-input" name="price" id="productPrice" step="0.01" min="0" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label">Categoria</label>
-                        <select class="form-select" name="category_id" id="modalCategorySelect">
+                        <select class="form-select" name="category_id" id="modalCategorySelect" onchange="onCategoryChange()">
                             <option value="">Sem categoria</option>
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Estoque Inicial</label>
-                        <input type="number" class="form-input" name="initial_stock" min="0" value="0">
+                    <div class="form-group" id="stockGeneralGroup">
+                        <label class="form-label">Estoque</label>
+                        <input type="number" class="form-input" name="initial_stock" id="productStock" min="0" value="0">
+                    </div>
+                </div>
+
+                <!-- Estoque por Tamanho (aparece quando categoria tem tamanho) -->
+                <div class="form-group" id="sizeStockGroup" style="display: none;">
+                    <label class="form-label">Estoque por Tamanho</label>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 8px;">
+                        <div style="text-align: center;">
+                            <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">PP</label>
+                            <input type="number" class="form-input size-stock-input" data-size="PP" min="0" value="0" style="text-align: center;">
+                        </div>
+                        <div style="text-align: center;">
+                            <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">P</label>
+                            <input type="number" class="form-input size-stock-input" data-size="P" min="0" value="0" style="text-align: center;">
+                        </div>
+                        <div style="text-align: center;">
+                            <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">M</label>
+                            <input type="number" class="form-input size-stock-input" data-size="M" min="0" value="0" style="text-align: center;">
+                        </div>
+                        <div style="text-align: center;">
+                            <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">G</label>
+                            <input type="number" class="form-input size-stock-input" data-size="G" min="0" value="0" style="text-align: center;">
+                        </div>
+                        <div style="text-align: center;">
+                            <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">GG</label>
+                            <input type="number" class="form-input size-stock-input" data-size="GG" min="0" value="0" style="text-align: center;">
+                        </div>
+                        <div style="text-align: center;">
+                            <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">XG</label>
+                            <input type="number" class="form-input size-stock-input" data-size="XG" min="0" value="0" style="text-align: center;">
+                        </div>
+                        <div style="text-align: center;">
+                            <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">2XG</label>
+                            <input type="number" class="form-input size-stock-input" data-size="2XG" min="0" value="0" style="text-align: center;">
+                        </div>
+                        <div style="text-align: center;">
+                            <label style="font-size: 12px; color: #6b7280; display: block; margin-bottom: 4px;">3XG</label>
+                            <input type="number" class="form-input size-stock-input" data-size="3XG" min="0" value="0" style="text-align: center;">
+                        </div>
                     </div>
                 </div>
 
@@ -844,22 +884,24 @@
                     <div class="upload-area" onclick="document.getElementById('imageUpload').click()">
                         <span class="material-icons">cloud_upload</span>
                         <p>Arraste imagens ou <span>clique para selecionar</span></p>
-                        <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">PNG, JPG, GIF ou WEBP (máx. 5MB)</p>
+                        <p style="font-size: 12px; color: #94a3b8; margin-top: 8px;">PNG, JPG, GIF, WEBP ou AVIF (máx. 5MB)</p>
                     </div>
                     <input type="file" id="imageUpload" class="upload-input" accept="image/*" multiple>
                     <div class="preview-grid" id="previewGrid"></div>
+                    <!-- Imagens existentes (para edição) -->
+                    <div class="preview-grid" id="existingImagesGrid" style="margin-top: 12px;"></div>
                 </div>
 
                 <div class="form-group">
                     <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                        <input type="checkbox" name="active" checked>
+                        <input type="checkbox" name="active" id="productActive" checked>
                         <span style="font-size: 14px; color: #374151; font-weight: 500;">Produto ativo</span>
                     </label>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancelar</button>
-                <button type="submit" class="btn btn-primary">
+                <button type="submit" class="btn btn-primary" id="submitBtn">
                     <span class="material-icons" style="font-size: 18px;">check</span>
                     Salvar Produto
                 </button>
@@ -879,6 +921,9 @@ let currentFilters = {
     sort: 'recent'
 };
 let selectedImages = [];
+let existingImages = [];
+let editingProductId = null;
+let categoriesData = [];
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
@@ -963,10 +1008,18 @@ function setupImageUpload() {
 }
 
 function handleFiles(files) {
+    console.log('handleFiles chamado com', files.length, 'arquivos');
     const maxSize = 5 * 1024 * 1024;
+    const allowedExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'avif'];
     
     Array.from(files).forEach(file => {
-        if (!file.type.startsWith('image/')) {
+        console.log('Processando arquivo:', file.name, file.type, file.size);
+        
+        // Verificar extensão do arquivo
+        const ext = file.name.split('.').pop().toLowerCase();
+        const isImage = file.type.startsWith('image/') || allowedExtensions.includes(ext);
+        
+        if (!isImage) {
             alert(`"${file.name}" não é uma imagem válida.`);
             return;
         }
@@ -977,6 +1030,7 @@ function handleFiles(files) {
         }
         
         selectedImages.push(file);
+        console.log('Arquivo adicionado. Total de selectedImages:', selectedImages.length);
     });
     
     renderPreviews();
@@ -1008,6 +1062,40 @@ function removeImage(index) {
     renderPreviews();
 }
 
+function removeExistingImage(imageId) {
+    existingImages = existingImages.filter(img => img.id !== imageId);
+    renderExistingImages();
+}
+
+function renderExistingImages() {
+    const grid = document.getElementById('existingImagesGrid');
+    grid.innerHTML = existingImages.map(img => `
+        <div class="preview-item">
+            <img src="${img.url}" alt="Imagem existente">
+            <button type="button" class="preview-remove" onclick="removeExistingImage('${img.id}')">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+    `).join('');
+}
+
+// Quando categoria muda, verificar se tem tamanho
+function onCategoryChange() {
+    const categoryId = document.getElementById('modalCategorySelect').value;
+    const category = categoriesData.find(c => c.id === categoryId);
+    
+    const sizeGroup = document.getElementById('sizeStockGroup');
+    const stockGroup = document.getElementById('stockGeneralGroup');
+    
+    if (category && category.has_size) {
+        sizeGroup.style.display = 'block';
+        stockGroup.style.display = 'none';
+    } else {
+        sizeGroup.style.display = 'none';
+        stockGroup.style.display = 'block';
+    }
+}
+
 // Load categories
 async function loadCategories() {
     try {
@@ -1015,16 +1103,26 @@ async function loadCategories() {
         const data = await res.json();
         
         if (data.success) {
-            const selects = [document.getElementById('categoryFilter'), document.getElementById('modalCategorySelect')];
-            const categories = data.data.categories || data.data;
+            categoriesData = data.data.categories || data.data;
             
-            categories.forEach(cat => {
-                selects.forEach(select => {
-                    const opt = document.createElement('option');
-                    opt.value = cat.id;
-                    opt.textContent = cat.name;
-                    select.appendChild(opt);
-                });
+            const filterSelect = document.getElementById('categoryFilter');
+            const modalSelect = document.getElementById('modalCategorySelect');
+            
+            // Limpar opções existentes (exceto a primeira)
+            filterSelect.innerHTML = '<option value="">Categoria</option>';
+            modalSelect.innerHTML = '<option value="">Sem categoria</option>';
+            
+            categoriesData.forEach(cat => {
+                const opt1 = document.createElement('option');
+                opt1.value = cat.id;
+                opt1.textContent = cat.name;
+                filterSelect.appendChild(opt1);
+                
+                const opt2 = document.createElement('option');
+                opt2.value = cat.id;
+                opt2.textContent = cat.name;
+                opt2.dataset.hasSize = cat.has_size ? 'true' : 'false';
+                modalSelect.appendChild(opt2);
             });
         }
     } catch (err) {
@@ -1154,14 +1252,92 @@ function changePage(page) {
 
 // Modal functions
 function openAddProductModal() {
+    editingProductId = null;
+    document.getElementById('modalTitle').textContent = 'Adicionar Novo Produto';
+    document.getElementById('submitBtn').innerHTML = '<span class="material-icons" style="font-size: 18px;">check</span> Salvar Produto';
+    document.getElementById('productForm').reset();
+    document.getElementById('productId').value = '';
+    document.getElementById('productActive').checked = true;
+    selectedImages = [];
+    existingImages = [];
+    document.getElementById('previewGrid').innerHTML = '';
+    document.getElementById('existingImagesGrid').innerHTML = '';
+    
+    // Reset size stocks
+    document.querySelectorAll('.size-stock-input').forEach(input => {
+        input.value = 0;
+    });
+    
+    // Reset visibility
+    document.getElementById('sizeStockGroup').style.display = 'none';
+    document.getElementById('stockGeneralGroup').style.display = 'block';
+    
     document.getElementById('productModal').classList.add('active');
 }
 
 function closeProductModal() {
     document.getElementById('productModal').classList.remove('active');
     document.getElementById('productForm').reset();
+    editingProductId = null;
     selectedImages = [];
+    existingImages = [];
     document.getElementById('previewGrid').innerHTML = '';
+    document.getElementById('existingImagesGrid').innerHTML = '';
+}
+
+// Editar produto
+async function editProduct(id) {
+    editingProductId = id;
+    
+    try {
+        const res = await fetch(`/admin/api/products/${id}`);
+        const result = await res.json();
+        
+        if (!result.success) {
+            alert('Erro ao carregar produto');
+            return;
+        }
+        
+        const product = result.data;
+        
+        // Preencher formulário
+        document.getElementById('modalTitle').textContent = 'Editar Produto';
+        document.getElementById('submitBtn').innerHTML = '<span class="material-icons" style="font-size: 18px;">check</span> Atualizar Produto';
+        document.getElementById('productId').value = product.id;
+        document.getElementById('productTitle').value = product.title;
+        document.getElementById('productDescription').value = product.description || '';
+        document.getElementById('productSku').value = product.sku || '';
+        document.getElementById('productPrice').value = product.price;
+        document.getElementById('modalCategorySelect').value = product.category_id || '';
+        document.getElementById('productStock').value = product.stock?.quantity || 0;
+        document.getElementById('productActive').checked = product.active;
+        
+        // Mostrar/ocultar campos de tamanho
+        onCategoryChange();
+        
+        // Preencher estoques por tamanho
+        if (product.size_stocks && product.size_stocks.length > 0) {
+            document.querySelectorAll('.size-stock-input').forEach(input => {
+                const size = input.dataset.size;
+                const sizeStock = product.size_stocks.find(ss => ss.size === size);
+                input.value = sizeStock ? sizeStock.quantity : 0;
+            });
+        }
+        
+        // Imagens existentes
+        existingImages = product.images || [];
+        renderExistingImages();
+        
+        // Reset novas imagens
+        selectedImages = [];
+        document.getElementById('previewGrid').innerHTML = '';
+        
+        document.getElementById('productModal').classList.add('active');
+        
+    } catch (err) {
+        console.error('Erro ao carregar produto:', err);
+        alert('Erro ao carregar produto');
+    }
 }
 
 // Submit form
@@ -1169,19 +1345,52 @@ async function handleSubmit(e) {
     e.preventDefault();
     
     const formData = new FormData(e.target);
+    const categoryId = formData.get('category_id');
+    const category = categoriesData.find(c => c.id === categoryId);
+    const hasSize = category && category.has_size;
+    
+    // Coletar dados básicos
     const data = {
         title: formData.get('title'),
         description: formData.get('description'),
         sku: formData.get('sku'),
         price: parseFloat(formData.get('price')),
-        category_id: formData.get('category_id') || null,
-        initial_stock: parseInt(formData.get('initial_stock')) || 0,
-        active: formData.get('active') === 'on'
+        category_id: categoryId || null,
+        active: document.getElementById('productActive').checked
     };
     
+    // Estoque
+    if (hasSize) {
+        // Coletar estoque por tamanho
+        const sizeStocks = [];
+        document.querySelectorAll('.size-stock-input').forEach(input => {
+            const qty = parseInt(input.value) || 0;
+            if (qty > 0) {
+                sizeStocks.push({
+                    size: input.dataset.size,
+                    quantity: qty
+                });
+            }
+        });
+        data.size_stocks = sizeStocks;
+        
+        // Calcular estoque total
+        data.initial_stock = sizeStocks.reduce((sum, ss) => sum + ss.quantity, 0);
+        data.stock_quantity = data.initial_stock;
+    } else {
+        data.initial_stock = parseInt(formData.get('initial_stock')) || 0;
+        data.stock_quantity = data.initial_stock;
+    }
+    
+    const isEdit = !!editingProductId;
+    
     try {
-        const res = await fetch('/admin/api/products', {
-            method: 'POST',
+        const url = isEdit 
+            ? `/admin/api/products/${editingProductId}` 
+            : '/admin/api/products';
+        
+        const res = await fetch(url, {
+            method: isEdit ? 'PUT' : 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
@@ -1189,38 +1398,66 @@ async function handleSubmit(e) {
         const result = await res.json();
         
         if (result.success) {
+            const productId = isEdit ? editingProductId : result.data.id;
+            console.log('Produto salvo com ID:', productId);
+            console.log('selectedImages.length:', selectedImages.length);
+            
+            // Upload novas imagens
             if (selectedImages.length > 0) {
-                await uploadImages(result.data.id);
+                await uploadImages(productId);
+            }
+            
+            // Deletar imagens removidas (para edição)
+            if (isEdit) {
+                const originalProduct = await (await fetch(`/admin/api/products/${productId}`)).json();
+                const originalImageIds = originalProduct.data.images?.map(img => img.id) || [];
+                const currentImageIds = existingImages.map(img => img.id);
+                
+                for (const imgId of originalImageIds) {
+                    if (!currentImageIds.includes(imgId)) {
+                        await fetch(`/admin/api/products/${productId}/images/${imgId}`, {
+                            method: 'DELETE'
+                        });
+                    }
+                }
             }
             
             closeProductModal();
             loadProducts();
-            alert('Produto criado com sucesso!');
+            alert(isEdit ? 'Produto atualizado com sucesso!' : 'Produto criado com sucesso!');
         } else {
             alert('Erro: ' + result.error);
         }
     } catch (err) {
         console.error(err);
-        alert('Erro ao criar produto');
+        alert('Erro ao salvar produto');
     }
 }
 
 async function uploadImages(productId) {
+    console.log('Iniciando upload de', selectedImages.length, 'imagens para produto', productId);
+    
     const formData = new FormData();
-    selectedImages.forEach(file => formData.append('images', file));
+    selectedImages.forEach((file, index) => {
+        console.log('Adicionando arquivo:', file.name, file.type, file.size);
+        formData.append('images', file);
+    });
     
     try {
-        await fetch(`/admin/api/products/${productId}/images`, {
+        const res = await fetch(`/admin/api/products/${productId}/images`, {
             method: 'POST',
             body: formData
         });
+        const result = await res.json();
+        console.log('Resultado do upload:', result);
+        if (!result.success) {
+            console.error('Erro no upload:', result.error);
+            alert('Erro ao fazer upload das imagens: ' + result.error);
+        }
     } catch (err) {
         console.error('Erro no upload:', err);
+        alert('Erro ao fazer upload das imagens');
     }
-}
-
-function editProduct(id) {
-    alert('Edição em breve!');
 }
 
 async function deleteProduct(id) {

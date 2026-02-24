@@ -854,7 +854,8 @@
                     </div>
                     {% endif %}
 
-                    <!-- Size Selection -->
+                    <!-- Size Selection (only if category has_size) -->
+                    {% if product.category and product.category.has_size %}
                     <div class="selection-section">
                         <div class="size-header">
                             <div class="section-label">Tamanho</div>
@@ -862,16 +863,21 @@
                         </div>
 
                         <div class="size-grid">
-                            <button class="size-option" onclick="selectSize(this)">PP</button>
-                            <button class="size-option" onclick="selectSize(this)">P</button>
-                            <button class="size-option active" onclick="selectSize(this)">M</button>
-                            <button class="size-option" onclick="selectSize(this)">G</button>
-                            <button class="size-option" onclick="selectSize(this)">GG</button>
-                            <button class="size-option" onclick="selectSize(this)">XG</button>
-                            <button class="size-option unavailable">2XG</button>
-                            <button class="size-option unavailable">3XG</button>
+                            {% set sizes = ['PP', 'P', 'M', 'G', 'GG', 'XG', '2XG', '3XG'] %}
+                            {% set first_available = namespace(found=false) %}
+                            {% for size in sizes %}
+                                {% set size_stock = product.size_stocks | selectattr('size', 'equalto', size) | first %}
+                                {% set available = size_stock.quantity - size_stock.reserved_quantity if size_stock else 0 %}
+                                {% if available > 0 %}
+                                    <button class="size-option {% if not first_available.found %}active{% endif %}" onclick="selectSize(this)" data-size="{{ size }}" data-available="{{ available }}">{{ size }}</button>
+                                    {% set first_available.found = true %}
+                                {% else %}
+                                    <button class="size-option unavailable" data-size="{{ size }}">{{ size }}</button>
+                                {% endif %}
+                            {% endfor %}
                         </div>
                     </div>
+                    {% endif %}
 
                     <!-- Action Buttons -->
                     <div class="action-buttons">

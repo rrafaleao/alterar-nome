@@ -546,6 +546,12 @@
         <span class="material-icons" style="color: var(--primary-color);">category</span>
         Categorias
     </h2>
+    <div class="header-actions">
+        <button class="btn btn-primary" onclick="openModal()">
+            <span class="material-icons" style="font-size: 18px;">add</span>
+            Nova Categoria
+        </button>
+    </div>
 </div>
 
 <!-- STATS CARDS -->
@@ -644,6 +650,14 @@
                         <option value="">Nenhuma (categoria principal)</option>
                     </select>
                     <p class="form-hint">Se selecionada, esta será uma subcategoria</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                        <input type="checkbox" name="has_size" id="categoryHasSize" style="width: 18px; height: 18px; cursor: pointer;">
+                        <span>Produtos desta categoria possuem tamanho</span>
+                    </label>
+                    <p class="form-hint">Marque se os produtos desta categoria têm opções de tamanho (ex: PP, P, M, G, GG)</p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -838,10 +852,12 @@ function openModal(categoryId = null) {
             document.getElementById('categoryName').value = category.name;
             document.getElementById('categorySlug').value = category.slug;
             document.getElementById('categoryParent').value = category.parent_id || '';
+            document.getElementById('categoryHasSize').checked = category.has_size || false;
         }
     } else {
         title.textContent = 'Nova Categoria';
         document.getElementById('categoryId').value = '';
+        document.getElementById('categoryHasSize').checked = false;
     }
     
     modal.classList.add('active');
@@ -894,7 +910,8 @@ async function handleSubmit(event) {
     const data = {
         name: formData.get('name'),
         slug: formData.get('slug') || null,
-        parent_id: formData.get('parent_id') || null
+        parent_id: formData.get('parent_id') || null,
+        has_size: document.getElementById('categoryHasSize').checked
     };
     
     const categoryId = formData.get('id');

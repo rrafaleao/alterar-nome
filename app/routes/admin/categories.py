@@ -160,7 +160,8 @@ def create_category():
             store_id=store_id,
             name=data.get('name'),
             slug=slug,
-            parent_id=parent_id if parent_id else None
+            parent_id=parent_id if parent_id else None,
+            has_size=data.get('has_size', False)
         )
         
         db.session.add(category)
@@ -259,6 +260,10 @@ def update_category(category_id):
                     current = Category.query.get(current.parent_id)
             
             category.parent_id = parent_id if parent_id else None
+        
+        # Atualizar has_size
+        if 'has_size' in data:
+            category.has_size = data['has_size']
         
         db.session.commit()
         

@@ -220,7 +220,7 @@ def get_stock_stats():
         }), 500
 
 
-@admin.route('/api/stock/<int:product_id>', methods=['PUT'])
+@admin.route('/api/stock/<product_id>', methods=['PUT'])
 @login_required
 @store_required
 def update_stock(product_id):
