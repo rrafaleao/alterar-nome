@@ -708,6 +708,124 @@
             }
         }
 
+         .search-bar {
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 48px 12px 20px;
+            border: 2px solid var(--gray-200);
+            border-radius: 50px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+            background: var(--gray-50);
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-bar button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .search-bar button:hover {
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .search-bar button .material-icons {
+            color: white;
+            font-size: 20px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--gray-100);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .icon-btn:hover .material-icons {
+            color: white;
+        }
+
+        .icon-btn .material-icons {
+            font-size: 22px;
+            color: var(--gray-600);
+            transition: color 0.2s;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .btn-login {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
         @media (max-width: 480px) {
             .container {
                 padding: 0 16px;
@@ -729,6 +847,132 @@
                 width: 80px;
                 height: 80px;
             }
+
+            .cart-sidebar {
+                width: 100%;
+                right: -100%;
+            }
+        }
+
+        /* ===== CART SIDEBAR ===== */
+        .cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .cart-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 420px;
+            height: 100%;
+            background: white;
+            z-index: 2001;
+            transition: right 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-sidebar.active {
+            right: 0;
+        }
+
+        .cart-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .close-cart {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .close-cart:hover {
+            background: var(--gray-100);
+        }
+
+        .cart-body {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .cart-empty {
+            text-align: center;
+            padding: 48px 0;
+            color: var(--gray-500);
+        }
+
+        .cart-empty .material-icons {
+            font-size: 64px;
+            color: var(--gray-300);
+            margin-bottom: 16px;
+        }
+
+        .cart-footer {
+            padding: 24px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .btn-checkout {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-checkout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-out-of-stock {
+            background: var(--gray-300) !important;
+            cursor: not-allowed !important;
+            box-shadow: none !important;
+        }
+
+        .btn-out-of-stock:hover {
+            transform: none !important;
         }
     </style>
 </head>
@@ -738,20 +982,23 @@
         <div class="header-top">
             <div class="container">
                 <div class="header-content">
-                    <div class="logo-section">
+                    <a href="{{ url_for('storefront.view_store', slug=store.slug) }}" class="logo-section" style="text-decoration: none;">
                         {% if store.logo_url %}
                             <img src="{{ store.logo_url }}" alt="{{ store.name }}" class="logo">
                         {% else %}
                             <div class="logo-placeholder">{{ store.name[0] | upper }}</div>
                         {% endif %}
                         <h1 class="store-name">{{ store.name }}</h1>
+                    </a>
+
+                    <div class="search-bar">
+                        <input type="text" placeholder="Buscar produtos..." id="searchInput">
+                        <button type="button" onclick="searchProducts()">
+                            <span class="material-icons">search</span>
+                        </button>
                     </div>
 
                     <div class="header-actions">
-                        <a href="{{ url_for('storefront.view_store', slug=store.slug) }}" class="btn-back">
-                            <span class="material-icons" style="font-size: 18px;">arrow_back</span>
-                            Voltar
-                        </a>
                         <a href="{{ url_for('storefront.favorites_page', slug=store.slug) }}" class="icon-btn" title="Favoritos">
                             <span class="material-icons">favorite_border</span>
                         </a>
@@ -759,11 +1006,30 @@
                             <span class="material-icons">shopping_bag</span>
                             <span class="cart-badge" id="cartCount">0</span>
                         </button>
+                        {% if session.get('customer_id') and session.get('customer_store_id') == store.id %}
+                        <div class="user-menu-wrapper" style="position: relative;">
+                            <button class="btn-login" onclick="toggleUserMenu()" style="display: flex; align-items: center; gap: 8px;">
+                                <span class="material-icons" style="font-size: 18px;">person</span>
+                                {{ session.get('customer_name', 'Minha Conta').split(' ')[0] }}
+                            </button>
+                            <div class="user-dropdown" id="userDropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 8px; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); border: 1px solid var(--gray-200); min-width: 200px; z-index: 100; overflow: hidden;">
+                                <div style="padding: 16px; border-bottom: 1px solid var(--gray-100);">
+                                    <p style="font-weight: 600; font-size: 14px; color: var(--gray-900);">{{ session.get('customer_name', '') }}</p>
+                                    <p style="font-size: 13px; color: var(--gray-500);">{{ session.get('customer_email', '') }}</p>
+                                </div>
+                                <a href="{{ url_for('storefront.customer_logout', slug=store.slug) }}" style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.2s;">
+                                    <span class="material-icons" style="font-size: 18px;">logout</span>
+                                    Sair
+                                </a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <a href="{{ url_for('storefront.customer_login_page', slug=store.slug) }}" class="btn-login" style="text-decoration: none;">Entrar</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
         </div>
-    </header>
 
     <!-- Breadcrumb -->
     <div class="container">
@@ -885,10 +1151,25 @@
                             <span class="material-icons">favorite_border</span>
                             Favoritar
                         </button>
-                        <button class="btn btn-primary" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }})">
+                        {% set ns = namespace(total_stock=0) %}
+                        {% if product.category and product.category.has_size %}
+                            {% for size_stock in product.size_stocks %}
+                                {% set ns.total_stock = ns.total_stock + (size_stock.quantity - size_stock.reserved_quantity) %}
+                            {% endfor %}
+                        {% elif product.stock %}
+                            {% set ns.total_stock = product.stock.quantity - product.stock.reserved_quantity %}
+                        {% endif %}
+                        {% if ns.total_stock > 0 %}
+                        <button class="btn btn-primary" id="addToCartBtn" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')">
                             <span class="material-icons">add_shopping_cart</span>
                             Adicionar ao carrinho
                         </button>
+                        {% else %}
+                        <button class="btn btn-primary btn-out-of-stock" disabled>
+                            <span class="material-icons">remove_shopping_cart</span>
+                            Produto Esgotado
+                        </button>
+                        {% endif %}
                     </div>
 
                     <!-- Description -->
@@ -910,6 +1191,31 @@
         </button>
         <img id="modalImage" src="" alt="">
     </div>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+    <aside class="cart-sidebar" id="cartSidebar">
+        <div class="cart-header">
+            <h3>Meu Carrinho</h3>
+            <button class="close-cart" onclick="closeCart()">
+                <span class="material-icons">close</span>
+            </button>
+        </div>
+        <div class="cart-body" id="cartBody">
+            <div class="cart-empty">
+                <span class="material-icons">shopping_cart</span>
+                <h4>Seu carrinho está vazio</h4>
+                <p>Adicione produtos para começar</p>
+            </div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total:</span>
+                <span id="cartTotal">R$ 0,00</span>
+            </div>
+            <button class="btn-checkout" onclick="goToCheckout()">Finalizar Compra</button>
+        </div>
+    </aside>
 
     <!-- Footer -->
     <footer class="footer">
@@ -953,6 +1259,22 @@
     <script>
         const storeSlug = '{{ store.slug }}';
         
+        // User menu toggle
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+        // Fecha o dropdown ao clicar fora
+        document.addEventListener('click', function(e) {
+            const wrapper = document.querySelector('.user-menu-wrapper');
+            const dropdown = document.getElementById('userDropdown');
+            if (wrapper && dropdown && !wrapper.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
         // Change Main Image
         function changeMainImage(thumbnail, imageUrl) {
             const mainImg = document.getElementById('mainImage');
@@ -1056,13 +1378,32 @@
         }
 
         // Cart functionality
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let cart = [];
+
+        // Carregar carrinho do localStorage ao iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedCart = localStorage.getItem('cart_' + storeSlug);
+            if (savedCart) {
+                try {
+                    cart = JSON.parse(savedCart);
+                    updateCartUI();
+                } catch (e) {
+                    cart = [];
+                }
+            }
+        });
 
         function openCart() {
-            window.location.href = '/purchase';
+            document.getElementById('cartOverlay').classList.add('active');
+            document.getElementById('cartSidebar').classList.add('active');
         }
 
-        function addToCart(productId, productTitle, productPrice) {
+        function closeCart() {
+            document.getElementById('cartOverlay').classList.remove('active');
+            document.getElementById('cartSidebar').classList.remove('active');
+        }
+
+        function addToCart(productId, productTitle, productPrice, productImage) {
             const existingItem = cart.find(item => item.id === productId);
             
             if (existingItem) {
@@ -1072,33 +1413,85 @@
                     id: productId,
                     title: productTitle,
                     price: productPrice,
+                    image: productImage || '',
                     quantity: 1
                 });
             }
             
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            
-            // Visual feedback
-            const btn = event.target.closest('.btn-primary');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="material-icons">check</span> Adicionado!';
-            btn.style.background = 'var(--success)';
-            
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.style.background = '';
-            }, 2000);
+            updateCartUI();
+            openCart();
         }
 
-        function updateCartCount() {
+        function removeFromCart(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const cartBody = document.getElementById('cartBody');
+            const cartCount = document.getElementById('cartCount');
+            const cartTotal = document.getElementById('cartTotal');
+            
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            document.getElementById('cartCount').textContent = totalItems;
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            cartCount.textContent = totalItems;
+            cartTotal.textContent = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+            
+            // Salvar carrinho no localStorage
+            localStorage.setItem('cart_' + storeSlug, JSON.stringify(cart));
+            
+            if (cart.length === 0) {
+                cartBody.innerHTML = `
+                    <div class="cart-empty">
+                        <span class="material-icons">shopping_cart</span>
+                        <h4>Seu carrinho está vazio</h4>
+                        <p>Adicione produtos para começar</p>
+                    </div>
+                `;
+            } else {
+                cartBody.innerHTML = cart.map(item => `
+                    <div style="display: flex; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--gray-200);">
+                        <div style="width: 70px; height: 70px; background: var(--gray-100); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            ${item.image ? 
+                                `<img src="${item.image}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                `<span class="material-icons" style="color: var(--gray-400);">image</span>`
+                            }
+                        </div>
+                        <div style="flex: 1;">
+                            <h4 style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">${item.title}</h4>
+                            <p style="color: var(--gray-500); font-size: 13px;">Qtd: ${item.quantity}</p>
+                            <p style="font-weight: 600; color: var(--primary);">R$ ${(item.price * item.quantity).toFixed(2).replace('.', ',')}</p>
+                        </div>
+                        <button onclick="removeFromCart('${item.id}')" style="background: none; border: none; cursor: pointer; color: var(--gray-400);">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </div>
+                `).join('');
+            }
         }
 
-        // Load cart on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            updateCartCount();
+        function goToCheckout() {
+            if (cart.length === 0) {
+                alert('Seu carrinho está vazio!');
+                return;
+            }
+            // Carrinho já foi salvo no localStorage pela função updateCartUI
+            window.location.href = '/' + storeSlug + '/checkout';
+        }
+
+        function searchProducts() {
+            const query = document.getElementById('searchInput').value;
+            if (query.trim()) {
+                window.location.href = '/' + storeSlug + '/produtos?search=' + encodeURIComponent(query);
+            }
+        }
+
+        // Search on Enter
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchProducts();
+            }
         });
     </script>
 </body>

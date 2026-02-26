@@ -615,18 +615,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadPaymentMethods() {
     try {
-        const response = await fetch('/admin/settings/store');
+        const response = await fetch('/admin/settings/payment-methods');
         const data = await response.json();
         
-        if (data.success && data.data.payment_methods) {
-            data.data.payment_methods.forEach(pm => {
+        if (data.success && data.data) {
+            data.data.forEach(pm => {
                 const toggle = document.getElementById(`${pm.method}-toggle`);
                 const status = document.getElementById(`${pm.method}-status`);
                 
-                if (toggle && pm.is_enabled) {
-                    toggle.checked = true;
-                    status.textContent = 'Ativo';
-                    status.className = 'status-badge active';
+                if (toggle) {
+                    toggle.checked = pm.is_enabled;
+                    if (pm.is_enabled) {
+                        status.textContent = 'Ativo';
+                        status.className = 'status-badge active';
+                    } else {
+                        status.textContent = 'Inativo';
+                        status.className = 'status-badge inactive';
+                    }
+                }
+                
+                // Preencher configurações se existirem
+                if (pm.config) {
+                    fillPaymentConfig(pm.method, pm.config);
                 }
             });
         }
@@ -635,30 +645,161 @@ async function loadPaymentMethods() {
     }
 }
 
+function fillPaymentConfig(method, config) {
+    if (method === 'pix') {
+        if (config.key) document.getElementById('pix-key').value = config.key;
+        if (config.key_type) document.getElementById('pix-key-type').value = config.key_type;
+        if (config.beneficiary) document.getElementById('pix-beneficiary').value = config.beneficiary;
+    } else if (method === 'credit_card') {
+        if (config.provider) document.getElementById('credit_card-provider').value = config.provider;
+        if (config.installments) document.getElementById('credit_card-installments').value = config.installments;
+    } else if (method === 'debit_card') {
+        if (config.provider) document.getElementById('debit_card-provider').value = config.provider;
+    } else if (method === 'boleto') {
+        if (config.days) document.getElementById('boleto-days').value = config.days;
+        if (config.discount) document.getElementById('boleto-discount').value = config.discount;
+        if (config.instructions) document.getElementById('boleto-instructions').value = config.instructions;
+    }
+}
+
 function toggleConfig(method) {
     const config = document.getElementById(`${method}-config`);
     config.classList.toggle('active');
 }
 
-function togglePaymentMethod(method) {
+async function togglePaymentMethod(method) {
     const toggle = document.getElementById(`${method}-toggle`);
     const status = document.getElementById(`${method}-status`);
+    const isEnabled = toggle.checked;
     
-    if (toggle.checked) {
-        status.textContent = 'Ativo';
-        status.className = 'status-badge active';
-    } else {
-        status.textContent = 'Inativo';
-        status.className = 'status-badge inactive';
+    try {
+        const response = await fetch(`/admin/settings/payment-methods/${method}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                is_enabled: isEnabled
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (isEnabled) {
+                status.textContent = 'Ativo';
+                status.className = 'status-badge active';
+            } else {
+                status.textContent = 'Inativo';
+                status.className = 'status-badge inactive';
+            }
+            showNotification(data.message, 'success');
+        } else {
+            // Reverter toggle em caso de erro
+            toggle.checked = !isEnabled;
+            showNotification(data.error || 'Erro ao atualizar', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao alternar método de pagamento:', error);
+        toggle.checked = !isEnabled;
+        showNotification('Erro ao processar requisição', 'error');
     }
-    
-    // TODO: Fazer chamada API para salvar
 }
 
-function savePaymentConfig(method) {
-    // TODO: Implementar salvamento via API
-    alert(`Configuração do método ${method} salva com sucesso!`);
-    toggleConfig(method);
+async function savePaymentConfig(method) {
+    let config = {};
+    
+    if (method === 'pix') {
+        config = {
+            key: document.getElementById('pix-key').value,
+            key_type: document.getElementById('pix-key-type').value,
+            beneficiary: document.getElementById('pix-beneficiary').value
+        };
+    } else if (method === 'credit_card') {
+        config = {
+            provider: document.getElementById('credit_card-provider').value,
+            installments: document.getElementById('credit_card-installments').value
+        };
+    } else if (method === 'debit_card') {
+        config = {
+            provider: document.getElementById('debit_card-provider').value
+        };
+    } else if (method === 'boleto') {
+        config = {
+            days: document.getElementById('boleto-days').value,
+            discount: document.getElementById('boleto-discount').value,
+            instructions: document.getElementById('boleto-instructions').value
+        };
+    }
+    
+    try {
+        const response = await fetch(`/admin/settings/payment-methods/${method}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                config: config
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Configuração salva com sucesso!', 'success');
+            toggleConfig(method);
+        } else {
+            showNotification(data.error || 'Erro ao salvar configuração', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao salvar configuração:', error);
+        showNotification('Erro ao processar requisição', 'error');
+    }
+}
+
+function showNotification(message, type) {
+    // Remover notificação existente
+    const existing = document.querySelector('.notification');
+    if (existing) existing.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <span class="material-icons">${type === 'success' ? 'check_circle' : 'error'}</span>
+        ${message}
+    `;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        background: ${type === 'success' ? '#48bb78' : '#e53e3e'};
+        color: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
 </script>
+<style>
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+</style>
 {% endblock %}

@@ -718,7 +718,6 @@
                     <th>Produto</th>
                     <th>SKU</th>
                     <th>Estoque Disponível</th>
-                    <th>Estoque Reservado</th>
                     <th>Status</th>
                     <th>Última Atualização</th>
                     <th style="text-align: center;">Ações</th>
@@ -726,7 +725,7 @@
             </thead>
             <tbody id="stock-table-body">
                 <tr>
-                    <td colspan="7">
+                    <td colspan="6">
                         <div class="loading-spinner">
                             <div class="spinner"></div>
                         </div>
@@ -748,7 +747,7 @@
 
 <!-- MODAL EDITAR ESTOQUE -->
 <div class="modal-overlay" id="edit-modal">
-    <div class="modal">
+    <div class="modal" style="max-width: 500px;">
         <div class="modal-header">
             <h3 class="modal-title">Ajustar Estoque</h3>
             <button class="modal-close" onclick="closeEditModal()">&times;</button>
@@ -756,14 +755,23 @@
         <div class="modal-body">
             <p style="color: #718096; margin-bottom: 20px;" id="edit-product-name"></p>
             
-            <div class="form-group" style="margin-bottom: 16px;">
-                <label class="form-label">Quantidade em Estoque</label>
-                <input type="number" class="form-input" id="edit-quantity" min="0" placeholder="0">
+            <!-- Estoque simples (sem tamanhos) -->
+            <div id="simple-stock-fields">
+                <div class="form-group">
+                    <label class="form-label">Quantidade em Estoque</label>
+                    <input type="number" class="form-input" id="edit-quantity" min="0" placeholder="0">
+                </div>
             </div>
             
-            <div class="form-group">
-                <label class="form-label">Quantidade Reservada</label>
-                <input type="number" class="form-input" id="edit-reserved" min="0" placeholder="0">
+            <!-- Estoque por tamanho -->
+            <div id="size-stock-fields" style="display: none;">
+                <p style="font-size: 13px; color: #4a5568; margin-bottom: 16px; font-weight: 600;">
+                    <span class="material-icons" style="font-size: 16px; vertical-align: middle;">straighten</span>
+                    Estoque por Tamanho
+                </p>
+                <div id="size-stocks-container" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Campos de tamanho serão inseridos aqui -->
+                </div>
             </div>
         </div>
         <div class="modal-footer">
@@ -775,6 +783,38 @@
         </div>
     </div>
 </div>
+
+<style>
+.size-stock-row {
+    display: grid;
+    grid-template-columns: 60px 1fr;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 12px;
+    background: #f7fafc;
+    border-radius: 8px;
+}
+.size-stock-row .form-input {
+    padding: 8px 12px;
+    font-size: 13px;
+}
+.size-stock-row label {
+    font-size: 11px;
+    color: #718096;
+    display: block;
+    margin-bottom: 4px;
+}
+.size-stock-row .size-label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 14px;
+    text-align: center;
+    background: #e2e8f0;
+    padding: 8px;
+    border-radius: 6px;
+}
+</style>
 
 <script>
     // Estado
@@ -860,7 +900,7 @@
         const tbody = document.getElementById('stock-table-body');
         tbody.innerHTML = `
             <tr>
-                <td colspan="7">
+                <td colspan="6">
                     <div class="loading-spinner">
                         <div class="spinner"></div>
                     </div>
@@ -887,7 +927,7 @@
             } else {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="7">
+                        <td colspan="6">
                             <div class="empty-state">
                                 <span class="material-icons">error_outline</span>
                                 <p>Erro ao carregar estoque</p>
@@ -900,7 +940,7 @@
             console.error('Erro ao carregar estoque:', error);
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7">
+                    <td colspan="6">
                         <div class="empty-state">
                             <span class="material-icons">error_outline</span>
                             <p>Erro ao carregar estoque</p>
@@ -936,7 +976,7 @@
         if (products.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="7">
+                    <td colspan="6">
                         <div class="empty-state">
                             <span class="material-icons">inventory_2</span>
                             <p>Nenhum produto encontrado</p>
@@ -954,12 +994,13 @@
 
         tbody.innerHTML = products.map(product => {
             const statusClass = product.status === 'out_of_stock' ? 'critical' : product.status;
+            const hasSizeIndicator = product.has_size ? '<span class="material-icons" style="font-size: 14px; color: #667eea; vertical-align: middle;" title="Tamanhos">straighten</span>' : '';
             
             return `
                 <tr>
                     <td>
                         <div class="product-info">
-                            <span class="product-title">${escapeHtml(product.title)}</span>
+                            <span class="product-title">${escapeHtml(product.title)} ${hasSizeIndicator}</span>
                         </div>
                     </td>
                     <td>${escapeHtml(product.sku)}</td>
@@ -970,9 +1011,6 @@
                                 <div class="stock-progress-bar ${statusClass}" style="width: ${product.progress}%;"></div>
                             </div>
                         </div>
-                    </td>
-                    <td>
-                        <span class="stock-badge reserved">${product.reserved_quantity} unid.</span>
                     </td>
                     <td><span class="stock-badge ${statusClass}">${product.status_label}</span></td>
                     <td><span class="last-update">${product.last_updated || '-'}</span></td>
@@ -1058,9 +1096,51 @@
         
         editingProductId = productId;
         document.getElementById('edit-product-name').textContent = product.title;
-        document.getElementById('edit-quantity').value = product.quantity;
-        document.getElementById('edit-reserved').value = product.reserved_quantity;
+        
+        // Verificar se o produto tem tamanhos
+        if (product.has_size && product.size_stocks && product.size_stocks.length > 0) {
+            // Mostrar campos de tamanho
+            document.getElementById('simple-stock-fields').style.display = 'none';
+            document.getElementById('size-stock-fields').style.display = 'block';
+            
+            // Renderizar campos de tamanho
+            const container = document.getElementById('size-stocks-container');
+            container.innerHTML = '';
+            
+            product.size_stocks.forEach((ss, index) => {
+                container.innerHTML += createSizeStockRow(ss.size, ss.quantity, index);
+            });
+        } else {
+            // Mostrar campos simples
+            document.getElementById('simple-stock-fields').style.display = 'block';
+            document.getElementById('size-stock-fields').style.display = 'none';
+            
+            document.getElementById('edit-quantity').value = product.quantity;
+        }
+        
         document.getElementById('edit-modal').classList.add('active');
+    }
+    
+    function createSizeStockRow(size, quantity, index) {
+        return `
+            <div class="size-stock-row" data-index="${index}">
+                <div>
+                    <label>Tam.</label>
+                    <div class="size-label">${escapeHtml(size)}</div>
+                    <input type="hidden" class="size-input" value="${escapeHtml(size)}">
+                </div>
+                <div>
+                    <label>Quantidade</label>
+                    <input type="number" class="form-input quantity-input" value="${quantity}" min="0" placeholder="0">
+                </div>
+            </div>
+        `;
+    }
+    
+    function addSizeField() {
+        const container = document.getElementById('size-stocks-container');
+        const index = container.children.length;
+        container.innerHTML += createSizeStockRow('', 0, index);
     }
 
     function closeEditModal() {
@@ -1070,44 +1150,87 @@
 
     async function saveStock() {
         if (!editingProductId) return;
-
-        const quantity = parseInt(document.getElementById('edit-quantity').value) || 0;
-        const reserved = parseInt(document.getElementById('edit-reserved').value) || 0;
-
-        if (quantity < 0) {
-            alert('A quantidade não pode ser negativa');
-            return;
-        }
-
-        if (reserved > quantity) {
-            alert('A quantidade reservada não pode ser maior que o estoque');
-            return;
-        }
-
-        try {
-            const response = await fetch(`/admin/api/stock/${editingProductId}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    quantity: quantity,
-                    reserved_quantity: reserved
-                })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                closeEditModal();
-                loadStats();
-                loadStock();
-            } else {
-                alert(result.error || 'Erro ao atualizar estoque');
+        
+        const product = productsData[String(editingProductId)];
+        
+        // Verificar se tem tamanhos
+        if (product.has_size && document.getElementById('size-stock-fields').style.display !== 'none') {
+            // Coletar dados de tamanhos
+            const sizeStocks = [];
+            const rows = document.querySelectorAll('.size-stock-row');
+            
+            for (const row of rows) {
+                const size = row.querySelector('.size-input').value.trim();
+                const quantity = parseInt(row.querySelector('.quantity-input').value) || 0;
+                
+                if (!size) {
+                    alert('Preencha o nome de todos os tamanhos');
+                    return;
+                }
+                
+                if (quantity < 0) {
+                    alert(`Quantidade não pode ser negativa para tamanho ${size}`);
+                    return;
+                }
+                
+                sizeStocks.push({ size, quantity });
             }
-        } catch (error) {
-            console.error('Erro ao atualizar estoque:', error);
-            alert('Erro ao atualizar estoque');
+            
+            try {
+                const response = await fetch(`/admin/api/stock/${editingProductId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ size_stocks: sizeStocks })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    closeEditModal();
+                    loadStats();
+                    loadStock();
+                } else {
+                    alert(result.error || 'Erro ao atualizar estoque');
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar estoque:', error);
+                alert('Erro ao atualizar estoque');
+            }
+        } else {
+            // Estoque simples
+            const quantity = parseInt(document.getElementById('edit-quantity').value) || 0;
+
+            if (quantity < 0) {
+                alert('A quantidade não pode ser negativa');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/api/stock/${editingProductId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        quantity: quantity
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    closeEditModal();
+                    loadStats();
+                    loadStock();
+                } else {
+                    alert(result.error || 'Erro ao atualizar estoque');
+                }
+            } catch (error) {
+                console.error('Erro ao atualizar estoque:', error);
+                alert('Erro ao atualizar estoque');
+            }
         }
     }
 

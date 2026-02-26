@@ -1,7 +1,14 @@
-from flask import render_template, jsonify, session
+from flask import render_template, jsonify, session, request
 from . import admin
 from .decorators import login_required, store_required
-from app.models.store import Store
+from app.models.store import Store, StoreCustomization
+from app.models.store_payment_method import StorePaymentMethod
+from app.models.store_shipping_methods import StoreShippingMethod
+from app.models.user import User
+from config.database import db
+import uuid
+import os
+from werkzeug.utils import secure_filename
 
 
 @admin.route('/settings')
@@ -130,4 +137,424 @@ def my_store_info():
         return jsonify({
             'success': False,
             'error': 'Erro ao carregar loja'
+        }), 500
+
+
+# ============================
+# APIs de Meios de Pagamento
+# ============================
+
+@admin.route('/settings/payment-methods', methods=['GET'])
+@login_required
+@store_required
+def get_payment_methods():
+    """API para obter todos os métodos de pagamento da loja"""
+    try:
+        store_id = session.get('store_id')
+        payment_methods = StorePaymentMethod.query.filter_by(store_id=store_id).all()
+        
+        return jsonify({
+            'success': True,
+            'data': [pm.to_dict() for pm in payment_methods]
+        }), 200
+        
+    except Exception as e:
+        print(f"Erro ao buscar métodos de pagamento: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao carregar métodos de pagamento'
+        }), 500
+
+
+@admin.route('/settings/payment-methods/<method>', methods=['PUT'])
+@login_required
+@store_required
+def update_payment_method(method):
+    """API para atualizar um método de pagamento"""
+    try:
+        store_id = session.get('store_id')
+        data = request.get_json()
+        
+        # Validar método
+        valid_methods = ['pix', 'credit_card', 'debit_card', 'boleto']
+        if method not in valid_methods:
+            return jsonify({
+                'success': False,
+                'error': 'Método de pagamento inválido'
+            }), 400
+        
+        # Buscar ou criar método de pagamento
+        payment_method = StorePaymentMethod.query.filter_by(
+            store_id=store_id,
+            method=method
+        ).first()
+        
+        if not payment_method:
+            # Criar novo método
+            payment_method = StorePaymentMethod(
+                id=str(uuid.uuid4()),
+                store_id=store_id,
+                method=method,
+                is_enabled=data.get('is_enabled', False),
+                config=data.get('config', {})
+            )
+            db.session.add(payment_method)
+        else:
+            # Atualizar método existente
+            if 'is_enabled' in data:
+                payment_method.is_enabled = data['is_enabled']
+            if 'config' in data:
+                payment_method.config = data['config']
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'data': payment_method.to_dict(),
+            'message': 'Método de pagamento atualizado com sucesso'
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao atualizar método de pagamento: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao atualizar método de pagamento'
+        }), 500
+
+
+@admin.route('/settings/payment-methods/<method>/toggle', methods=['POST'])
+@login_required
+@store_required
+def toggle_payment_method(method):
+    """API para ativar/desativar um método de pagamento"""
+    try:
+        store_id = session.get('store_id')
+        
+        # Validar método
+        valid_methods = ['pix', 'credit_card', 'debit_card', 'boleto']
+        if method not in valid_methods:
+            return jsonify({
+                'success': False,
+                'error': 'Método de pagamento inválido'
+            }), 400
+        
+        # Buscar ou criar método de pagamento
+        payment_method = StorePaymentMethod.query.filter_by(
+            store_id=store_id,
+            method=method
+        ).first()
+        
+        if not payment_method:
+            # Criar novo método habilitado
+            payment_method = StorePaymentMethod(
+                id=str(uuid.uuid4()),
+                store_id=store_id,
+                method=method,
+                is_enabled=True,
+                config={}
+            )
+            db.session.add(payment_method)
+        else:
+            # Toggle status
+            payment_method.is_enabled = not payment_method.is_enabled
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'data': payment_method.to_dict(),
+            'message': f"Método {'ativado' if payment_method.is_enabled else 'desativado'} com sucesso"
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao alternar método de pagamento: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao alternar método de pagamento'
+        }), 500
+
+
+# ============================
+# APIs de Meios de Envio
+# ============================
+
+@admin.route('/settings/shipping-methods', methods=['GET'])
+@login_required
+@store_required
+def get_shipping_methods():
+    """API para obter todos os métodos de envio da loja"""
+    try:
+        store_id = session.get('store_id')
+        shipping_methods = StoreShippingMethod.query.filter_by(store_id=store_id).all()
+        
+        return jsonify({
+            'success': True,
+            'data': [sm.to_dict() for sm in shipping_methods]
+        }), 200
+        
+    except Exception as e:
+        print(f"Erro ao buscar métodos de envio: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao carregar métodos de envio'
+        }), 500
+
+
+@admin.route('/settings/shipping-methods/<method>', methods=['PUT'])
+@login_required
+@store_required
+def update_shipping_method(method):
+    """API para atualizar um método de envio"""
+    try:
+        store_id = session.get('store_id')
+        data = request.get_json()
+        
+        # Validar método
+        valid_methods = ['correios', 'fixed', 'pickup', 'custom']
+        if method not in valid_methods:
+            return jsonify({
+                'success': False,
+                'error': 'Método de envio inválido'
+            }), 400
+        
+        # Buscar ou criar método de envio
+        shipping_method = StoreShippingMethod.query.filter_by(
+            store_id=store_id,
+            method=method
+        ).first()
+        
+        if not shipping_method:
+            # Criar novo método
+            shipping_method = StoreShippingMethod(
+                id=str(uuid.uuid4()),
+                store_id=store_id,
+                method=method,
+                is_enabled=data.get('is_enabled', False),
+                config=data.get('config', {})
+            )
+            db.session.add(shipping_method)
+        else:
+            # Atualizar método existente
+            if 'is_enabled' in data:
+                shipping_method.is_enabled = data['is_enabled']
+            if 'config' in data:
+                shipping_method.config = data['config']
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'data': shipping_method.to_dict(),
+            'message': 'Método de envio atualizado com sucesso'
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao atualizar método de envio: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao atualizar método de envio'
+        }), 500
+
+
+@admin.route('/settings/shipping-methods/<method>/toggle', methods=['POST'])
+@login_required
+@store_required
+def toggle_shipping_method(method):
+    """API para ativar/desativar um método de envio"""
+    try:
+        store_id = session.get('store_id')
+        
+        # Validar método
+        valid_methods = ['correios', 'fixed', 'pickup', 'custom']
+        if method not in valid_methods:
+            return jsonify({
+                'success': False,
+                'error': 'Método de envio inválido'
+            }), 400
+        
+        # Buscar ou criar método de envio
+        shipping_method = StoreShippingMethod.query.filter_by(
+            store_id=store_id,
+            method=method
+        ).first()
+        
+        if not shipping_method:
+            # Criar novo método habilitado
+            shipping_method = StoreShippingMethod(
+                id=str(uuid.uuid4()),
+                store_id=store_id,
+                method=method,
+                is_enabled=True,
+                config={}
+            )
+            db.session.add(shipping_method)
+        else:
+            # Toggle status
+            shipping_method.is_enabled = not shipping_method.is_enabled
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'data': shipping_method.to_dict(),
+            'message': f"Método {'ativado' if shipping_method.is_enabled else 'desativado'} com sucesso"
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao alternar método de envio: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao alternar método de envio'
+        }), 500
+
+
+# ============================
+# APIs de Dados do Negócio
+# ============================
+
+@admin.route('/settings/business', methods=['PUT'])
+@login_required
+@store_required
+def update_business_data():
+    """API para atualizar dados do negócio"""
+    try:
+        store_id = session.get('store_id')
+        store = Store.query.get(store_id)
+        
+        if not store:
+            return jsonify({
+                'success': False,
+                'error': 'Loja não encontrada'
+            }), 404
+        
+        data = request.get_json()
+        
+        # Atualizar dados básicos da loja
+        if 'name' in data:
+            store.name = data['name']
+        if 'slug' in data:
+            new_slug = data['slug'].strip().lower()
+            # Verificar se o slug já existe em outra loja
+            existing = Store.query.filter(Store.slug == new_slug, Store.id != store_id).first()
+            if existing:
+                return jsonify({
+                    'success': False,
+                    'error': 'Esta URL já está sendo usada por outra loja'
+                }), 400
+            store.slug = new_slug
+        if 'description' in data:
+            store.description = data['description']
+        if 'person_type' in data and data['person_type'] in ['PF', 'PJ']:
+            store.person_type = data['person_type']
+        if 'cpf' in data:
+            store.cpf = data['cpf'].replace('.', '').replace('-', '') if data['cpf'] else None
+        if 'cnpj' in data:
+            store.cnpj = data['cnpj'].replace('.', '').replace('/', '').replace('-', '') if data['cnpj'] else None
+        if 'legal_name' in data:
+            store.legal_name = data['legal_name']
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'data': store.to_dict(),
+            'message': 'Dados do negócio atualizados com sucesso'
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao atualizar dados do negócio: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao atualizar dados do negócio'
+        }), 500
+
+
+@admin.route('/settings/business/logo', methods=['POST'])
+@login_required
+@store_required
+def upload_business_logo():
+    """API para fazer upload do logo da loja"""
+    try:
+        store_id = session.get('store_id')
+        store = Store.query.get(store_id)
+        
+        if not store:
+            return jsonify({
+                'success': False,
+                'error': 'Loja não encontrada'
+            }), 404
+        
+        if 'logo' not in request.files:
+            return jsonify({
+                'success': False,
+                'error': 'Nenhum arquivo enviado'
+            }), 400
+        
+        file = request.files['logo']
+        
+        if file.filename == '':
+            return jsonify({
+                'success': False,
+                'error': 'Nenhum arquivo selecionado'
+            }), 400
+        
+        # Validar extensão
+        allowed_extensions = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+        if '.' not in file.filename or \
+           file.filename.rsplit('.', 1)[1].lower() not in allowed_extensions:
+            return jsonify({
+                'success': False,
+                'error': 'Tipo de arquivo não permitido'
+            }), 400
+        
+        # Gerar nome único
+        ext = file.filename.rsplit('.', 1)[1].lower()
+        filename = f"{store_id}_{uuid.uuid4().hex[:8]}.{ext}"
+        
+        # Caminho para salvar
+        upload_folder = os.path.join('app', 'static', 'uploads', 'logos')
+        os.makedirs(upload_folder, exist_ok=True)
+        filepath = os.path.join(upload_folder, filename)
+        
+        file.save(filepath)
+        
+        # Atualizar customização da loja
+        logo_url = f"/static/uploads/logos/{filename}"
+        
+        if not store.customization:
+            customization = StoreCustomization(
+                store_id=store_id,
+                logo=logo_url
+            )
+            db.session.add(customization)
+        else:
+            # Remover logo antigo se existir
+            if store.customization.logo:
+                old_path = os.path.join('app', store.customization.logo.lstrip('/'))
+                if os.path.exists(old_path):
+                    try:
+                        os.remove(old_path)
+                    except:
+                        pass
+            store.customization.logo = logo_url
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'data': {'logo_url': logo_url},
+            'message': 'Logo atualizado com sucesso'
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao fazer upload do logo: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao fazer upload do logo'
         }), 500

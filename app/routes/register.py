@@ -472,15 +472,12 @@ def registration_step4():
             }), 400
         
         store_id = registration_data['store_id']
-        
-        # Atualiza logo na store se fornecido
         store = Store.query.get(store_id)
-        if logo_url:
-            store.logo_url = logo_url
         
-        # Cria customização da loja
+        # Cria customização da loja (incluindo logo se fornecido)
         customization = StoreCustomization(
             store_id=store_id,
+            logo=logo_url if logo_url else None,
             primary_color=primary_color,
             secondary_color=secondary_color,
             theme={

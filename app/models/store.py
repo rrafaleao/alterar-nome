@@ -43,6 +43,13 @@ class Store(db.Model):
         db.Index('idx_stores_slug', 'slug'),
     )
     
+    @property
+    def logo_url(self):
+        """Retorna a URL do logo da loja (da customização)"""
+        if self.customization and self.customization.logo:
+            return self.customization.logo
+        return None
+    
     def __repr__(self):
         return f'<Store {self.name} ({self.slug})>'
     
@@ -53,6 +60,7 @@ class Store(db.Model):
             'slug': self.slug,
             'name': self.name,
             'description': self.description,
+            'logo_url': self.logo_url,
             'onboarding_step': self.onboarding_step,
             'onboarding_completed': self.onboarding_completed,
             'person_type': self.person_type,

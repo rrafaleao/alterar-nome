@@ -550,6 +550,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 preview.innerHTML = `<img src="${e.target.result}" alt="Logo">`;
             };
             reader.readAsDataURL(file);
+            
+            // Upload logo automaticamente
+            uploadLogo(file);
         }
     });
 });
@@ -562,20 +565,30 @@ async function loadBusinessData() {
         if (data.success) {
             const store = data.data;
             
+            // Dados básicos
             document.getElementById('store-name').value = store.name || '';
             document.getElementById('store-slug').value = store.slug || '';
             document.getElementById('store-description').value = store.description || '';
             
+            // Logo
+            if (store.logo_url) {
+                const preview = document.getElementById('logo-preview');
+                preview.innerHTML = `<img src="${store.logo_url}" alt="Logo">`;
+            }
+            
+            // Tipo de pessoa
             if (store.person_type === 'PJ') {
                 selectPersonType('PJ');
                 document.getElementById('cnpj').value = store.cnpj || '';
                 document.getElementById('legal-name').value = store.legal_name || '';
             } else {
+                selectPersonType('PF');
                 document.getElementById('cpf').value = store.cpf || '';
             }
         }
     } catch (error) {
         console.error('Erro ao carregar dados:', error);
+        showNotification('Erro ao carregar dados', 'error');
     }
 }
 
@@ -618,9 +631,113 @@ async function searchCep() {
     }
 }
 
-function saveBusinessData() {
-    // TODO: Implementar salvamento via API
-    alert('Dados salvos com sucesso!');
+async function uploadLogo(file) {
+    const formData = new FormData();
+    formData.append('logo', file);
+    
+    try {
+        const response = await fetch('/admin/settings/business/logo', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Logo atualizado com sucesso!', 'success');
+        } else {
+            showNotification(data.error || 'Erro ao enviar logo', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao enviar logo:', error);
+        showNotification('Erro ao processar requisição', 'error');
+    }
+}
+
+async function saveBusinessData() {
+    const btnPj = document.getElementById('btn-pj');
+    const personType = btnPj.classList.contains('active') ? 'PJ' : 'PF';
+    
+    const businessData = {
+        name: document.getElementById('store-name').value,
+        slug: document.getElementById('store-slug').value,
+        description: document.getElementById('store-description').value,
+        person_type: personType
+    };
+    
+    // Adicionar campos específicos do tipo
+    if (personType === 'PJ') {
+        businessData.cnpj = document.getElementById('cnpj').value;
+        businessData.legal_name = document.getElementById('legal-name').value;
+    } else {
+        businessData.cpf = document.getElementById('cpf').value;
+    }
+    
+    try {
+        const response = await fetch('/admin/settings/business', {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(businessData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Dados salvos com sucesso!', 'success');
+        } else {
+            showNotification(data.error || 'Erro ao salvar dados', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao salvar dados:', error);
+        showNotification('Erro ao processar requisição', 'error');
+    }
+}
+
+function showNotification(message, type) {
+    // Remover notificação existente
+    const existing = document.querySelector('.notification');
+    if (existing) existing.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <span class="material-icons">${type === 'success' ? 'check_circle' : 'error'}</span>
+        ${message}
+    `;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        background: ${type === 'success' ? '#48bb78' : '#e53e3e'};
+        color: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
 </script>
+<style>
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+</style>
 {% endblock %}

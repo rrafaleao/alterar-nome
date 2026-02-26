@@ -7,7 +7,7 @@ from datetime import datetime
 from . import admin
 from .decorators import login_required, store_required
 from config.database import db
-from app.models.product import Product, ProductStock
+from app.models.product import Product, ProductStock, ProductSizeStock
 from app.models.category import Category
 
 # Limite para considerar estoque baixo
@@ -99,6 +99,33 @@ def get_stock():
             reserved = stock.reserved_quantity if stock else 0
             available = quantity - reserved
             
+            # Verificar se a categoria tem tamanhos
+            has_size = False
+            category_name = None
+            if product.category_id:
+                category = Category.query.get(product.category_id)
+                if category:
+                    has_size = category.has_size
+                    category_name = category.name
+            
+            # Buscar estoques por tamanho se a categoria tem tamanhos
+            size_stocks = []
+            if has_size:
+                size_stock_records = ProductSizeStock.query.filter_by(product_id=product.id).all()
+                for ss in size_stock_records:
+                    size_stocks.append({
+                        'id': ss.id,
+                        'size': ss.size,
+                        'quantity': ss.quantity,
+                        'reserved_quantity': ss.reserved_quantity,
+                        'available': ss.quantity - ss.reserved_quantity
+                    })
+                # Calcular quantidade total baseado nos tamanhos
+                if size_stocks:
+                    quantity = sum(ss['quantity'] for ss in size_stocks)
+                    reserved = sum(ss['reserved_quantity'] for ss in size_stocks)
+                    available = quantity - reserved
+            
             # Determinar status
             if quantity == 0:
                 stock_status = 'out_of_stock'
@@ -127,6 +154,9 @@ def get_stock():
                 'sku': product.sku or '-',
                 'price': float(product.price) if product.price else 0,
                 'category_id': product.category_id,
+                'category_name': category_name,
+                'has_size': has_size,
+                'size_stocks': size_stocks,
                 'quantity': quantity,
                 'reserved_quantity': reserved,
                 'available': available,
@@ -224,7 +254,7 @@ def get_stock_stats():
 @login_required
 @store_required
 def update_stock(product_id):
-    """API para atualizar estoque de um produto"""
+    """API para atualizar estoque de um produto (com ou sem tamanhos)"""
     try:
         store_id = session.get('store_id')
         
@@ -238,7 +268,78 @@ def update_stock(product_id):
         
         data = request.get_json()
         
-        # Buscar ou criar registro de estoque
+        # Verificar se a categoria tem tamanhos
+        has_size = False
+        if product.category_id:
+            category = Category.query.get(product.category_id)
+            if category:
+                has_size = category.has_size
+        
+        # Se tem tamanhos, atualizar estoque por tamanho
+        if has_size and 'size_stocks' in data:
+            size_stocks_data = data['size_stocks']
+            
+            for size_data in size_stocks_data:
+                size = size_data.get('size')
+                if not size:
+                    continue
+                
+                quantity = int(size_data.get('quantity', 0))
+                reserved = int(size_data.get('reserved_quantity', 0))
+                
+                if quantity < 0:
+                    return jsonify({
+                        'success': False,
+                        'error': f'Quantidade não pode ser negativa para tamanho {size}'
+                    }), 400
+                
+                if reserved > quantity:
+                    return jsonify({
+                        'success': False,
+                        'error': f'Quantidade reservada não pode ser maior que o estoque para tamanho {size}'
+                    }), 400
+                
+                # Buscar ou criar registro de estoque por tamanho
+                size_stock = ProductSizeStock.query.filter_by(
+                    product_id=product_id, 
+                    size=size
+                ).first()
+                
+                if not size_stock:
+                    size_stock = ProductSizeStock(
+                        product_id=product_id,
+                        size=size,
+                        quantity=0,
+                        reserved_quantity=0
+                    )
+                    db.session.add(size_stock)
+                
+                size_stock.quantity = quantity
+                size_stock.reserved_quantity = reserved
+                size_stock.last_updated = datetime.utcnow()
+            
+            db.session.commit()
+            
+            # Buscar dados atualizados
+            updated_size_stocks = ProductSizeStock.query.filter_by(product_id=product_id).all()
+            total_quantity = sum(ss.quantity for ss in updated_size_stocks)
+            total_reserved = sum(ss.reserved_quantity for ss in updated_size_stocks)
+            
+            return jsonify({
+                'success': True,
+                'message': 'Estoque por tamanho atualizado com sucesso',
+                'data': {
+                    'product_id': product_id,
+                    'has_size': True,
+                    'size_stocks': [ss.to_dict() for ss in updated_size_stocks],
+                    'quantity': total_quantity,
+                    'reserved_quantity': total_reserved,
+                    'available': total_quantity - total_reserved,
+                    'last_updated': datetime.utcnow().strftime('%d/%m/%Y %H:%M')
+                }
+            }), 200
+        
+        # Estoque simples (sem tamanhos)
         stock = ProductStock.query.filter_by(product_id=product_id).first()
         
         if not stock:
@@ -283,6 +384,7 @@ def update_stock(product_id):
             'message': 'Estoque atualizado com sucesso',
             'data': {
                 'product_id': product_id,
+                'has_size': False,
                 'quantity': stock.quantity,
                 'reserved_quantity': stock.reserved_quantity,
                 'available': stock.quantity - stock.reserved_quantity,

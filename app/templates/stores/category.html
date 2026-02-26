@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ store.name }} - Loja Online</title>
+    <title>{{ category.name }} - {{ store.name }}</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style>
@@ -34,11 +34,22 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            height: 100%;
+        }
+
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background-color: var(--gray-50);
             color: var(--gray-800);
             line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .main-wrapper {
+            flex: 1;
         }
 
         .container {
@@ -72,6 +83,8 @@
             display: flex;
             align-items: center;
             gap: 16px;
+            text-decoration: none;
+            color: inherit;
         }
 
         .logo {
@@ -171,6 +184,7 @@
             justify-content: center;
             transition: all 0.2s;
             position: relative;
+            text-decoration: none;
         }
 
         .icon-btn:hover {
@@ -215,6 +229,7 @@
             font-weight: 600;
             transition: all 0.3s;
             box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+            text-decoration: none;
         }
 
         .btn-login:hover {
@@ -260,180 +275,166 @@
             font-size: 18px;
         }
 
-        /* ===== HERO SECTION ===== */
-        .hero-section {
-            padding: 32px 0;
+        /* ===== PAGE HEADER ===== */
+        .page-header {
+            padding: 48px 0 32px;
         }
 
-        .hero-banner {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 24px;
-            padding: 60px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero-banner::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .hero-banner::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -5%;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            border-radius: 50%;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            color: white;
-        }
-
-        .hero-content h1 {
-            font-size: 48px;
-            font-weight: 800;
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             margin-bottom: 16px;
-            letter-spacing: -1px;
-        }
-
-        .hero-content p {
-            font-size: 18px;
-            opacity: 0.9;
-            max-width: 600px;
-            margin: 0 auto 32px;
-        }
-
-        .hero-cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 16px 32px;
-            background: white;
-            color: var(--primary);
-            border-radius: 50px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-        }
-
-        .hero-cta:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-        }
-
-        /* ===== CATEGORIES SECTION ===== */
-        .categories-section {
-            padding: 48px 0;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 32px;
-        }
-
-        .section-title {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--gray-900);
-        }
-
-        .section-title span {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .view-all {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 500;
-            transition: gap 0.2s;
-        }
-
-        .view-all:hover {
-            gap: 8px;
-        }
-
-        .categories-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 20px;
-        }
-
-        .category-card {
-            background: white;
-            border-radius: 16px;
-            padding: 24px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .category-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--card-shadow-hover);
-            border-color: var(--primary);
-        }
-
-        .category-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 16px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .category-icon .material-icons {
-            font-size: 28px;
-            color: var(--primary);
-        }
-
-        .category-card h3 {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--gray-800);
-            margin-bottom: 4px;
-        }
-
-        .category-card span {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--gray-500);
         }
 
-        /* ===== PRODUCTS SECTION ===== */
+        .breadcrumb a {
+            color: var(--gray-500);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb a:hover {
+            color: var(--primary);
+        }
+
+        .breadcrumb .current {
+            color: var(--gray-900);
+            font-weight: 500;
+        }
+
+        .page-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .page-description {
+            font-size: 16px;
+            color: var(--gray-500);
+        }
+
+        .product-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--gray-100);
+            border-radius: 50px;
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-top: 16px;
+        }
+
+        /* ===== CATEGORIES SIDEBAR ===== */
+        .content-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 32px;
+            padding-bottom: 64px;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-title .material-icons {
+            color: var(--primary);
+        }
+
+        .category-list {
+            list-style: none;
+        }
+
+        .category-item {
+            margin-bottom: 4px;
+        }
+
+        .category-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            color: var(--gray-600);
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+
+        .category-link:hover {
+            background: var(--gray-50);
+            color: var(--gray-900);
+        }
+
+        .category-link.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .category-link .count {
+            background: var(--gray-100);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .category-link.active .count {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* ===== PRODUCTS GRID ===== */
         .products-section {
-            padding: 48px 0;
+            padding: 0;
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .sort-select {
+            padding: 10px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--gray-700);
+            background: white;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .sort-select:focus {
+            border-color: var(--primary);
         }
 
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
             gap: 24px;
         }
 
@@ -473,10 +474,6 @@
             text-decoration: none;
             color: inherit;
             display: block;
-        }
-
-        .product-info-bottom {
-            padding: 0 20px 20px;
         }
 
         .product-placeholder {
@@ -583,6 +580,10 @@
             overflow: hidden;
         }
 
+        .product-info-bottom {
+            padding: 0 20px 20px;
+        }
+
         .product-price-row {
             display: flex;
             align-items: center;
@@ -639,6 +640,7 @@
             background: white;
             border-radius: 20px;
             border: 2px dashed var(--gray-200);
+            grid-column: 1 / -1;
         }
 
         .empty-state .material-icons {
@@ -657,59 +659,12 @@
             color: var(--gray-500);
         }
 
-        /* ===== FEATURES SECTION ===== */
-        .features-section {
-            padding: 48px 0;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 24px;
-        }
-
-        .feature-card {
-            background: white;
-            border-radius: 16px;
-            padding: 32px;
-            text-align: center;
-            border: 1px solid var(--gray-200);
-        }
-
-        .feature-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .feature-icon .material-icons {
-            font-size: 28px;
-            color: var(--primary);
-        }
-
-        .feature-card h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--gray-900);
-            margin-bottom: 8px;
-        }
-
-        .feature-card p {
-            font-size: 14px;
-            color: var(--gray-500);
-        }
-
         /* ===== FOOTER ===== */
         .footer {
             background: var(--gray-900);
             color: white;
             padding: 64px 0 32px;
-            margin-top: 64px;
+            margin-top: auto;
         }
 
         .footer-content {
@@ -878,6 +833,18 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 1024px) {
+            .content-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .sidebar-card {
+                display: none;
+            }
+
             .footer-content {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -895,12 +862,8 @@
                 margin-top: 16px;
             }
 
-            .hero-banner {
-                padding: 40px 24px;
-            }
-
-            .hero-content h1 {
-                font-size: 32px;
+            .page-title {
+                font-size: 28px;
             }
 
             .footer-content {
@@ -923,12 +886,8 @@
                 font-size: 18px;
             }
 
-            .hero-content h1 {
+            .page-title {
                 font-size: 24px;
-            }
-
-            .section-title {
-                font-size: 22px;
             }
 
             .products-grid {
@@ -947,297 +906,201 @@
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-top">
-            <div class="container">
-                <div class="header-content">
-                    <div class="logo-section">
-                        {% if store.logo_url %}
-                            <img src="{{ store.logo_url }}" alt="{{ store.name }}" class="logo">
-                        {% else %}
-                            <div class="logo-placeholder">{{ store.name[0] | upper }}</div>
-                        {% endif %}
-                        <h1 class="store-name">{{ store.name }}</h1>
-                    </div>
-
-                    <div class="search-bar">
-                        <input type="text" placeholder="Buscar produtos..." id="searchInput">
-                        <button type="button" onclick="searchProducts()">
-                            <span class="material-icons">search</span>
-                        </button>
-                    </div>
-
-                    <div class="header-actions">
-                        <a href="{{ url_for('storefront.favorites_page', slug=store.slug) }}" class="icon-btn" title="Favoritos">
-                            <span class="material-icons">favorite_border</span>
+    <div class="main-wrapper">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <div class="container">
+                    <div class="header-content">
+                        <a href="{{ url_for('storefront.view_store', slug=store.slug) }}" class="logo-section">
+                            {% if store.logo_url %}
+                                <img src="{{ store.logo_url }}" alt="{{ store.name }}" class="logo">
+                            {% else %}
+                                <div class="logo-placeholder">{{ store.name[0] | upper }}</div>
+                            {% endif %}
+                            <h1 class="store-name">{{ store.name }}</h1>
                         </a>
-                        <button class="icon-btn" onclick="openCart()" title="Carrinho">
-                            <span class="material-icons">shopping_bag</span>
-                            <span class="cart-badge" id="cartCount">0</span>
-                        </button>
-                        {% if session.get('customer_id') and session.get('customer_store_id') == store.id %}
-                        <div class="user-menu-wrapper" style="position: relative;">
-                            <button class="btn-login" onclick="toggleUserMenu()" style="display: flex; align-items: center; gap: 8px;">
-                                <span class="material-icons" style="font-size: 18px;">person</span>
-                                {{ session.get('customer_name', 'Minha Conta').split(' ')[0] }}
+
+                        <div class="search-bar">
+                            <input type="text" placeholder="Buscar produtos..." id="searchInput">
+                            <button type="button" onclick="searchProducts()">
+                                <span class="material-icons">search</span>
                             </button>
-                            <div class="user-dropdown" id="userDropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 8px; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); border: 1px solid var(--gray-200); min-width: 200px; z-index: 100; overflow: hidden;">
-                                <div style="padding: 16px; border-bottom: 1px solid var(--gray-100);">
-                                    <p style="font-weight: 600; font-size: 14px; color: var(--gray-900);">{{ session.get('customer_name', '') }}</p>
-                                    <p style="font-size: 13px; color: var(--gray-500);">{{ session.get('customer_email', '') }}</p>
+                        </div>
+
+                        <div class="header-actions">
+                            <a href="{{ url_for('storefront.favorites_page', slug=store.slug) }}" class="icon-btn" title="Favoritos">
+                                <span class="material-icons">favorite_border</span>
+                            </a>
+                            <button class="icon-btn" onclick="openCart()" title="Carrinho">
+                                <span class="material-icons">shopping_bag</span>
+                                <span class="cart-badge" id="cartCount">0</span>
+                            </button>
+                            {% if session.get('customer_id') and session.get('customer_store_id') == store.id %}
+                            <div class="user-menu-wrapper" style="position: relative;">
+                                <button class="icon-btn" onclick="toggleUserMenu()" title="Minha Conta">
+                                    <span class="material-icons">person</span>
+                                </button>
+                                <div id="userDropdown" style="display: none; position: absolute; top: 100%; right: 0; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 8px; min-width: 180px; z-index: 100;">
+                                    <a href="{{ url_for('storefront.favorites_page', slug=store.slug) }}" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: var(--gray-700); text-decoration: none; border-radius: 8px; font-size: 14px; transition: background 0.2s;">
+                                        <span class="material-icons" style="font-size: 20px;">favorite</span>
+                                        Meus Favoritos
+                                    </a>
+                                    <a href="{{ url_for('storefront.customer_logout', slug=store.slug) }}" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: var(--accent); text-decoration: none; border-radius: 8px; font-size: 14px; transition: background 0.2s;">
+                                        <span class="material-icons" style="font-size: 20px;">logout</span>
+                                        Sair
+                                    </a>
                                 </div>
-                                <a href="{{ url_for('storefront.customer_logout', slug=store.slug) }}" style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.2s;">
-                                    <span class="material-icons" style="font-size: 18px;">logout</span>
-                                    Sair
+                            </div>
+                            {% else %}
+                            <a href="{{ url_for('storefront.customer_login_page', slug=store.slug) }}" class="btn-login">Entrar</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="navbar">
+                <div class="container">
+                    <ul class="nav-menu">
+                        <li>
+                            <a href="{{ url_for('storefront.view_store', slug=store.slug) }}" class="nav-link">
+                                <span class="material-icons">home</span>
+                                Início
+                            </a>
+                        </li>
+                        {% for cat in categories %}
+                        <li>
+                            <a href="{{ url_for('storefront.store_category_page', slug=store.slug, category_id=cat.id) }}" class="nav-link {% if cat.id == category.id %}active{% endif %}">
+                                {{ cat.name }}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        <main>
+            <div class="container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="breadcrumb">
+                        <a href="{{ url_for('storefront.view_store', slug=store.slug) }}">
+                            <span class="material-icons" style="font-size: 18px; vertical-align: middle;">home</span>
+                        </a>
+                        <span class="material-icons" style="font-size: 16px;">chevron_right</span>
+                        <span>Categorias</span>
+                        <span class="material-icons" style="font-size: 16px;">chevron_right</span>
+                        <span class="current">{{ category.name }}</span>
+                    </div>
+                    <h1 class="page-title">{{ category.name }}</h1>
+                    {% if category.description %}
+                    <p class="page-description">{{ category.description }}</p>
+                    {% endif %}
+                    <div class="product-count">
+                        <span class="material-icons" style="font-size: 18px;">inventory_2</span>
+                        {{ products | length }} produto{% if products | length != 1 %}s{% endif %} encontrado{% if products | length != 1 %}s{% endif %}
+                    </div>
+                </div>
+
+                <!-- Content Layout -->
+                <div class="content-layout">
+                    <!-- Sidebar -->
+                    <aside class="sidebar">
+                        <div class="sidebar-card">
+                            <h3 class="sidebar-title">
+                                <span class="material-icons">category</span>
+                                Categorias
+                            </h3>
+                            <ul class="category-list">
+                                {% for cat in categories %}
+                                <li class="category-item">
+                                    <a href="{{ url_for('storefront.store_category_page', slug=store.slug, category_id=cat.id) }}" class="category-link {% if cat.id == category.id %}active{% endif %}">
+                                        {{ cat.name }}
+                                    </a>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </aside>
+
+                    <!-- Products Section -->
+                    <section class="products-section">
+                        {% if products_with_promo %}
+                        <div class="products-grid">
+                            {% for item in products_with_promo %}
+                            {% set product = item.product %}
+                            {% set promo = item.promo %}
+                            <div class="product-card" data-product-id="{{ product.id }}">
+                                <a href="{{ url_for('storefront.store_product_page', slug=store.slug, product_id=product.id) }}" class="product-link">
+                                    <div class="product-image">
+                                        {% if product.images and product.images | length > 0 %}
+                                            <img src="{{ product.images[0].url }}" alt="{{ product.title }}">
+                                        {% else %}
+                                            <div class="product-placeholder">
+                                                <span class="material-icons">image</span>
+                                                <span>Sem imagem</span>
+                                            </div>
+                                        {% endif %}
+                                        
+                                        {% if promo.has_promotion %}
+                                        <div class="product-badge">-{{ promo.discount_percent }}%</div>
+                                        {% endif %}
+                                    </div>
+
+                                    <div class="product-info">
+                                        <p class="product-category">{{ category.name }}</p>
+                                        <h3 class="product-title">{{ product.title }}</h3>
+                                    </div>
                                 </a>
+                                
+                                <div class="product-actions">
+                                    <button class="product-action-btn favorite-btn" data-product-id="{{ product.id }}" onclick="event.stopPropagation(); toggleFavorite('{{ product.id }}')" title="Adicionar aos favoritos">
+                                        <span class="material-icons">favorite_border</span>
+                                    </button>
+                                    <button class="product-action-btn" title="Visualização rápida">
+                                        <span class="material-icons">visibility</span>
+                                    </button>
+                                </div>
+
+                                <div class="product-info-bottom">
+                                    <div class="product-price-row">
+                                        <div class="product-price">
+                                            {% if promo.has_promotion %}
+                                            <span class="price-original">R$ {{ "%.2f" | format(promo.original_price) | replace('.', ',') }}</span>
+                                            <span class="price-current price-promo">R$ {{ "%.2f" | format(promo.promo_price) | replace('.', ',') }}</span>
+                                            {% else %}
+                                            <span class="price-current">R$ {{ "%.2f" | format(product.price) | replace('.', ',') }}</span>
+                                            {% endif %}
+                                        </div>
+                                        {% if promo.has_promotion %}
+                                        <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ promo.promo_price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')" title="Adicionar ao carrinho">
+                                            <span class="material-icons">add_shopping_cart</span>
+                                        </button>
+                                        {% else %}
+                                        <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')" title="Adicionar ao carrinho">
+                                            <span class="material-icons">add_shopping_cart</span>
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
+                            {% endfor %}
                         </div>
                         {% else %}
-                        <a href="{{ url_for('storefront.customer_login_page', slug=store.slug) }}" class="btn-login" style="text-decoration: none;">Entrar</a>
+                        <div class="empty-state">
+                            <span class="material-icons">inventory_2</span>
+                            <h3>Nenhum produto nesta categoria</h3>
+                            <p>Em breve teremos novidades para você!</p>
+                        </div>
                         {% endif %}
-                    </div>
+                    </section>
                 </div>
             </div>
-        </div>
-
-        <!-- Navigation -->
-        <nav class="navbar">
-            <div class="container">
-                <ul class="nav-menu">
-                    <li>
-                        <a href="{{ url_for('storefront.view_store', slug=store.slug) }}" class="nav-link active">
-                            <span class="material-icons">home</span>
-                            Início
-                        </a>
-                    </li>
-                    {% for category in categories %}
-                    <li>
-                        <a href="{{ url_for('storefront.store_category_page', slug=store.slug, category_id=category.id) }}" class="nav-link">
-                            {{ category.name }}
-                        </a>
-                    </li>
-                    {% endfor %}
-                    <li>
-                        <a href="#" class="nav-link">
-                            <span class="material-icons">local_offer</span>
-                            Ofertas
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="hero-section">
-        <div class="container">
-            <div class="hero-banner">
-                <div class="hero-content">
-                    <h1>Bem-vindo à {{ store.name }}</h1>
-                    <p>{{ store.description or 'Encontre os melhores produtos com os melhores preços. Qualidade e confiança em cada compra.' }}</p>
-                    <a href="#products" class="hero-cta">
-                        <span class="material-icons">shopping_bag</span>
-                        Ver Produtos
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Categories Section -->
-    {% if categories %}
-    <section class="categories-section">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Navegue por <span>Categorias</span></h2>
-                <a href="#" class="view-all">
-                    Ver todas
-                    <span class="material-icons">arrow_forward</span>
-                </a>
-            </div>
-
-            <div class="categories-grid">
-                {% for category in categories %}
-                <a href="{{ url_for('storefront.store_category_page', slug=store.slug, category_id=category.id) }}" class="category-card">
-                    <div class="category-icon">
-                        <span class="material-icons">folder</span>
-                    </div>
-                    <h3>{{ category.name }}</h3>
-                    <span>{{ category.products | length }} produtos</span>
-                </a>
-                {% endfor %}
-            </div>
-        </div>
-    </section>
-    {% endif %}
-
-    <!-- Products Section -->
-    <section class="products-section" id="products">
-        <div class="container">
-            <div class="section-header">
-                <h2 class="section-title">Nossos <span>Produtos</span></h2>
-                <a href="#" class="view-all">
-                    Ver todos
-                    <span class="material-icons">arrow_forward</span>
-                </a>
-            </div>
-
-            {% if products_with_promo %}
-            <div class="products-grid">
-                {% for item in products_with_promo %}
-                {% set product = item.product %}
-                {% set promo = item.promo %}
-                <div class="product-card" data-product-id="{{ product.id }}">
-                    <a href="{{ url_for('storefront.store_product_page', slug=store.slug, product_id=product.id) }}" class="product-link">
-                        <div class="product-image">
-                            {% if product.images and product.images | length > 0 %}
-                                <img src="{{ product.images[0].url }}" alt="{{ product.title }}">
-                            {% else %}
-                                <div class="product-placeholder">
-                                    <span class="material-icons">image</span>
-                                    <span>Sem imagem</span>
-                                </div>
-                            {% endif %}
-                            
-                            {% if promo.has_promotion %}
-                            <div class="product-badge">-{{ promo.discount_percent }}%</div>
-                            {% endif %}
-                        </div>
-
-                        <div class="product-info">
-                            {% if product.category %}
-                            <p class="product-category">{{ product.category.name }}</p>
-                            {% endif %}
-                            <h3 class="product-title">{{ product.title }}</h3>
-                        </div>
-                    </a>
-                    
-                    <div class="product-actions">
-                        <button class="product-action-btn favorite-btn" data-product-id="{{ product.id }}" onclick="event.stopPropagation(); toggleFavorite('{{ product.id }}')" title="Adicionar aos favoritos">
-                            <span class="material-icons">favorite_border</span>
-                        </button>
-                        <button class="product-action-btn" title="Visualização rápida">
-                            <span class="material-icons">visibility</span>
-                        </button>
-                    </div>
-
-                    <div class="product-info-bottom">
-                        
-                        <div class="product-price-row">
-                            <div class="product-price">
-                                {% if promo.has_promotion %}
-                                <span class="price-original">R$ {{ "%.2f" | format(promo.original_price) | replace('.', ',') }}</span>
-                                <span class="price-current price-promo">R$ {{ "%.2f" | format(promo.promo_price) | replace('.', ',') }}</span>
-                                {% else %}
-                                <span class="price-current">R$ {{ "%.2f" | format(product.price) | replace('.', ',') }}</span>
-                                {% endif %}
-                            </div>
-                            {% if promo.has_promotion %}
-                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ promo.promo_price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')" title="Adicionar ao carrinho">
-                                <span class="material-icons">add_shopping_cart</span>
-                            </button>
-                            {% else %}
-                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')" title="Adicionar ao carrinho">
-                                <span class="material-icons">add_shopping_cart</span>
-                            </button>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% elif products %}
-            <div class="products-grid">
-                {% for product in products %}
-                <div class="product-card" data-product-id="{{ product.id }}">
-                    <a href="{{ url_for('storefront.store_product_page', slug=store.slug, product_id=product.id) }}" class="product-link">
-                        <div class="product-image">
-                            {% if product.images and product.images | length > 0 %}
-                                <img src="{{ product.images[0].url }}" alt="{{ product.title }}">
-                            {% else %}
-                                <div class="product-placeholder">
-                                    <span class="material-icons">image</span>
-                                    <span>Sem imagem</span>
-                                </div>
-                            {% endif %}
-                        </div>
-
-                        <div class="product-info">
-                            {% if product.category %}
-                            <p class="product-category">{{ product.category.name }}</p>
-                            {% endif %}
-                            <h3 class="product-title">{{ product.title }}</h3>
-                        </div>
-                    </a>
-                    
-                    <div class="product-actions">
-                        <button class="product-action-btn favorite-btn" data-product-id="{{ product.id }}" onclick="event.stopPropagation(); toggleFavorite('{{ product.id }}')" title="Adicionar aos favoritos">
-                            <span class="material-icons">favorite_border</span>
-                        </button>
-                        <button class="product-action-btn" title="Visualização rápida">
-                            <span class="material-icons">visibility</span>
-                        </button>
-                    </div>
-
-                    <div class="product-info-bottom">
-                        <div class="product-price-row">
-                            <div class="product-price">
-                                <span class="price-current">R$ {{ "%.2f" | format(product.price) | replace('.', ',') }}</span>
-                            </div>
-                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')" title="Adicionar ao carrinho">
-                                <span class="material-icons">add_shopping_cart</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="empty-state">
-                <span class="material-icons">inventory_2</span>
-                <h3>Nenhum produto disponível</h3>
-                <p>Em breve teremos novidades para você!</p>
-            </div>
-            {% endif %}
-        </div>
-    </section>
-
-    <!-- Features Section -->
-    <section class="features-section">
-        <div class="container">
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <span class="material-icons">local_shipping</span>
-                    </div>
-                    <h3>Entrega Rápida</h3>
-                    <p>Receba seus produtos no conforto da sua casa</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <span class="material-icons">security</span>
-                    </div>
-                    <h3>Pagamento Seguro</h3>
-                    <p>Suas informações sempre protegidas</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <span class="material-icons">support_agent</span>
-                    </div>
-                    <h3>Suporte 24/7</h3>
-                    <p>Estamos sempre prontos para ajudar</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <span class="material-icons">replay</span>
-                    </div>
-                    <h3>Troca Fácil</h3>
-                    <p>Política de devolução sem complicações</p>
-                </div>
-            </div>
-        </div>
-    </section>
+        </main>
+    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -1253,7 +1116,6 @@
                         <li><a href="#">Sobre nós</a></li>
                         <li><a href="#">Política de privacidade</a></li>
                         <li><a href="#">Termos de uso</a></li>
-                        <li><a href="#">Trabalhe conosco</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -1262,7 +1124,6 @@
                         <li><a href="#">Central de ajuda</a></li>
                         <li><a href="#">Como comprar</a></li>
                         <li><a href="#">Formas de pagamento</a></li>
-                        <li><a href="#">Trocas e devoluções</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -1313,7 +1174,7 @@
                 dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
             }
         }
-        // Fecha o dropdown ao clicar fora
+        
         document.addEventListener('click', function(e) {
             const wrapper = document.querySelector('.user-menu-wrapper');
             const dropdown = document.getElementById('userDropdown');
@@ -1325,7 +1186,6 @@
         // Cart functionality
         let cart = [];
 
-        // Carregar carrinho do localStorage ao iniciar
         document.addEventListener('DOMContentLoaded', function() {
             const savedCart = localStorage.getItem('cart_{{ store.slug }}');
             if (savedCart) {
@@ -1336,6 +1196,7 @@
                     cart = [];
                 }
             }
+            loadFavorites();
         });
 
         function openCart() {
@@ -1383,7 +1244,6 @@
             cartCount.textContent = totalItems;
             cartTotal.textContent = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
             
-            // Salvar carrinho no localStorage
             localStorage.setItem('cart_{{ store.slug }}', JSON.stringify(cart));
             
             if (cart.length === 0) {
@@ -1421,7 +1281,6 @@
                 alert('Seu carrinho está vazio!');
                 return;
             }
-            // Carrinho já foi salvo no localStorage pela função updateCartUI
             window.location.href = '/{{ store.slug }}/checkout';
         }
 
@@ -1432,23 +1291,14 @@
             }
         }
 
-        // Search on Enter
         document.getElementById('searchInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 searchProducts();
             }
         });
 
-        // ========================================
-        // FAVORITES FUNCTIONALITY
-        // ========================================
-        
+        // Favorites functionality
         const storeSlug = '{{ store.slug }}';
-        
-        // Carrega os favoritos ao carregar a página
-        document.addEventListener('DOMContentLoaded', function() {
-            loadFavorites();
-        });
         
         function loadFavorites() {
             const productCards = document.querySelectorAll('.product-card');
@@ -1500,7 +1350,6 @@
                         }
                     }
                 } else if (data.redirect) {
-                    // Usuário não logado - redireciona para login
                     window.location.href = data.redirect;
                 } else {
                     alert(data.error || 'Erro ao favoritar produto');

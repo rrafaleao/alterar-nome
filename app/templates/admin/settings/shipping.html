@@ -759,18 +759,28 @@ document.addEventListener('DOMContentLoaded', function() {
 
 async function loadShippingMethods() {
     try {
-        const response = await fetch('/admin/settings/store');
+        const response = await fetch('/admin/settings/shipping-methods');
         const data = await response.json();
         
-        if (data.success && data.data.shipping_methods) {
-            data.data.shipping_methods.forEach(sm => {
+        if (data.success && data.data) {
+            data.data.forEach(sm => {
                 const toggle = document.getElementById(`${sm.method}-toggle`);
                 const status = document.getElementById(`${sm.method}-status`);
                 
-                if (toggle && sm.is_enabled) {
-                    toggle.checked = true;
-                    status.textContent = 'Ativo';
-                    status.className = 'status-badge active';
+                if (toggle) {
+                    toggle.checked = sm.is_enabled;
+                    if (sm.is_enabled) {
+                        status.textContent = 'Ativo';
+                        status.className = 'status-badge active';
+                    } else {
+                        status.textContent = 'Inativo';
+                        status.className = 'status-badge inactive';
+                    }
+                }
+                
+                // Preencher configurações se existirem
+                if (sm.config) {
+                    fillShippingConfig(sm.method, sm.config);
                 }
             });
         }
@@ -779,27 +789,175 @@ async function loadShippingMethods() {
     }
 }
 
+function fillShippingConfig(method, config) {
+    if (method === 'correios') {
+        if (config.cep_origin) document.getElementById('correios-cep').value = config.cep_origin;
+        if (config.services) {
+            config.services.forEach(service => {
+                const checkbox = document.getElementById(`correios-${service}`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+    } else if (method === 'fixed') {
+        if (config.price) document.getElementById('fixed-price').value = config.price;
+        if (config.delivery_days) document.getElementById('fixed-delivery-days').value = config.delivery_days;
+    } else if (method === 'pickup') {
+        if (config.name) document.getElementById('pickup-name').value = config.name;
+        if (config.address) document.getElementById('pickup-address').value = config.address;
+        if (config.hours) document.getElementById('pickup-hours').value = config.hours;
+        if (config.days) document.getElementById('pickup-days').value = config.days;
+    } else if (method === 'custom') {
+        if (config.price) document.getElementById('custom-price').value = config.price;
+        if (config.deadline) document.getElementById('custom-deadline').value = config.deadline;
+        if (config.area) document.getElementById('custom-area').value = config.area;
+    }
+}
+
 function toggleConfig(method) {
     const config = document.getElementById(`${method}-config`);
     config.classList.toggle('active');
 }
 
-function toggleShippingMethod(method) {
+async function toggleShippingMethod(method) {
     const toggle = document.getElementById(`${method}-toggle`);
     const status = document.getElementById(`${method}-status`);
+    const isEnabled = toggle.checked;
     
-    if (toggle.checked) {
-        status.textContent = 'Ativo';
-        status.className = 'status-badge active';
-    } else {
-        status.textContent = 'Inativo';
-        status.className = 'status-badge inactive';
+    try {
+        const response = await fetch(`/admin/settings/shipping-methods/${method}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                is_enabled: isEnabled
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            if (isEnabled) {
+                status.textContent = 'Ativo';
+                status.className = 'status-badge active';
+            } else {
+                status.textContent = 'Inativo';
+                status.className = 'status-badge inactive';
+            }
+            showNotification(data.message, 'success');
+        } else {
+            // Reverter toggle em caso de erro
+            toggle.checked = !isEnabled;
+            showNotification(data.error || 'Erro ao atualizar', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao alternar método de envio:', error);
+        toggle.checked = !isEnabled;
+        showNotification('Erro ao processar requisição', 'error');
     }
 }
 
-function saveShippingConfig(method) {
-    alert(`Configuração do método ${method} salva com sucesso!`);
-    toggleConfig(method);
+async function saveShippingConfig(method) {
+    let config = {};
+    
+    if (method === 'correios') {
+        const services = [];
+        ['sedex', 'pac', 'sedex10'].forEach(service => {
+            const checkbox = document.getElementById(`correios-${service}`);
+            if (checkbox && checkbox.checked) services.push(service);
+        });
+        config = {
+            cep_origin: document.getElementById('correios-cep').value,
+            services: services
+        };
+    } else if (method === 'fixed') {
+        config = {
+            price: parseFloat(document.getElementById('fixed-price').value) || 0,
+            delivery_days: parseInt(document.getElementById('fixed-delivery-days').value) || 5
+        };
+    } else if (method === 'pickup') {
+        config = {
+            name: document.getElementById('pickup-name').value,
+            address: document.getElementById('pickup-address').value,
+            hours: document.getElementById('pickup-hours').value,
+            days: parseInt(document.getElementById('pickup-days').value) || 1
+        };
+    } else if (method === 'custom') {
+        config = {
+            price: parseFloat(document.getElementById('custom-price').value) || 0,
+            deadline: document.getElementById('custom-deadline').value,
+            area: document.getElementById('custom-area').value
+        };
+    }
+    
+    try {
+        const response = await fetch(`/admin/settings/shipping-methods/${method}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                config: config
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('Configuração salva com sucesso!', 'success');
+            toggleConfig(method);
+        } else {
+            showNotification(data.error || 'Erro ao salvar configuração', 'error');
+        }
+    } catch (error) {
+        console.error('Erro ao salvar configuração:', error);
+        showNotification('Erro ao processar requisição', 'error');
+    }
+}
+
+function showNotification(message, type) {
+    // Remover notificação existente
+    const existing = document.querySelector('.notification');
+    if (existing) existing.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.innerHTML = `
+        <span class="material-icons">${type === 'success' ? 'check_circle' : 'error'}</span>
+        ${message}
+    `;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        background: ${type === 'success' ? '#48bb78' : '#e53e3e'};
+        color: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
 }
 </script>
+<style>
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideOut {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+}
+</style>
 {% endblock %}

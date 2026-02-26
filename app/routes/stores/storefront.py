@@ -264,6 +264,68 @@ def store_categories(slug):
         }), 500
 
 
+@storefront.route('/<slug>/categoria/<category_id>')
+def store_category_page(slug, category_id):
+    """Página de categoria mostrando produtos filtrados"""
+    try:
+        store = Store.query.filter_by(slug=slug, onboarding_completed=True).first()
+        
+        if not store:
+            abort(404)
+        
+        # Buscar a categoria
+        category = Category.query.filter_by(id=category_id, store_id=store.id).first()
+        
+        if not category:
+            abort(404)
+        
+        # Buscar produtos da categoria
+        products = Product.query.filter_by(
+            store_id=store.id,
+            category_id=category_id,
+            active=True
+        ).order_by(Product.created_at.desc()).all()
+        
+        # Buscar todas as categorias para a navegação
+        categories = Category.query.filter_by(store_id=store.id).order_by(Category.name).all()
+        
+        # Buscar promoções ativas
+        active_promotions = get_active_promotions(store.id)
+        
+        # Calcular promoções para cada produto
+        products_with_promo = []
+        for product in products:
+            promo_info = calculate_product_promotion(product, active_promotions)
+            products_with_promo.append({
+                'product': product,
+                'promo': promo_info
+            })
+        
+        # Preparar dados de customização
+        customization = {
+            'primary_color': '#667eea',
+            'secondary_color': '#764ba2'
+        }
+        
+        if store.customization:
+            customization['primary_color'] = store.customization.primary_color or '#667eea'
+            customization['secondary_color'] = store.customization.secondary_color or '#764ba2'
+        
+        return render_template(
+            'stores/category.html',
+            store=store,
+            category=category,
+            products=products,
+            products_with_promo=products_with_promo,
+            categories=categories,
+            customization=customization
+        )
+        
+    except Exception as e:
+        print(f"Erro ao carregar página da categoria: {e}")
+        abort(500)
+
+
 @storefront.route('/<slug>/info')
 def store_info(slug):
     try:
