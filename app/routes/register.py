@@ -7,6 +7,8 @@ from app.models.user import User
 from app.models.store_payment_method import StorePaymentMethod
 from app.models.store_shipping_methods import StoreShippingMethod
 from app.models.store import StoreCustomization
+from app.models.store_customer import StoreCustomer
+from app.models.store_admin import StoreAdmin
 import uuid
 import re
 import traceback
@@ -492,6 +494,28 @@ def registration_step4():
         # Marca onboarding como completo
         store.onboarding_step = 4
         store.onboarding_completed = True
+        
+        # Cria store_customer para o owner (para poder ser admin)
+        owner_customer = StoreCustomer(
+            id=str(uuid.uuid4()),
+            store_id=store_id,
+            email=registration_data['email'],
+            password_hash=registration_data['password_hash'],
+            full_name=registration_data.get('full_name', ''),
+            phone=registration_data.get('phone'),
+            is_active=True
+        )
+        db.session.add(owner_customer)
+        db.session.flush()
+        
+        # Cria store_admin para o owner
+        store_admin = StoreAdmin(
+            id=str(uuid.uuid4()),
+            store_id=store_id,
+            customer_id=owner_customer.id,
+            role='owner'
+        )
+        db.session.add(store_admin)
         
         db.session.commit()
         

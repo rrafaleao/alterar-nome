@@ -279,4 +279,18 @@ CREATE TABLE IF NOT EXISTS promotion_categories (
   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
 );
 
+CREATE TABLE IF NOT EXISTS store_admins (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  store_id CHAR(36) NOT NULL,
+  customer_id CHAR(36) NOT NULL,
+  role ENUM('owner', 'admin') NOT NULL DEFAULT 'admin',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE (store_id, customer_id),
+  INDEX idx_store_admins_store (store_id),
+  INDEX idx_store_admins_customer (customer_id),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
+  FOREIGN KEY (customer_id) REFERENCES store_customers(id) ON DELETE CASCADE
+);
+
 SET FOREIGN_KEY_CHECKS = 1;

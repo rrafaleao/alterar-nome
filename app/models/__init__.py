@@ -1,6 +1,7 @@
 from .user import User
 from .store import Store, StoreCustomization
 from .store_customer import StoreCustomer
+from .store_admin import StoreAdmin
 from .customer_favorite import CustomerFavorite
 from .category import Category
 from .product import Product, ProductImage, ProductStock

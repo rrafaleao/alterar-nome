@@ -6,6 +6,7 @@ from app.models.product import Product
 from app.models.category import Category
 from app.models.customer_favorite import CustomerFavorite
 from app.models.promotion import Promotion, PromotionProduct, PromotionCategory
+from app.models.store_admin import StoreAdmin
 from . import storefront
 
 
@@ -107,13 +108,19 @@ def view_store(slug):
             }
             template_name = template_map.get(template_type, 'layout1.html')
         
+        # Verificar se o cliente logado é admin da loja
+        is_admin = False
+        if session.get('customer_id') and session.get('customer_store_id') == store.id:
+            is_admin = StoreAdmin.is_admin(store.id, session.get('customer_id'))
+        
         return render_template(
             f'layouts/{template_name}', 
             store=store,
             products=products,
             products_with_promo=products_with_promo,
             categories=categories,
-            customization=customization
+            customization=customization,
+            is_admin=is_admin
         )
         
     except Exception as e:
@@ -226,12 +233,18 @@ def store_product_page(slug, product_id):
             customization['primary_color'] = store.customization.primary_color or '#667eea'
             customization['secondary_color'] = store.customization.secondary_color or '#764ba2'
         
+        # Verificar se o cliente logado é admin da loja
+        is_admin = False
+        if session.get('customer_id') and session.get('customer_store_id') == store.id:
+            is_admin = StoreAdmin.is_admin(store.id, session.get('customer_id'))
+        
         return render_template(
             'stores/product_detail.html',
             store=store,
             product=product,
             promo=promo_info,
-            customization=customization
+            customization=customization,
+            is_admin=is_admin
         )
         
     except Exception as e:
@@ -311,6 +324,11 @@ def store_category_page(slug, category_id):
             customization['primary_color'] = store.customization.primary_color or '#667eea'
             customization['secondary_color'] = store.customization.secondary_color or '#764ba2'
         
+        # Verificar se o cliente logado é admin da loja
+        is_admin = False
+        if session.get('customer_id') and session.get('customer_store_id') == store.id:
+            is_admin = StoreAdmin.is_admin(store.id, session.get('customer_id'))
+        
         return render_template(
             'stores/category.html',
             store=store,
@@ -318,7 +336,8 @@ def store_category_page(slug, category_id):
             products=products,
             products_with_promo=products_with_promo,
             categories=categories,
-            customization=customization
+            customization=customization,
+            is_admin=is_admin
         )
         
     except Exception as e:
@@ -463,12 +482,18 @@ def favorites_page(slug):
         customization['primary_color'] = store.customization.primary_color or '#667eea'
         customization['secondary_color'] = store.customization.secondary_color or '#764ba2'
     
+    # Verificar se o cliente logado é admin da loja
+    is_admin = False
+    if session.get('customer_id') and session.get('customer_store_id') == store.id:
+        is_admin = StoreAdmin.is_admin(store.id, session.get('customer_id'))
+    
     return render_template(
         'stores/favorites.html',
         store=store,
         products=favorite_products,
         categories=categories,
-        customization=customization
+        customization=customization,
+        is_admin=is_admin
     )
 
 

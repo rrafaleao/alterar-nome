@@ -1,6 +1,6 @@
-{% extends "/admin/base.html" %}
+﻿{% extends "/admin/base.html" %}
 
-{% block title %}Usuários e Permissões{% endblock %}
+{% block title %}Administradores{% endblock %}
 
 {% block nav_configuracoes %}active{% endblock %}
 
@@ -97,7 +97,6 @@
         background: #e2e8f0;
     }
 
-    /* USERS TABLE */
     .users-section {
         background: #fff;
         border-radius: 12px;
@@ -220,16 +219,6 @@
         color: #fff;
     }
 
-    .role-badge.manager {
-        background: #c6f6d5;
-        color: #22543d;
-    }
-
-    .role-badge.staff {
-        background: #e2e8f0;
-        color: #4a5568;
-    }
-
     .status-active {
         display: flex;
         align-items: center;
@@ -247,21 +236,21 @@
         background: #48bb78;
     }
 
-    .status-pending {
+    .status-inactive {
         display: flex;
         align-items: center;
         gap: 6px;
-        color: #ed8936;
+        color: #e53e3e;
         font-size: 14px;
         font-weight: 500;
     }
 
-    .status-pending::before {
+    .status-inactive::before {
         content: '';
         width: 8px;
         height: 8px;
         border-radius: 50%;
-        background: #ed8936;
+        background: #e53e3e;
     }
 
     .action-btn {
@@ -293,7 +282,6 @@
         gap: 8px;
     }
 
-    /* INVITE MODAL */
     .modal-overlay {
         position: fixed;
         top: 0;
@@ -390,6 +378,12 @@
         box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.1);
     }
 
+    .form-hint {
+        font-size: 12px;
+        color: #718096;
+        margin-top: 6px;
+    }
+
     .modal-footer {
         padding: 20px 28px;
         background: #f7fafc;
@@ -399,107 +393,118 @@
         gap: 12px;
     }
 
-    /* ROLES SECTION */
-    .roles-section {
+    .info-section {
         background: #fff;
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         margin-top: 24px;
+        padding: 28px;
     }
 
-    .roles-header {
-        padding: 24px 28px;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .roles-title {
+    .info-title {
         font-size: 18px;
         font-weight: 700;
         color: #1a202c;
         display: flex;
         align-items: center;
         gap: 10px;
+        margin-bottom: 20px;
     }
 
-    .roles-title .material-icons {
+    .info-title .material-icons {
         color: #9f7aea;
     }
 
-    .roles-grid {
+    .info-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 20px;
-        padding: 28px;
     }
 
-    .role-card {
+    .info-card {
         padding: 20px;
         border: 1px solid #e2e8f0;
         border-radius: 12px;
-        transition: all 0.2s;
     }
 
-    .role-card:hover {
-        border-color: #9f7aea;
-        box-shadow: 0 4px 12px rgba(159, 122, 234, 0.1);
-    }
-
-    .role-card-header {
+    .info-card-header {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
         margin-bottom: 12px;
     }
 
-    .role-card-title {
+    .info-card-title {
         font-size: 16px;
         font-weight: 700;
         color: #1a202c;
     }
 
-    .role-card-users {
-        font-size: 12px;
-        color: #718096;
-        background: #f7fafc;
-        padding: 4px 10px;
-        border-radius: 12px;
-    }
-
-    .role-card-description {
+    .info-card-description {
         font-size: 14px;
         color: #718096;
         line-height: 1.5;
+    }
+
+    .loading-state, .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #718096;
+    }
+
+    .loading-state .material-icons, .empty-state .material-icons {
+        font-size: 48px;
         margin-bottom: 16px;
+        opacity: 0.5;
     }
 
-    .role-permissions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
+    .spinner {
+        animation: spin 1s linear infinite;
     }
 
-    .permission-tag {
-        font-size: 11px;
-        padding: 4px 10px;
-        background: #f7fafc;
-        color: #4a5568;
-        border-radius: 6px;
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
 
-    /* RESPONSIVE */
+    .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        padding: 16px 24px;
+        border-radius: 10px;
+        color: #fff;
+        font-weight: 500;
+        z-index: 9999;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    .toast.success {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    }
+
+    .toast.error {
+        background: linear-gradient(135deg, #fc8181 0%, #e53e3e 100%);
+    }
+
     @media (max-width: 768px) {
         .header {
             flex-direction: column;
             align-items: flex-start;
             gap: 16px;
         }
-
         .users-table {
             display: block;
             overflow-x: auto;
         }
-
-        .roles-grid {
+        .info-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -507,7 +512,6 @@
 {% endblock %}
 
 {% block content %}
-<!-- Header -->
 <div class="header">
     <div class="header-left">
         <a href="{{ url_for('admin.settings_page') }}" class="back-btn">
@@ -515,238 +519,245 @@
         </a>
         <div>
             <h2>
-                <span class="material-icons">manage_accounts</span>
-                Usuários e Permissões
+                <span class="material-icons">admin_panel_settings</span>
+                Administradores
             </h2>
-            <p class="header-subtitle">Gerencie sua equipe e controle os níveis de acesso</p>
+            <p class="header-subtitle">Gerencie os administradores da sua loja</p>
         </div>
     </div>
-    <button class="btn btn-primary" onclick="openInviteModal()">
+    <button class="btn btn-primary" onclick="openAddModal()">
         <span class="material-icons" style="font-size: 18px;">person_add</span>
-        Convidar Usuário
+        Adicionar Admin
     </button>
 </div>
 
-<!-- Users Section -->
 <div class="users-section">
     <div class="users-header">
         <div class="users-title">
             <span class="material-icons">group</span>
-            Equipe
-            <span class="users-count">3</span>
+            Equipe Administrativa
+            <span class="users-count" id="adminsCount">0</span>
         </div>
     </div>
-    <table class="users-table">
-        <thead>
-            <tr>
-                <th>Usuário</th>
-                <th>Função</th>
-                <th>Status</th>
-                <th>Último Acesso</th>
-                <th>Ações</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>
-                    <div class="user-info">
-                        <div class="user-avatar">RC</div>
-                        <div class="user-details">
-                            <span class="user-name">Rafael Câmpera</span>
-                            <span class="user-email">rafael@exemplo.com</span>
-                        </div>
-                    </div>
-                </td>
-                <td><span class="role-badge owner">Proprietário</span></td>
-                <td><span class="status-active">Ativo</span></td>
-                <td style="color: #718096; font-size: 14px;">Agora</td>
-                <td>
-                    <div class="actions-cell">
-                        <button class="action-btn" title="Editar">
-                            <span class="material-icons" style="font-size: 18px;">edit</span>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="user-info">
-                        <div class="user-avatar" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);">MS</div>
-                        <div class="user-details">
-                            <span class="user-name">Maria Silva</span>
-                            <span class="user-email">maria@exemplo.com</span>
-                        </div>
-                    </div>
-                </td>
-                <td><span class="role-badge admin">Administrador</span></td>
-                <td><span class="status-active">Ativo</span></td>
-                <td style="color: #718096; font-size: 14px;">Há 2 horas</td>
-                <td>
-                    <div class="actions-cell">
-                        <button class="action-btn" title="Editar">
-                            <span class="material-icons" style="font-size: 18px;">edit</span>
-                        </button>
-                        <button class="action-btn delete" title="Remover">
-                            <span class="material-icons" style="font-size: 18px;">delete</span>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="user-info">
-                        <div class="user-avatar" style="background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);">JP</div>
-                        <div class="user-details">
-                            <span class="user-name">João Pedro</span>
-                            <span class="user-email">joao@exemplo.com</span>
-                        </div>
-                    </div>
-                </td>
-                <td><span class="role-badge staff">Vendedor</span></td>
-                <td><span class="status-pending">Convite Pendente</span></td>
-                <td style="color: #718096; font-size: 14px;">--</td>
-                <td>
-                    <div class="actions-cell">
-                        <button class="action-btn" title="Reenviar Convite">
-                            <span class="material-icons" style="font-size: 18px;">send</span>
-                        </button>
-                        <button class="action-btn delete" title="Cancelar Convite">
-                            <span class="material-icons" style="font-size: 18px;">close</span>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
-</div>
-
-<!-- Roles Section -->
-<div class="roles-section">
-    <div class="roles-header">
-        <div class="roles-title">
-            <span class="material-icons">admin_panel_settings</span>
-            Funções e Permissões
-        </div>
-    </div>
-    <div class="roles-grid">
-        <div class="role-card">
-            <div class="role-card-header">
-                <span class="role-card-title">Proprietário</span>
-                <span class="role-card-users">1 usuário</span>
-            </div>
-            <p class="role-card-description">Acesso total à loja. Pode gerenciar todos os aspectos incluindo faturamento e exclusão da conta.</p>
-            <div class="role-permissions">
-                <span class="permission-tag">Todas as permissões</span>
-            </div>
-        </div>
-        <div class="role-card">
-            <div class="role-card-header">
-                <span class="role-card-title">Administrador</span>
-                <span class="role-card-users">1 usuário</span>
-            </div>
-            <p class="role-card-description">Gerencia produtos, pedidos, clientes e configurações. Não pode alterar dados de faturamento.</p>
-            <div class="role-permissions">
-                <span class="permission-tag">Produtos</span>
-                <span class="permission-tag">Pedidos</span>
-                <span class="permission-tag">Clientes</span>
-                <span class="permission-tag">Relatórios</span>
-                <span class="permission-tag">Configurações</span>
-            </div>
-        </div>
-        <div class="role-card">
-            <div class="role-card-header">
-                <span class="role-card-title">Gerente</span>
-                <span class="role-card-users">0 usuários</span>
-            </div>
-            <p class="role-card-description">Gerencia produtos e pedidos. Pode ver relatórios de vendas.</p>
-            <div class="role-permissions">
-                <span class="permission-tag">Produtos</span>
-                <span class="permission-tag">Pedidos</span>
-                <span class="permission-tag">Relatórios</span>
-            </div>
-        </div>
-        <div class="role-card">
-            <div class="role-card-header">
-                <span class="role-card-title">Vendedor</span>
-                <span class="role-card-users">1 usuário</span>
-            </div>
-            <p class="role-card-description">Visualiza e processa pedidos. Acesso básico ao painel.</p>
-            <div class="role-permissions">
-                <span class="permission-tag">Pedidos</span>
-                <span class="permission-tag">Clientes</span>
-            </div>
+    <div id="adminsContainer">
+        <div class="loading-state">
+            <span class="material-icons spinner">refresh</span>
+            <p>Carregando administradores...</p>
         </div>
     </div>
 </div>
 
-<!-- Invite Modal -->
-<div class="modal-overlay" id="inviteModal">
+<div class="info-section">
+    <div class="info-title">
+        <span class="material-icons">info</span>
+        Sobre os Níveis de Acesso
+    </div>
+    <div class="info-grid">
+        <div class="info-card">
+            <div class="info-card-header">
+                <span class="info-card-title">Proprietário</span>
+                <span class="role-badge owner">Proprietário</span>
+            </div>
+            <p class="info-card-description">
+                Acesso total à loja. Pode gerenciar todos os aspectos incluindo faturamento, 
+                configurações e outros administradores. Não pode ser removido.
+            </p>
+        </div>
+        <div class="info-card">
+            <div class="info-card-header">
+                <span class="info-card-title">Administrador</span>
+                <span class="role-badge admin">Admin</span>
+            </div>
+            <p class="info-card-description">
+                Gerencia produtos, pedidos, clientes e configurações da loja.
+                Pode ser adicionado ou removido pelo proprietário.
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="addModal">
     <div class="modal">
         <div class="modal-header">
-            <span class="modal-title">Convidar Usuário</span>
-            <button class="modal-close" onclick="closeInviteModal()">
+            <span class="modal-title">Adicionar Administrador</span>
+            <button class="modal-close" onclick="closeAddModal()">
                 <span class="material-icons">close</span>
             </button>
         </div>
         <div class="modal-body">
             <div class="form-group">
-                <label class="form-label">E-mail</label>
-                <input type="email" class="form-input" placeholder="email@exemplo.com" id="invite-email">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Nome</label>
-                <input type="text" class="form-input" placeholder="Nome do usuário" id="invite-name">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Função</label>
-                <select class="form-input" id="invite-role">
-                    <option value="admin">Administrador</option>
-                    <option value="manager">Gerente</option>
-                    <option value="staff" selected>Vendedor</option>
-                </select>
+                <label class="form-label">E-mail do usuário</label>
+                <input type="email" class="form-input" placeholder="email@exemplo.com" id="admin-email">
+                <p class="form-hint">O usuário precisa já estar cadastrado como cliente na loja.</p>
             </div>
         </div>
         <div class="modal-footer">
-            <button class="btn btn-secondary" onclick="closeInviteModal()">Cancelar</button>
-            <button class="btn btn-primary" onclick="sendInvite()">
-                <span class="material-icons" style="font-size: 18px;">send</span>
-                Enviar Convite
+            <button class="btn btn-secondary" onclick="closeAddModal()">Cancelar</button>
+            <button class="btn btn-primary" onclick="addAdmin()" id="btnAddAdmin">
+                <span class="material-icons" style="font-size: 18px;">person_add</span>
+                Adicionar
             </button>
         </div>
     </div>
 </div>
+
+<div class="toast" id="toast"></div>
 {% endblock %}
 
 {% block extra_scripts %}
 <script>
-function openInviteModal() {
-    document.getElementById('inviteModal').classList.add('active');
+let admins = [];
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadAdmins();
+});
+
+function loadAdmins() {
+    fetch('/admin/settings/admins')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                admins = data.data;
+                renderAdmins();
+            } else {
+                showError('Erro ao carregar administradores');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            showError('Erro ao carregar administradores');
+        });
 }
 
-function closeInviteModal() {
-    document.getElementById('inviteModal').classList.remove('active');
-}
-
-function sendInvite() {
-    const email = document.getElementById('invite-email').value;
-    const name = document.getElementById('invite-name').value;
-    const role = document.getElementById('invite-role').value;
+function renderAdmins() {
+    const container = document.getElementById('adminsContainer');
+    const countEl = document.getElementById('adminsCount');
     
-    if (!email || !name) {
-        alert('Preencha todos os campos');
+    countEl.textContent = admins.length;
+    
+    if (admins.length === 0) {
+        container.innerHTML = '<div class="empty-state"><span class="material-icons">group_off</span><p>Nenhum administrador encontrado</p></div>';
         return;
     }
     
-    // TODO: Implementar envio de convite via API
-    alert(`Convite enviado para ${email}!`);
-    closeInviteModal();
+    let html = '<table class="users-table"><thead><tr><th>Usuário</th><th>Função</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
+    
+    admins.forEach(admin => {
+        const initials = getInitials(admin.full_name || admin.email);
+        const roleClass = admin.role === 'owner' ? 'owner' : 'admin';
+        const roleText = admin.role === 'owner' ? 'Proprietário' : 'Admin';
+        const statusClass = admin.is_active ? 'status-active' : 'status-inactive';
+        const statusText = admin.is_active ? 'Ativo' : 'Inativo';
+        
+        html += '<tr><td><div class="user-info"><div class="user-avatar">' + initials + '</div><div class="user-details"><span class="user-name">' + (admin.full_name || 'Sem nome') + '</span><span class="user-email">' + admin.email + '</span></div></div></td><td><span class="role-badge ' + roleClass + '">' + roleText + '</span></td><td><span class="' + statusClass + '">' + statusText + '</span></td><td><div class="actions-cell">';
+        
+        if (admin.role !== 'owner') {
+            html += '<button class="action-btn delete" title="Remover" onclick="removeAdmin(\'' + admin.id + '\', \'' + admin.email + '\')"><span class="material-icons" style="font-size: 18px;">delete</span></button>';
+        } else {
+            html += '<span style="color: #718096; font-size: 12px;">Não removível</span>';
+        }
+        
+        html += '</div></td></tr>';
+    });
+    
+    html += '</tbody></table>';
+    container.innerHTML = html;
 }
 
-// Fechar modal ao clicar fora
-document.getElementById('inviteModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeInviteModal();
+function getInitials(name) {
+    if (!name) return '?';
+    const parts = name.split(' ').filter(p => p.length > 0);
+    if (parts.length >= 2) {
+        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
+    return name.substring(0, 2).toUpperCase();
+}
+
+function openAddModal() {
+    document.getElementById('addModal').classList.add('active');
+    document.getElementById('admin-email').value = '';
+    document.getElementById('admin-email').focus();
+}
+
+function closeAddModal() {
+    document.getElementById('addModal').classList.remove('active');
+}
+
+function addAdmin() {
+    const email = document.getElementById('admin-email').value.trim().toLowerCase();
+    const btn = document.getElementById('btnAddAdmin');
+    
+    if (!email) {
+        showToast('Preencha o e-mail', 'error');
+        return;
+    }
+    
+    btn.disabled = true;
+    btn.innerHTML = '<span class="material-icons spinner" style="font-size: 18px;">refresh</span> Adicionando...';
+    
+    fetch('/admin/settings/admins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast(data.message || 'Administrador adicionado!', 'success');
+            closeAddModal();
+            loadAdmins();
+        } else {
+            showToast(data.error || 'Erro ao adicionar', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showToast('Erro ao adicionar administrador', 'error');
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-icons" style="font-size: 18px;">person_add</span> Adicionar';
+    });
+}
+
+function removeAdmin(adminId, email) {
+    if (!confirm('Tem certeza que deseja remover ' + email + ' como administrador?')) {
+        return;
+    }
+    
+    fetch('/admin/settings/admins/' + adminId, { method: 'DELETE' })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Administrador removido!', 'success');
+            loadAdmins();
+        } else {
+            showToast(data.error || 'Erro ao remover', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showToast('Erro ao remover administrador', 'error');
+    });
+}
+
+function showToast(message, type) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast ' + type + ' show';
+    setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
+
+function showError(message) {
+    document.getElementById('adminsContainer').innerHTML = '<div class="empty-state"><span class="material-icons">error_outline</span><p>' + message + '</p></div>';
+}
+
+document.getElementById('addModal').addEventListener('click', function(e) {
+    if (e.target === this) closeAddModal();
+});
+
+document.getElementById('admin-email').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') addAdmin();
 });
 </script>
 {% endblock %}

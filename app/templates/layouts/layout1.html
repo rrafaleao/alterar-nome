@@ -987,6 +987,12 @@
                                     <p style="font-weight: 600; font-size: 14px; color: var(--gray-900);">{{ session.get('customer_name', '') }}</p>
                                     <p style="font-size: 13px; color: var(--gray-500);">{{ session.get('customer_email', '') }}</p>
                                 </div>
+                                {% if is_admin %}
+                                <a href="{{ url_for('admin.dashboard') }}" style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(--primary); text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.2s; border-bottom: 1px solid var(--gray-100);">
+                                    <span class="material-icons" style="font-size: 18px;">admin_panel_settings</span>
+                                    Painel Admin
+                                </a>
+                                {% endif %}
                                 <a href="{{ url_for('storefront.customer_logout', slug=store.slug) }}" style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(--accent); text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.2s;">
                                     <span class="material-icons" style="font-size: 18px;">logout</span>
                                     Sair
@@ -1018,12 +1024,6 @@
                         </a>
                     </li>
                     {% endfor %}
-                    <li>
-                        <a href="#" class="nav-link">
-                            <span class="material-icons">local_offer</span>
-                            Ofertas
-                        </a>
-                    </li>
                 </ul>
             </div>
         </nav>
@@ -1051,10 +1051,6 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Navegue por <span>Categorias</span></h2>
-                <a href="#" class="view-all">
-                    Ver todas
-                    <span class="material-icons">arrow_forward</span>
-                </a>
             </div>
 
             <div class="categories-grid">
@@ -1077,10 +1073,7 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Nossos <span>Produtos</span></h2>
-                <a href="#" class="view-all">
-                    Ver todos
-                    <span class="material-icons">arrow_forward</span>
-                </a>
+
             </div>
 
             {% if products_with_promo %}

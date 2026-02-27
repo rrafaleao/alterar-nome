@@ -942,6 +942,12 @@
                                     <span class="material-icons">person</span>
                                 </button>
                                 <div id="userDropdown" style="display: none; position: absolute; top: 100%; right: 0; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 8px; min-width: 180px; z-index: 100;">
+                                    {% if is_admin %}
+                                    <a href="{{ url_for('admin.dashboard') }}" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: var(--primary); text-decoration: none; border-radius: 8px; font-size: 14px; transition: background 0.2s;">
+                                        <span class="material-icons" style="font-size: 20px;">admin_panel_settings</span>
+                                        Painel Admin
+                                    </a>
+                                    {% endif %}
                                     <a href="{{ url_for('storefront.favorites_page', slug=store.slug) }}" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: var(--gray-700); text-decoration: none; border-radius: 8px; font-size: 14px; transition: background 0.2s;">
                                         <span class="material-icons" style="font-size: 20px;">favorite</span>
                                         Meus Favoritos
