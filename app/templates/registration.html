@@ -1016,7 +1016,7 @@
         <!-- Header -->
         <div class="header">
             <div class="logo">
-                <img class="logo-icon" src="https://dl.airtable.com/.blockIconImages/a30bee50aeefaf4ffd8c4dc699b642c6/d3accafa" alt="Logo">
+                <img class="logo-icon" src="{{ url_for('static', filename='images/logo.png') }}" alt="Logo">
                 <span class="logo-text">Zapp</span>
             </div>
             <h1>Criar Sua Loja</h1>
@@ -1447,7 +1447,7 @@
                         <!-- Preenchido via JavaScript -->
                     </div>
 
-                    <button type="button" class="btn-primary" onclick="window.location.href='/admin'" style="width: 100%;">
+                    <button type="button" class="btn-primary" onclick="window.location.href='/admin/dashboard'" style="width: 100%;">
                         <span class="material-icons">dashboard</span>
                         Ir para o Painel
                     </button>
@@ -1776,20 +1776,24 @@
         async function submitStep4() {
             clearErrors();
 
-            const data = {
-                layout_template: 'default',
-                primary_color: document.getElementById('primary_color').value,
-                secondary_color: document.getElementById('secondary_color').value,
-                logo_url: ''
-            };
+            // Criar FormData para enviar arquivo
+            const formData = new FormData();
+            formData.append('layout_template', 'default');
+            formData.append('primary_color', document.getElementById('primary_color').value);
+            formData.append('secondary_color', document.getElementById('secondary_color').value);
+            
+            // Adicionar logo se selecionado
+            const logoInput = document.getElementById('logo_input');
+            if (logoInput.files && logoInput.files[0]) {
+                formData.append('logo', logoInput.files[0]);
+            }
 
             try {
                 disableButton('btn-step4', true);
                 
                 const response = await fetch('/registration/step4', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                    body: formData
                 });
 
                 const result = await response.json();

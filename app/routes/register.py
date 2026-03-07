@@ -431,6 +431,7 @@ def registration_step4():
     Etapa 4: Personalização visual (layout, logo, cores)
     Finaliza o onboarding
     Rota: POST /registration/step4
+    Aceita FormData com arquivo de logo
     """
     try:
         registration_data = session.get('registration_data')
@@ -440,12 +441,38 @@ def registration_step4():
                 'error': 'Complete as etapas anteriores primeiro'
             }), 400
         
-        data = request.get_json()
+        # Aceita tanto JSON quanto FormData
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            layout_template = request.form.get('layout_template', 'default')
+            primary_color = request.form.get('primary_color', '#667eea')
+            secondary_color = request.form.get('secondary_color', '#764ba2')
+        else:
+            data = request.get_json() or {}
+            layout_template = data.get('layout_template', 'default')
+            primary_color = data.get('primary_color', '#667eea')
+            secondary_color = data.get('secondary_color', '#764ba2')
         
-        layout_template = data.get('layout_template', 'default')
-        primary_color = data.get('primary_color', '#667eea')
-        secondary_color = data.get('secondary_color', '#764ba2')
-        logo_url = data.get('logo_url', '')
+        logo_url = ''
+        
+        # Processa upload de logo se enviado
+        if 'logo' in request.files:
+            file = request.files['logo']
+            if file and file.filename and allowed_file(file.filename):
+                # Gerar nome único para o arquivo
+                ext = file.filename.rsplit('.', 1)[1].lower()
+                store_id = registration_data['store_id']
+                filename = f"{store_id}_{uuid.uuid4().hex[:8]}.{ext}"
+                
+                # Criar pasta de logos se não existir
+                upload_folder = os.path.join('app', 'static', 'uploads', 'logos')
+                os.makedirs(upload_folder, exist_ok=True)
+                
+                # Salvar arquivo
+                filepath = os.path.join(upload_folder, filename)
+                file.save(filepath)
+                
+                logo_url = f"/static/uploads/logos/{filename}"
+                print(f"Logo salvo: {logo_url}")
         
         print(f"\n=== REGISTRO ETAPA 4 ===")
         print(f"Template: {layout_template}")

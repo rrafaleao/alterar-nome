@@ -21,11 +21,11 @@
     .page-header h2 {
         font-size: 28px;
         font-weight: 700;
+        margin-bottom: 25px;
         color: #1a202c;
         display: flex;
         align-items: center;
         gap: 12px;
-        margin: 0;
     }
 
     .header-actions {
@@ -568,6 +568,9 @@
         .form-row {
             grid-template-columns: 1fr;
         }
+        .promot {
+            margin: 25px;
+        }
     }
 </style>
 {% endblock %}
@@ -579,12 +582,6 @@
         <span class="material-icons" style="color: var(--primary-color);">local_offer</span>
         Promoções
     </h2>
-    <div class="header-actions">
-        <button class="btn btn-primary" onclick="openCreateModal()">
-            <span class="material-icons" style="font-size: 18px;">add</span>
-            Nova Promoção
-        </button>
-    </div>
 </div>
 
 <!-- STATS CARDS -->

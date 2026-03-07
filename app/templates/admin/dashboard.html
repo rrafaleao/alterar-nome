@@ -6,7 +6,8 @@
 
 {% block extra_styles %}
 <style>
-    .header {
+    /* PAGE HEADER */
+    .page-header {
         background: #fff;
         padding: 24px 32px;
         border-radius: 12px;
@@ -17,10 +18,10 @@
         align-items: center;
     }
 
-    .header h2 {
+    .page-header h2 {
         font-size: 28px;
-        margin-bottom: 25px;
         font-weight: 700;
+        margin-bottom: 25px;
         color: #1a202c;
         display: flex;
         align-items: center;
@@ -391,9 +392,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="header">
+<!-- PAGE HEADER -->
+<div class="page-header">
     <h2>
-        <span class="material-icons">dashboard</span>
+        <span class="material-icons" style="color: var(--primary-color);">dashboard</span>
         Dashboard
     </h2>
 </div>

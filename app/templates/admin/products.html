@@ -8,19 +8,24 @@
 <style>
     /* PAGE HEADER */
     .page-header {
-        background: transparent;
-        padding: 0 0 24px 0;
-        margin-bottom: 24px;
+        background: #fff;
+        padding: 24px 32px;
+        border-radius: 12px;
+        margin-bottom: 32px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
         display: flex;
         justify-content: space-between;
         align-items: center;
     }
 
     .page-header h2 {
-        font-size: 32px;
-        padding: 20px;
+        font-size: 28px;
         font-weight: 700;
+        margin-bottom: 25px;
         color: #1a202c;
+        display: flex;
+        align-items: center;
+        gap: 12px;
     }
 
     .header-actions {
@@ -724,6 +729,10 @@
 {% block content %}
 <!-- PAGE HEADER -->
 <div class="page-header">
+    <h2>
+        <span class="material-icons" style="color: var(--primary-color);">inventory_2</span>
+        Produtos
+    </h2>
     <div class="header-actions">
         <button class="btn btn-primary" onclick="openAddProductModal()">
             <span class="material-icons" style="font-size: 18px;">add</span>
