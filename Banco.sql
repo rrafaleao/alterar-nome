@@ -91,9 +91,11 @@ CREATE TABLE IF NOT EXISTS products (
   sku VARCHAR(255),
   price DECIMAL(12,2) NOT NULL CHECK (price >= 0),
   active BOOLEAN DEFAULT TRUE,
+  show_in_zappshop BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_products_store (store_id),
+  INDEX idx_products_zappshop (show_in_zappshop),
   FULLTEXT INDEX idx_products_title_fulltext (title, description),
   FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
   FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL

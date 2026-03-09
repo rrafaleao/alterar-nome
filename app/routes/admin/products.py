@@ -213,7 +213,8 @@ def create_product():
             sku=data.get('sku', ''),
             price=float(data.get('price')),
             category_id=data.get('category_id') if data.get('category_id') else None,
-            active=data.get('active', True)
+            active=data.get('active', True),
+            show_in_zappshop=data.get('show_in_zappshop', False)
         )
         
         db.session.add(product)
@@ -344,6 +345,8 @@ def update_product(product_id):
             product.category_id = data['category_id'] if data['category_id'] else None
         if 'active' in data:
             product.active = data['active']
+        if 'show_in_zappshop' in data:
+            product.show_in_zappshop = data['show_in_zappshop']
         
         # Atualizar estoque geral
         if 'stock_quantity' in data:

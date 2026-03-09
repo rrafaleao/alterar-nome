@@ -13,6 +13,7 @@ class Product(db.Model):
     sku = db.Column(db.String(255))
     price = db.Column(db.Numeric(12, 2), nullable=False)
     active = db.Column(db.Boolean, default=True)
+    show_in_zappshop = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -30,6 +31,7 @@ class Product(db.Model):
             'sku': self.sku,
             'price': float(self.price) if self.price else 0,
             'active': self.active,
+            'show_in_zappshop': self.show_in_zappshop,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'updated_at': self.updated_at.isoformat() if self.updated_at else None,
             'images': [img.to_dict() for img in self.images] if self.images else [],

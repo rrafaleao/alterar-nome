@@ -350,6 +350,35 @@
         background: #fff5f5;
     }
 
+    .btn-publish {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        color: #fff;
+        border: none;
+    }
+
+    .btn-publish:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(72, 187, 120, 0.4);
+    }
+
+    .store-status.offline .btn-publish {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    }
+
+    .store-status:not(.offline) .btn-publish {
+        background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+    }
+
+    .store-status:not(.offline) .btn-publish:hover {
+        box-shadow: 0 6px 20px rgba(229, 57, 53, 0.4);
+    }
+
+    .btn-publish:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        transform: none;
+    }
+
     /* HELP SECTION */
     .help-section {
         background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
@@ -450,6 +479,10 @@
         <span class="status-text">Loja Online</span>
     </div>
     <span class="status-description">Sua loja está publicada e acessível para os clientes</span>
+    <button class="btn btn-publish" id="togglePublish" onclick="toggleStorePublish()">
+        <span class="material-icons" style="font-size: 18px;">cloud_upload</span>
+        <span class="btn-text">Publicar Loja</span>
+    </button>
     <a href="#" class="btn btn-outline" id="toggleStore">
         <span class="material-icons" style="font-size: 18px;">visibility</span>
         Ver Loja
@@ -620,10 +653,20 @@ async function loadStoreInfo() {
             document.getElementById('toggleStore').href = store.public_url;
             
             const statusEl = document.getElementById('storeStatus');
+            const publishBtn = document.getElementById('togglePublish');
+            
             if (!store.is_published) {
                 statusEl.classList.add('offline');
                 statusEl.querySelector('.status-text').textContent = 'Loja Offline';
                 statusEl.querySelector('.status-description').textContent = 'Sua loja não está visível para os clientes';
+                publishBtn.querySelector('.btn-text').textContent = 'Publicar Loja';
+                publishBtn.querySelector('.material-icons').textContent = 'cloud_upload';
+            } else {
+                statusEl.classList.remove('offline');
+                statusEl.querySelector('.status-text').textContent = 'Loja Online';
+                statusEl.querySelector('.status-description').textContent = 'Sua loja está publicada e acessível para os clientes';
+                publishBtn.querySelector('.btn-text').textContent = 'Despublicar';
+                publishBtn.querySelector('.material-icons').textContent = 'cloud_off';
             }
         }
     } catch (error) {
@@ -631,6 +674,83 @@ async function loadStoreInfo() {
         document.getElementById('storeName').textContent = 'Erro ao carregar';
         document.getElementById('storeUrl').textContent = 'Erro ao carregar';
     }
+}
+
+async function toggleStorePublish() {
+    const btn = document.getElementById('togglePublish');
+    const originalText = btn.querySelector('.btn-text').textContent;
+    
+    try {
+        btn.disabled = true;
+        btn.querySelector('.btn-text').textContent = 'Aguarde...';
+        
+        const response = await fetch('/admin/settings/toggle-publish', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            // Recarregar informações da loja
+            await loadStoreInfo();
+            
+            // Mostrar mensagem de sucesso
+            showNotification(data.message, 'success');
+        } else {
+            showNotification(data.error || 'Erro ao alterar status da loja', 'error');
+            btn.querySelector('.btn-text').textContent = originalText;
+        }
+    } catch (error) {
+        console.error('Erro ao alternar publicação:', error);
+        showNotification('Erro ao alterar status da loja', 'error');
+        btn.querySelector('.btn-text').textContent = originalText;
+    } finally {
+        btn.disabled = false;
+    }
+}
+
+function showNotification(message, type = 'info') {
+    // Remover notificação existente
+    const existing = document.querySelector('.notification-toast');
+    if (existing) existing.remove();
+    
+    const notification = document.createElement('div');
+    notification.className = `notification-toast ${type}`;
+    notification.innerHTML = `
+        <span class="material-icons">${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info'}</span>
+        <span>${message}</span>
+    `;
+    
+    // Estilos inline para a notificação
+    notification.style.cssText = `
+        position: fixed;
+        top: 24px;
+        right: 24px;
+        padding: 16px 24px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 15px;
+        font-weight: 500;
+        z-index: 9999;
+        animation: slideIn 0.3s ease;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        ${type === 'success' ? 'background: #48bb78; color: #fff;' : ''}
+        ${type === 'error' ? 'background: #e53935; color: #fff;' : ''}
+        ${type === 'info' ? 'background: #4A90E2; color: #fff;' : ''}
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Remover após 4 segundos
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 4000);
 }
 </script>
 {% endblock %}

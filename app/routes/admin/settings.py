@@ -142,6 +142,42 @@ def my_store_info():
         }), 500
 
 
+@admin.route('/settings/toggle-publish', methods=['POST'])
+@login_required
+@store_required
+def toggle_store_publish():
+    """API para publicar/despublicar a loja"""
+    try:
+        store_id = session.get('store_id')
+        store = Store.query.get(store_id)
+        
+        if not store:
+            return jsonify({
+                'success': False,
+                'error': 'Loja não encontrada'
+            }), 404
+        
+        # Alternar status de publicação
+        store.is_published = not store.is_published
+        db.session.commit()
+        
+        status = 'publicada' if store.is_published else 'despublicada'
+        
+        return jsonify({
+            'success': True,
+            'is_published': store.is_published,
+            'message': f'Loja {status} com sucesso!'
+        }), 200
+        
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao alternar publicação da loja: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao alterar status da loja'
+        }), 500
+
+
 # ============================
 # APIs de Meios de Pagamento
 # ============================
