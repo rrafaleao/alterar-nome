@@ -94,7 +94,6 @@
             color: var(--gray-900);
             letter-spacing: 0.3px;
             line-height: 1;
-            text-transform: lowercase;
         }
 
         /* Search Bar */
@@ -863,7 +862,6 @@
             font-size: 30px;
             font-weight: 400;
             margin-bottom: 16px;
-            text-transform: lowercase;
         }
 
         .footer-brand p {
@@ -1239,15 +1237,7 @@
                                     <small>{{ session.get('customer_email', '') }}</small>
                                 </div>
                                 {% if session.get('customer_store_slug') %}
-                                <a class="account-link" href="/{{ session.get('customer_store_slug') }}">
-                                    <span class="material-icons" style="font-size:18px;">store</span>
-                                    Minha loja
-                                </a>
-                                <a class="account-link" href="/{{ session.get('customer_store_slug') }}/favorites">
-                                    <span class="material-icons" style="font-size:18px;">favorite_border</span>
-                                    Favoritos
-                                </a>
-                                <a class="account-link logout" href="/{{ session.get('customer_store_slug') }}/auth/logout">
+                                <a class="account-link logout" href="{{ url_for('storefront.customer_logout', slug=session.get('customer_store_slug'), next=url_for('main.zappshop')) }}">
                                     <span class="material-icons" style="font-size:18px;">logout</span>
                                     Sair
                                 </a>
@@ -1273,7 +1263,7 @@
                                 </a>
                             </div>
                             {% else %}
-                            <a href="/auth/login" class="btn-login">Entrar</a>
+                            <a href="{{ url_for('main.zappshop_customer_login_redirect') }}" class="btn-login">Entrar</a>
                             {% endif %}
                         </div>
 
@@ -1408,7 +1398,6 @@
                         <li><a href="#">Sobre nós</a></li>
                         <li><a href="#">Política de privacidade</a></li>
                         <li><a href="#">Termos de uso</a></li>
-                        <li><a href="#">Trabalhe conosco</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -1430,7 +1419,7 @@
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2026 zappshop. Todos os direitos reservados.</p>
+                <p>&copy; 2026 ZappShop. Todos os direitos reservados.</p>
             </div>
         </div>
     </footer>

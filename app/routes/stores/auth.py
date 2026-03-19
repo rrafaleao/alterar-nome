@@ -1,11 +1,33 @@
 from flask import render_template, jsonify, request, session, redirect, url_for
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import generate_password_hash
 from config.database import db
 from app.models.store import Store
 from app.models.store_customer import StoreCustomer
 from . import storefront
+from .customer_auth import (
+    clear_customer_session,
+    ensure_customer_for_store,
+    find_customer_by_email_and_password,
+    get_customers_by_email,
+    set_customer_session,
+    sync_customer_session_for_store,
+)
 import traceback
 import re
+
+
+def _get_safe_next_url(value):
+    """Aceita apenas redirecionamentos internos relativos para evitar open redirect."""
+    if not value:
+        return None
+
+    if not value.startswith('/'):
+        return None
+
+    if value.startswith('//') or '://' in value:
+        return None
+
+    return value
 
 
 # ========================================
@@ -20,9 +42,12 @@ def customer_login_page(slug):
         from flask import abort
         abort(404)
 
-    # Se já logado, redireciona para a loja
-    if session.get('customer_id') and session.get('customer_store_id') == store.id:
-        return redirect(url_for('storefront.view_store', slug=slug))
+    next_url = _get_safe_next_url(request.args.get('next'))
+
+    # Se já logado (inclusive vindo de outra loja), sincroniza e redireciona
+    current_customer = sync_customer_session_for_store(store)
+    if current_customer and current_customer.is_active:
+        return redirect(next_url or url_for('storefront.view_store', slug=slug))
 
     customization = {
         'primary_color': '#667eea',
@@ -35,7 +60,8 @@ def customer_login_page(slug):
     return render_template(
         'stores/auth/login.html',
         store=store,
-        customization=customization
+        customization=customization,
+        next_url=next_url
     )
 
 
@@ -47,8 +73,11 @@ def customer_register_page(slug):
         from flask import abort
         abort(404)
 
-    if session.get('customer_id') and session.get('customer_store_id') == store.id:
-        return redirect(url_for('storefront.view_store', slug=slug))
+    next_url = _get_safe_next_url(request.args.get('next'))
+
+    current_customer = sync_customer_session_for_store(store)
+    if current_customer and current_customer.is_active:
+        return redirect(next_url or url_for('storefront.view_store', slug=slug))
 
     customization = {
         'primary_color': '#667eea',
@@ -61,7 +90,8 @@ def customer_register_page(slug):
     return render_template(
         'stores/auth/register.html',
         store=store,
-        customization=customization
+        customization=customization,
+        next_url=next_url
     )
 
 
@@ -76,6 +106,8 @@ def customer_register(slug):
         store = Store.query.filter_by(slug=slug, onboarding_completed=True).first()
         if not store:
             return jsonify({'success': False, 'error': 'Loja não encontrada'}), 404
+
+        next_url = _get_safe_next_url(request.args.get('next'))
 
         data = request.get_json()
 
@@ -107,13 +139,59 @@ def customer_register(slug):
         if errors:
             return jsonify({'success': False, 'errors': errors}), 400
 
-        # Verifica se email já cadastrado nesta loja
-        existing = StoreCustomer.query.filter_by(store_id=store.id, email=email).first()
-        if existing:
+        # Se já existe na loja atual, impede novo cadastro duplicado
+        existing_in_store = StoreCustomer.query.filter_by(store_id=store.id, email=email).first()
+        if existing_in_store:
             return jsonify({
                 'success': False,
-                'errors': {'email': 'Este e-mail já está cadastrado nesta loja'}
+                'errors': {'email': 'Este e-mail já está cadastrado nesta loja. Faça login.'}
             }), 409
+
+        # Se já existe em qualquer loja, vincula automaticamente esta loja
+        existing_accounts = get_customers_by_email(email)
+        if existing_accounts:
+            source_customer = find_customer_by_email_and_password(email, password)
+
+            if not source_customer:
+                return jsonify({
+                    'success': False,
+                    'errors': {
+                        'email': 'Este e-mail já está cadastrado na ZappShop. Use a senha correta para entrar.'
+                    }
+                }), 409
+
+            customer = ensure_customer_for_store(store, source_customer)
+
+            if not customer:
+                return jsonify({
+                    'success': False,
+                    'error': 'Não foi possível vincular sua conta nesta loja. Tente novamente.'
+                }), 500
+
+            if not customer.is_active:
+                return jsonify({
+                    'success': False,
+                    'error': 'Conta desativada para esta loja. Entre em contato com a loja.'
+                }), 403
+
+            set_customer_session(customer, store)
+
+            redirect_url = (
+                session.pop('checkout_redirect', None)
+                or next_url
+                or url_for('storefront.view_store', slug=slug)
+            )
+
+            return jsonify({
+                'success': True,
+                'message': 'Conta existente vinculada com sucesso! Você já pode comprar nesta loja.',
+                'data': {
+                    'customer_id': customer.id,
+                    'customer_name': customer.full_name,
+                    'customer_email': customer.email,
+                    'redirect_url': redirect_url
+                }
+            }), 200
 
         # Cria o cliente
         customer = StoreCustomer(
@@ -128,14 +206,14 @@ def customer_register(slug):
         db.session.commit()
 
         # Loga automaticamente após registro
-        session['customer_id'] = customer.id
-        session['customer_email'] = customer.email
-        session['customer_name'] = customer.full_name
-        session['customer_store_id'] = store.id
-        session['customer_store_slug'] = store.slug
+        set_customer_session(customer, store)
 
         # Verificar se há redirecionamento pendente (ex: checkout)
-        redirect_url = session.pop('checkout_redirect', None) or url_for('storefront.view_store', slug=slug)
+        redirect_url = (
+            session.pop('checkout_redirect', None)
+            or next_url
+            or url_for('storefront.view_store', slug=slug)
+        )
 
         print(f"Novo cliente registrado: {customer.email} na loja {store.name}")
 
@@ -168,6 +246,8 @@ def customer_login(slug):
         if not store:
             return jsonify({'success': False, 'error': 'Loja não encontrada'}), 404
 
+        next_url = _get_safe_next_url(request.args.get('next'))
+
         data = request.get_json()
 
         email = data.get('email', '').strip().lower()
@@ -182,35 +262,44 @@ def customer_login(slug):
         if errors:
             return jsonify({'success': False, 'errors': errors}), 400
 
-        customer = StoreCustomer.query.filter_by(store_id=store.id, email=email).first()
+        existing_accounts = get_customers_by_email(email)
 
-        if not customer:
+        if not existing_accounts:
             return jsonify({
                 'success': False,
-                'errors': {'email': 'E-mail não encontrado nesta loja'}
+                'errors': {'email': 'E-mail não encontrado'}
             }), 401
 
-        if not check_password_hash(customer.password_hash, password):
+        source_customer = find_customer_by_email_and_password(email, password)
+        if not source_customer:
             return jsonify({
                 'success': False,
                 'errors': {'password': 'Senha incorreta'}
             }), 401
 
+        customer = ensure_customer_for_store(store, source_customer)
+
+        if not customer:
+            return jsonify({
+                'success': False,
+                'error': 'Não foi possível preparar sua conta nesta loja. Tente novamente.'
+            }), 500
+
         if not customer.is_active:
             return jsonify({
                 'success': False,
-                'error': 'Conta desativada. Entre em contato com a loja.'
+                'error': 'Conta desativada para esta loja. Entre em contato com a loja.'
             }), 403
 
         # Salva sessão do cliente
-        session['customer_id'] = customer.id
-        session['customer_email'] = customer.email
-        session['customer_name'] = customer.full_name
-        session['customer_store_id'] = store.id
-        session['customer_store_slug'] = store.slug
+        set_customer_session(customer, store)
 
         # Verificar se há redirecionamento pendente (ex: checkout)
-        redirect_url = session.pop('checkout_redirect', None) or url_for('storefront.view_store', slug=slug)
+        redirect_url = (
+            session.pop('checkout_redirect', None)
+            or next_url
+            or url_for('storefront.view_store', slug=slug)
+        )
 
         print(f"Login de cliente: {customer.email} na loja {store.name}")
 
@@ -237,20 +326,18 @@ def customer_login(slug):
 @storefront.route('/<slug>/auth/logout', methods=['GET', 'POST'])
 def customer_logout(slug):
     """Logout do cliente da loja"""
+    next_url = _get_safe_next_url(request.args.get('next'))
+
     try:
         customer_email = session.get('customer_email', 'Desconhecido')
 
         # Remove apenas dados do cliente (mantém sessão do admin se houver)
-        session.pop('customer_id', None)
-        session.pop('customer_email', None)
-        session.pop('customer_name', None)
-        session.pop('customer_store_id', None)
-        session.pop('customer_store_slug', None)
+        clear_customer_session()
 
         print(f"Logout de cliente: {customer_email}")
 
         if request.method == 'GET':
-            return redirect(url_for('storefront.view_store', slug=slug))
+            return redirect(next_url or url_for('storefront.view_store', slug=slug))
 
         return jsonify({
             'success': True,
@@ -260,7 +347,7 @@ def customer_logout(slug):
     except Exception as e:
         print(f"Erro no logout de cliente: {e}")
         if request.method == 'GET':
-            return redirect(url_for('storefront.view_store', slug=slug))
+            return redirect(next_url or url_for('storefront.view_store', slug=slug))
         return jsonify({
             'success': False,
             'error': 'Erro ao processar logout'
@@ -274,16 +361,16 @@ def customer_check_auth(slug):
     if not store:
         return jsonify({'authenticated': False}), 200
 
-    if session.get('customer_id') and session.get('customer_store_id') == store.id:
-        customer = StoreCustomer.query.get(session['customer_id'])
-        if customer and customer.is_active:
-            return jsonify({
-                'authenticated': True,
-                'customer': {
-                    'id': customer.id,
-                    'name': customer.full_name,
-                    'email': customer.email,
-                }
-            }), 200
+    customer = sync_customer_session_for_store(store)
+
+    if customer and customer.is_active:
+        return jsonify({
+            'authenticated': True,
+            'customer': {
+                'id': customer.id,
+                'name': customer.full_name,
+                'email': customer.email,
+            }
+        }), 200
 
     return jsonify({'authenticated': False}), 200

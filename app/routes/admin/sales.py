@@ -59,7 +59,7 @@ def customers_page():
 @login_required
 @store_required
 def customers_data():
-    """API para obter dados dos clientes da loja"""
+    """API para obter dados dos clientes da loja que já realizaram pedidos"""
     try:
         store_id = session.get('store_id')
         page = request.args.get('page', 1, type=int)
@@ -67,7 +67,18 @@ def customers_data():
         search = request.args.get('search', '', type=str).strip()
         sort = request.args.get('sort', 'recent', type=str)
 
-        query = StoreCustomer.query.filter_by(store_id=store_id)
+        # Mostra apenas clientes que tenham ao menos 1 pedido nesta loja
+        has_order_in_store = db.session.query(Order.id).filter(
+            Order.store_id == store_id,
+            Order.user_id == StoreCustomer.id
+        ).exists()
+
+        base_query = StoreCustomer.query.filter(
+            StoreCustomer.store_id == store_id,
+            has_order_in_store
+        )
+
+        query = base_query
 
         # Busca
         if search:
@@ -88,18 +99,15 @@ def customers_data():
             query = query.order_by(StoreCustomer.created_at.desc())
 
         # Stats
-        total_customers = StoreCustomer.query.filter_by(store_id=store_id).count()
+        total_customers = base_query.count()
 
         now = datetime.utcnow()
         first_day_of_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        new_this_month = StoreCustomer.query.filter(
-            StoreCustomer.store_id == store_id,
+        new_this_month = base_query.filter(
             StoreCustomer.created_at >= first_day_of_month
         ).count()
 
-        active_customers = StoreCustomer.query.filter_by(
-            store_id=store_id, is_active=True
-        ).count()
+        active_customers = base_query.filter(StoreCustomer.is_active == True).count()
 
         # Paginação
         pagination = query.paginate(page=page, per_page=per_page, error_out=False)

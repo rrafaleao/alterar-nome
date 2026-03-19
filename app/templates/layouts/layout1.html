@@ -579,6 +579,7 @@
             line-height: 1.4;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -1127,11 +1128,11 @@
                                 {% endif %}
                             </div>
                             {% if promo.has_promotion %}
-                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ promo.promo_price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')" title="Adicionar ao carrinho">
+                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', '{{ promo.promo_price }}', '{{ product.images[0].url if product.images and product.images|length > 0 }}')" title="Adicionar ao carrinho">
                                 <span class="material-icons">add_shopping_cart</span>
                             </button>
                             {% else %}
-                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')" title="Adicionar ao carrinho">
+                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', '{{ product.price }}', '{{ product.images[0].url if product.images and product.images|length > 0 }}')" title="Adicionar ao carrinho">
                                 <span class="material-icons">add_shopping_cart</span>
                             </button>
                             {% endif %}
@@ -1178,7 +1179,7 @@
                             <div class="product-price">
                                 <span class="price-current">R$ {{ "%.2f" | format(product.price) | replace('.', ',') }}</span>
                             </div>
-                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')" title="Adicionar ao carrinho">
+                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', '{{ product.price }}', '{{ product.images[0].url if product.images and product.images|length > 0 }}')" title="Adicionar ao carrinho">
                                 <span class="material-icons">add_shopping_cart</span>
                             </button>
                         </div>

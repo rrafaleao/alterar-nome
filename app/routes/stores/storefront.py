@@ -1,4 +1,4 @@
-from flask import render_template, abort, request, jsonify, session
+from flask import render_template, abort, request, jsonify
 from datetime import datetime
 from config.database import db
 from app.models.store import Store, StoreCustomization
@@ -8,6 +8,7 @@ from app.models.customer_favorite import CustomerFavorite
 from app.models.promotion import Promotion, PromotionProduct, PromotionCategory
 from app.models.store_admin import StoreAdmin
 from . import storefront
+from .customer_auth import sync_customer_session_for_store
 
 
 def get_active_promotions(store_id):
@@ -61,6 +62,8 @@ def view_store(slug):
         
         if not store:
             abort(404)
+
+        current_customer = sync_customer_session_for_store(store)
         
         # Buscar produtos ativos da loja
         products = Product.query.filter_by(
@@ -110,8 +113,8 @@ def view_store(slug):
         
         # Verificar se o cliente logado é admin da loja
         is_admin = False
-        if session.get('customer_id') and session.get('customer_store_id') == store.id:
-            is_admin = StoreAdmin.is_admin(store.id, session.get('customer_id'))
+        if current_customer and current_customer.is_active:
+            is_admin = StoreAdmin.is_admin(store.id, current_customer.id)
         
         return render_template(
             f'layouts/{template_name}', 
@@ -213,6 +216,8 @@ def store_product_page(slug, product_id):
         
         if not store:
             abort(404)
+
+        current_customer = sync_customer_session_for_store(store)
         
         product = Product.query.filter_by(id=product_id, store_id=store.id, active=True).first()
         
@@ -235,8 +240,8 @@ def store_product_page(slug, product_id):
         
         # Verificar se o cliente logado é admin da loja
         is_admin = False
-        if session.get('customer_id') and session.get('customer_store_id') == store.id:
-            is_admin = StoreAdmin.is_admin(store.id, session.get('customer_id'))
+        if current_customer and current_customer.is_active:
+            is_admin = StoreAdmin.is_admin(store.id, current_customer.id)
         
         return render_template(
             'stores/product_detail.html',
@@ -285,6 +290,8 @@ def store_category_page(slug, category_id):
         
         if not store:
             abort(404)
+
+        current_customer = sync_customer_session_for_store(store)
         
         # Buscar a categoria
         category = Category.query.filter_by(id=category_id, store_id=store.id).first()
@@ -326,8 +333,8 @@ def store_category_page(slug, category_id):
         
         # Verificar se o cliente logado é admin da loja
         is_admin = False
-        if session.get('customer_id') and session.get('customer_store_id') == store.id:
-            is_admin = StoreAdmin.is_admin(store.id, session.get('customer_id'))
+        if current_customer and current_customer.is_active:
+            is_admin = StoreAdmin.is_admin(store.id, current_customer.id)
         
         return render_template(
             'stores/category.html',
@@ -452,15 +459,17 @@ def favorites_page(slug):
     
     if not store:
         abort(404)
+
+    customer = sync_customer_session_for_store(store)
     
     # Se não estiver logado, redireciona para login
-    if not session.get('customer_id') or session.get('customer_store_id') != store.id:
+    if not customer or not customer.is_active:
         from flask import redirect, url_for
         return redirect(url_for('storefront.customer_login_page', slug=slug))
     
     # Buscar favoritos do cliente
     favorites = CustomerFavorite.query.filter_by(
-        customer_id=session.get('customer_id')
+        customer_id=customer.id
     ).order_by(CustomerFavorite.created_at.desc()).all()
     
     # Filtrar produtos ativos da loja
@@ -484,8 +493,8 @@ def favorites_page(slug):
     
     # Verificar se o cliente logado é admin da loja
     is_admin = False
-    if session.get('customer_id') and session.get('customer_store_id') == store.id:
-        is_admin = StoreAdmin.is_admin(store.id, session.get('customer_id'))
+    if customer.is_active:
+        is_admin = StoreAdmin.is_admin(store.id, customer.id)
     
     return render_template(
         'stores/favorites.html',
@@ -506,11 +515,10 @@ def toggle_favorite(slug):
         if not store:
             return jsonify({'success': False, 'error': 'Loja não encontrada'}), 404
         
-        # Verifica se está logado
-        customer_id = session.get('customer_id')
-        customer_store_id = session.get('customer_store_id')
+        # Verifica se está logado e sincroniza com a loja atual
+        customer = sync_customer_session_for_store(store)
         
-        if not customer_id or customer_store_id != store.id:
+        if not customer or not customer.is_active:
             return jsonify({
                 'success': False, 
                 'error': 'Você precisa estar logado para favoritar produtos',
@@ -531,7 +539,7 @@ def toggle_favorite(slug):
         
         # Verifica se já é favorito
         existing_favorite = CustomerFavorite.query.filter_by(
-            customer_id=customer_id,
+            customer_id=customer.id,
             product_id=product_id
         ).first()
         
@@ -547,7 +555,7 @@ def toggle_favorite(slug):
         else:
             # Adiciona aos favoritos
             new_favorite = CustomerFavorite(
-                customer_id=customer_id,
+                customer_id=customer.id,
                 product_id=product_id
             )
             db.session.add(new_favorite)
@@ -575,11 +583,10 @@ def check_favorites(slug):
         
         if not store:
             return jsonify({'success': False, 'error': 'Loja não encontrada'}), 404
-        
-        customer_id = session.get('customer_id')
-        customer_store_id = session.get('customer_store_id')
-        
-        if not customer_id or customer_store_id != store.id:
+
+        customer = sync_customer_session_for_store(store)
+
+        if not customer or not customer.is_active:
             return jsonify({
                 'success': True,
                 'favorites': [],
@@ -598,7 +605,7 @@ def check_favorites(slug):
         
         # Busca favoritos do cliente que estão na lista
         favorites = CustomerFavorite.query.filter(
-            CustomerFavorite.customer_id == customer_id,
+            CustomerFavorite.customer_id == customer.id,
             CustomerFavorite.product_id.in_(product_ids)
         ).all()
         
@@ -626,11 +633,10 @@ def list_favorites(slug):
         
         if not store:
             return jsonify({'success': False, 'error': 'Loja não encontrada'}), 404
-        
-        customer_id = session.get('customer_id')
-        customer_store_id = session.get('customer_store_id')
-        
-        if not customer_id or customer_store_id != store.id:
+
+        customer = sync_customer_session_for_store(store)
+
+        if not customer or not customer.is_active:
             return jsonify({
                 'success': False,
                 'error': 'Você precisa estar logado',
@@ -638,7 +644,7 @@ def list_favorites(slug):
             }), 401
         
         favorites = CustomerFavorite.query.filter_by(
-            customer_id=customer_id
+            customer_id=customer.id
         ).order_by(CustomerFavorite.created_at.desc()).all()
         
         # Filtrar produtos ativos da loja

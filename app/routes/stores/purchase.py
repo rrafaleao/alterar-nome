@@ -1,15 +1,13 @@
 from flask import render_template, abort, request, jsonify, session, redirect, url_for
 from config.database import db
 from . import storefront
-from app.models.store import Store, StoreCustomization
+from app.models.store import Store
 from app.models.product import Product
-from app.models.category import Category
 from app.models.order import Order, OrderItem
 from app.models.payment import Payment
-from app.models.store_customer import StoreCustomer
 from app.models.address import Address
+from .customer_auth import sync_customer_session_for_store
 from decimal import Decimal
-import json
 
 
 @storefront.route('/<slug>/checkout')
@@ -20,20 +18,16 @@ def checkout_page(slug):
     if not store:
         abort(404)
     
-    # Verificar se o cliente está logado
-    customer_id = session.get('customer_id')
-    customer_store_id = session.get('customer_store_id')
-    
-    # Redirecionar para login se não estiver logado
-    if not customer_id or customer_store_id != store.id:
+    customer = sync_customer_session_for_store(store)
+
+    # Redirecionar para login se não estiver logado para esta loja
+    if not customer or not customer.is_active:
         # Salvar URL de retorno na sessão
         session['checkout_redirect'] = url_for('storefront.checkout_page', slug=slug)
         return redirect(url_for('storefront.customer_login_page', slug=slug))
     
-    customer = StoreCustomer.query.get(customer_id)
-    
     # Buscar último endereço do cliente (se houver)
-    customer_address = Address.query.filter_by(user_id=customer_id).order_by(Address.created_at.desc()).first()
+    customer_address = Address.query.filter_by(user_id=customer.id).order_by(Address.created_at.desc()).first()
     
     # Buscar métodos de pagamento habilitados da loja
     payment_methods = [pm for pm in store.payment_methods if pm.is_enabled]
@@ -118,11 +112,9 @@ def process_checkout(slug):
     if not store:
         return jsonify({'success': False, 'error': 'Loja não encontrada'}), 404
     
-    # Verificar se o cliente está logado
-    customer_id = session.get('customer_id')
-    customer_store_id = session.get('customer_store_id')
-    
-    if not customer_id or customer_store_id != store.id:
+    customer = sync_customer_session_for_store(store)
+
+    if not customer or not customer.is_active:
         return jsonify({'success': False, 'error': 'Você precisa estar logado para finalizar a compra', 'redirect': url_for('storefront.customer_login_page', slug=slug)}), 401
     
     try:
@@ -193,7 +185,7 @@ def process_checkout(slug):
         
         if shipping_method != 'pickup' and address_data:
             shipping_address = Address(
-                user_id=customer_id,  # ID do store_customer
+                user_id=customer.id,
                 cep=address_data.get('cep', ''),
                 street=address_data.get('street', ''),
                 number=address_data.get('number', ''),
@@ -209,7 +201,7 @@ def process_checkout(slug):
         # Criar o pedido
         order = Order(
             store_id=store.id,
-            user_id=customer_id,  # ID do store_customer
+            user_id=customer.id,
             total_amount=total_with_shipping,
             status='pending',
             shipping_address_id=shipping_address_id,

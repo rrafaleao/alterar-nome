@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify, request
+from flask import Blueprint, render_template, jsonify, request, redirect, url_for
 from config.database import db
 from app.models.product import Product
 from app.models.store import Store
@@ -24,6 +24,26 @@ def index():
 def zappshop():
     """Página do marketplace ZappShop com produtos de todas as lojas"""
     return render_template('/zapp_shop/zappshop.html')
+
+
+@main.get("/zappshop/auth/login")
+def zappshop_customer_login_redirect():
+    """Redireciona o login da ZappShop para o mesmo login de cliente usado nas lojas."""
+    store = Store.query.filter(
+        Store.onboarding_completed == True,
+        Store.is_published == True
+    ).order_by(Store.created_at.desc()).first()
+
+    if not store:
+        return redirect(url_for('main.zappshop'))
+
+    return redirect(
+        url_for(
+            'storefront.customer_login_page',
+            slug=store.slug,
+            next=url_for('main.zappshop')
+        )
+    )
 
 
 @main.get("/api/zappshop/products")

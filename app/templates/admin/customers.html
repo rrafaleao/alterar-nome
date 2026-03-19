@@ -22,7 +22,7 @@
     <div class="stat-card">
         <div class="stat-header">
             <div>
-                <div class="stat-label">Total de Clientes</div>
+                <div class="stat-label">Clientes com Pedidos</div>
                 <div class="stat-value" id="statTotal">0</div>
             </div>
             <div class="stat-icon blue">
@@ -173,8 +173,8 @@
                 grid.innerHTML = `
                     <div class="empty-state">
                         <span class="material-icons">people_outline</span>
-                        <h3>${search ? 'Nenhum cliente encontrado' : 'Nenhum cliente cadastrado'}</h3>
-                        <p>${search ? 'Tente buscar com outros termos' : 'Quando clientes se registrarem na sua loja, eles aparecerão aqui'}</p>
+                        <h3>${search ? 'Nenhum cliente encontrado' : 'Nenhum cliente com pedido ainda'}</h3>
+                        <p>${search ? 'Tente buscar com outros termos' : 'Os clientes aparecem aqui depois que fizerem pelo menos 1 pedido nesta loja'}</p>
                     </div>
                 `;
                 document.getElementById('paginationBar').style.display = 'none';
