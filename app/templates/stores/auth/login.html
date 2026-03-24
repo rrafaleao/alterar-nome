@@ -65,6 +65,14 @@
             font-size: 18px;
         }
 
+        .auth-header-left .logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            object-fit: cover;
+            border: 2px solid var(--gray-200);
+        }
+
         .auth-header-left .store-name {
             font-size: 20px;
             font-weight: 700;
@@ -295,7 +303,11 @@
     <!-- Header -->
     <header class="auth-header">
         <a href="{{ back_url }}" class="auth-header-left">
+            {% if store.logo_url %}
+                <img src="{{ store.logo_url }}" alt="{{ store.name }}" class="logo">
+            {% else %}
             <div class="logo-placeholder">{{ store.name[0] | upper }}</div>
+            {% endif %}
             <span class="store-name">{{ store.name }}</span>
         </a>
         <a href="{{ back_url }}" class="back-link">

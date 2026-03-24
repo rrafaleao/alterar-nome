@@ -938,8 +938,9 @@
                             </button>
                             {% if session.get('customer_id') and session.get('customer_store_id') == store.id %}
                             <div class="user-menu-wrapper" style="position: relative;">
-                                <button class="icon-btn" onclick="toggleUserMenu()" title="Minha Conta">
-                                    <span class="material-icons">person</span>
+                                <button class="btn-login" onclick="toggleUserMenu()" style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="material-icons" style="font-size: 18px;">person</span>
+                                    {{ session.get('customer_name', 'Minha Conta').split(' ')[0] }}
                                 </button>
                                 <div id="userDropdown" style="display: none; position: absolute; top: 100%; right: 0; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 8px; min-width: 180px; z-index: 100;">
                                     {% if is_admin %}

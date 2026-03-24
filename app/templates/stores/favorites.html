@@ -432,8 +432,18 @@
             line-height: 1.4;
             display: -webkit-box;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+        }
+
+        .product-title-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .product-title-link:hover .product-title {
+            color: var(--primary);
         }
 
         .product-price-row {
@@ -826,17 +836,10 @@
                     {% for category in categories %}
                     <li>
                         <a href="{{ url_for('storefront.view_store', slug=store.slug) }}#category-{{ category.id }}" class="nav-link">
-                            <span class="material-icons">category</span>
                             {{ category.name }}
                         </a>
                     </li>
                     {% endfor %}
-                    <li>
-                        <a href="#" class="nav-link">
-                            <span class="material-icons">local_offer</span>
-                            Ofertas
-                        </a>
-                    </li>
                 </ul>
             </div>
         </nav>
@@ -863,7 +866,7 @@
             <div class="products-grid">
                 {% for product in products %}
                 <div class="product-card" data-product-id="{{ product.id }}">
-                    <div class="product-image">
+                    <div class="product-image" data-url="{{ url_for('storefront.store_product_page', slug=store.slug, product_id=product.id) }}" onclick="goToProduct(this)" style="cursor: pointer;">
                         {% if product.images and product.images | length > 0 %}
                             <img src="{{ product.images[0].url }}" alt="{{ product.title }}">
                         {% else %}
@@ -874,7 +877,7 @@
                         {% endif %}
                         
                         <div class="product-actions">
-                            <button class="product-action-btn favorite-btn favorited" data-product-id="{{ product.id }}" onclick="toggleFavorite('{{ product.id }}')" title="Remover dos favoritos">
+                            <button class="product-action-btn favorite-btn favorited" data-product-id="{{ product.id }}" onclick="event.stopPropagation(); toggleFavorite('{{ product.id }}')" title="Remover dos favoritos">
                                 <span class="material-icons">favorite</span>
                             </button>
                         </div>
@@ -884,13 +887,15 @@
                         {% if product.category %}
                         <p class="product-category">{{ product.category.name }}</p>
                         {% endif %}
-                        <h3 class="product-title">{{ product.title }}</h3>
+                        <a href="{{ url_for('storefront.store_product_page', slug=store.slug, product_id=product.id) }}" class="product-title-link">
+                            <h3 class="product-title">{{ product.title }}</h3>
+                        </a>
                         
                         <div class="product-price-row">
                             <div class="product-price">
                                 <span class="price-current">R$ {{ "%.2f" | format(product.price) | replace('.', ',') }}</span>
                             </div>
-                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }})" title="Adicionar ao carrinho">
+                            <button class="btn-add-cart" onclick="addToCart('{{ product.id }}', '{{ product.title }}', '{{ product.price }}', '{{ product.images[0].url if product.images and product.images|length > 0 }}')" title="Adicionar ao carrinho">
                                 <span class="material-icons">add_shopping_cart</span>
                             </button>
                         </div>
@@ -975,7 +980,7 @@
                 <span>Total:</span>
                 <span id="cartTotal">R$ 0,00</span>
             </div>
-            <button class="btn-checkout">Finalizar Compra</button>
+            <button class="btn-checkout" onclick="goToCheckout()">Finalizar Compra</button>
         </div>
     </aside>
 
@@ -1002,6 +1007,19 @@
         // Cart functionality
         let cart = [];
 
+        // Carregar carrinho do localStorage ao iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedCart = localStorage.getItem('cart_{{ store.slug }}');
+            if (savedCart) {
+                try {
+                    cart = JSON.parse(savedCart);
+                    updateCartUI();
+                } catch (e) {
+                    cart = [];
+                }
+            }
+        });
+
         function openCart() {
             document.getElementById('cartOverlay').classList.add('active');
             document.getElementById('cartSidebar').classList.add('active');
@@ -1012,7 +1030,14 @@
             document.getElementById('cartSidebar').classList.remove('active');
         }
 
-        function addToCart(productId, productTitle, productPrice) {
+        function goToProduct(element) {
+            const url = element.dataset.url;
+            if (url) {
+                window.location.href = url;
+            }
+        }
+
+        function addToCart(productId, productTitle, productPrice, productImage) {
             const existingItem = cart.find(item => item.id === productId);
             
             if (existingItem) {
@@ -1022,6 +1047,7 @@
                     id: productId,
                     title: productTitle,
                     price: productPrice,
+                    image: productImage || '',
                     quantity: 1
                 });
             }
@@ -1045,6 +1071,9 @@
             
             cartCount.textContent = totalItems;
             cartTotal.textContent = `R$ ${totalPrice.toFixed(2).replace('.', ',')}`;
+
+            // Salvar carrinho no localStorage
+            localStorage.setItem('cart_{{ store.slug }}', JSON.stringify(cart));
             
             if (cart.length === 0) {
                 cartBody.innerHTML = `
@@ -1057,8 +1086,11 @@
             } else {
                 cartBody.innerHTML = cart.map(item => `
                     <div style="display: flex; gap: 12px; padding: 16px 0; border-bottom: 1px solid var(--gray-200);">
-                        <div style="width: 70px; height: 70px; background: var(--gray-100); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-icons" style="color: var(--gray-400);">image</span>
+                        <div style="width: 70px; height: 70px; background: var(--gray-100); border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden;">
+                            ${item.image ? 
+                                `<img src="${item.image}" alt="${item.title}" style="width: 100%; height: 100%; object-fit: cover;">` :
+                                `<span class="material-icons" style="color: var(--gray-400);">image</span>`
+                            }
                         </div>
                         <div style="flex: 1;">
                             <h4 style="font-size: 14px; font-weight: 500; margin-bottom: 4px;">${item.title}</h4>
@@ -1071,6 +1103,15 @@
                     </div>
                 `).join('');
             }
+        }
+
+        function goToCheckout() {
+            if (cart.length === 0) {
+                alert('Seu carrinho está vazio!');
+                return;
+            }
+            // Carrinho já foi salvo no localStorage pela função updateCartUI
+            window.location.href = '/{{ store.slug }}/checkout';
         }
 
         function searchProducts() {
