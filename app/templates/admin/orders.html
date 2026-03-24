@@ -237,8 +237,24 @@
     function updateOrderStatus(orderId) {
         const newStatus = prompt('Novo status (pending, paid, shipped, delivered, cancelled):');
         if (newStatus) {
-            // TODO: Implementar API de atualização de status
-            alert('Atualizando status do pedido para: ' + newStatus);
+            fetch(`/admin/orders/${orderId}/status`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert(data.error || 'Erro ao atualizar status');
+                    return;
+                }
+                window.location.reload();
+            })
+            .catch(() => {
+                alert('Erro ao atualizar status');
+            });
         }
     }
 </script>

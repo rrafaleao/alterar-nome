@@ -39,6 +39,40 @@ def orders_page():
     )
 
 
+@admin.route('/orders/<order_id>/status', methods=['POST'])
+@login_required
+@store_required
+def update_order_status(order_id):
+    """Atualiza o status de um pedido da loja."""
+    try:
+        store_id = session.get('store_id')
+        data = request.get_json(silent=True) or {}
+        new_status = (data.get('status') or '').strip().lower()
+
+        allowed_status = {'pending', 'paid', 'shipped', 'delivered', 'cancelled', 'refunded'}
+        if new_status not in allowed_status:
+            return jsonify({'success': False, 'error': 'Status inválido'}), 400
+
+        order = Order.query.filter_by(id=order_id, store_id=store_id).first()
+        if not order:
+            return jsonify({'success': False, 'error': 'Pedido não encontrado'}), 404
+
+        order.status = new_status
+        db.session.commit()
+
+        return jsonify({
+            'success': True,
+            'message': 'Status atualizado com sucesso',
+            'order_id': order.id,
+            'status': order.status,
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao atualizar status do pedido: {e}")
+        return jsonify({'success': False, 'error': 'Erro ao atualizar status do pedido'}), 500
+
+
 @admin.route('/abandoned-carts')
 @login_required
 @store_required

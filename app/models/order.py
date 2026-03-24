@@ -24,6 +24,7 @@ class Order(db.Model):
     shipping_address = db.relationship("Address", backref="orders", foreign_keys=[shipping_address_id])
     items = db.relationship("OrderItem", backref="order", cascade="all, delete-orphan")
     payment = db.relationship("Payment", backref="order", uselist=False, cascade="all, delete-orphan")
+    reviews = db.relationship("ProductReview", backref="order", cascade="all, delete-orphan")
 
 class OrderItem(db.Model):
     __tablename__ = "order_items"

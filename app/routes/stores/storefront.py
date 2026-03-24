@@ -1,10 +1,13 @@
 from flask import render_template, abort, request, jsonify
 from datetime import datetime
+from sqlalchemy import and_
 from config.database import db
 from app.models.store import Store, StoreCustomization
 from app.models.product import Product
 from app.models.category import Category
 from app.models.customer_favorite import CustomerFavorite
+from app.models.order import Order, OrderItem
+from app.models.product_review import ProductReview
 from app.models.promotion import Promotion, PromotionProduct, PromotionCategory
 from app.models.store_admin import StoreAdmin
 from . import storefront
@@ -53,6 +56,56 @@ def calculate_product_promotion(product, active_promotions):
             }
     
     return {'has_promotion': False}
+
+
+def get_product_reviews_data(store_id, product_id):
+    reviews = ProductReview.query.filter(
+        ProductReview.store_id == store_id,
+        ProductReview.product_id == product_id,
+        ProductReview.status == 'reviewed',
+        ProductReview.rating.isnot(None)
+    ).order_by(ProductReview.created_at.desc()).all()
+
+    avg_rating = 0.0
+    if reviews:
+        avg_rating = float(sum((review.rating or 0) for review in reviews)) / len(reviews)
+
+    return reviews, avg_rating, len(reviews)
+
+
+def get_review_eligibility(store_id, product_id, customer_id):
+    if not customer_id:
+        return None
+
+    pending_order = db.session.query(Order).join(
+        OrderItem,
+        OrderItem.order_id == Order.id
+    ).outerjoin(
+        ProductReview,
+        and_(
+            ProductReview.order_id == Order.id,
+            ProductReview.customer_id == Order.user_id,
+            ProductReview.product_id == OrderItem.product_id,
+        )
+    ).filter(
+        Order.store_id == store_id,
+        Order.user_id == customer_id,
+        Order.status == 'delivered',
+        OrderItem.product_id == product_id,
+        ProductReview.id.is_(None)
+    ).order_by(
+        Order.updated_at.desc(),
+        Order.placed_at.desc()
+    ).first()
+
+    if not pending_order:
+        return None
+
+    return {
+        'eligible': True,
+        'order_id': pending_order.id,
+        'placed_at': pending_order.placed_at,
+    }
 
 
 @storefront.route('/<slug>')
@@ -238,6 +291,12 @@ def store_product_page(slug, product_id):
             customization['primary_color'] = store.customization.primary_color or '#667eea'
             customization['secondary_color'] = store.customization.secondary_color or '#764ba2'
         
+        reviews, avg_rating, review_count = get_product_reviews_data(store.id, product.id)
+
+        review_eligibility = None
+        if current_customer and current_customer.is_active:
+            review_eligibility = get_review_eligibility(store.id, product.id, current_customer.id)
+
         # Verificar se o cliente logado é admin da loja
         is_admin = False
         if current_customer and current_customer.is_active:
@@ -248,6 +307,10 @@ def store_product_page(slug, product_id):
             store=store,
             product=product,
             promo=promo_info,
+            reviews=reviews,
+            avg_rating=avg_rating,
+            review_count=review_count,
+            review_eligibility=review_eligibility,
             customization=customization,
             is_admin=is_admin
         )
@@ -255,6 +318,128 @@ def store_product_page(slug, product_id):
     except Exception as e:
         print(f"Erro ao carregar página do produto: {e}")
         abort(500)
+
+
+@storefront.route('/<slug>/produto/<product_id>/avaliar', methods=['POST'])
+def submit_product_review(slug, product_id):
+    try:
+        store = Store.query.filter_by(slug=slug, onboarding_completed=True).first()
+        if not store:
+            return jsonify({'success': False, 'error': 'Loja não encontrada'}), 404
+
+        product = Product.query.filter_by(id=product_id, store_id=store.id, active=True).first()
+        if not product:
+            return jsonify({'success': False, 'error': 'Produto não encontrado'}), 404
+
+        customer = sync_customer_session_for_store(store)
+        if not customer or not customer.is_active:
+            return jsonify({
+                'success': False,
+                'error': 'Você precisa estar logado para avaliar',
+                'redirect': f'/{slug}/auth/login'
+            }), 401
+
+        data = request.get_json(silent=True) or {}
+        order_id = (data.get('order_id') or '').strip()
+        raw_comment = data.get('comment')
+        comment = raw_comment.strip() if isinstance(raw_comment, str) else ''
+        report_not_received = bool(data.get('not_received'))
+
+        if not order_id:
+            return jsonify({'success': False, 'error': 'Pedido inválido para avaliação'}), 400
+
+        order = Order.query.filter_by(
+            id=order_id,
+            store_id=store.id,
+            user_id=customer.id,
+            status='delivered'
+        ).first()
+
+        if not order:
+            return jsonify({'success': False, 'error': 'Este pedido não pode ser avaliado'}), 400
+
+        has_product = OrderItem.query.filter_by(order_id=order.id, product_id=product.id).first()
+        if not has_product:
+            return jsonify({'success': False, 'error': 'Produto não encontrado neste pedido'}), 400
+
+        existing_review = ProductReview.query.filter_by(
+            order_id=order.id,
+            customer_id=customer.id,
+            product_id=product.id
+        ).first()
+        if existing_review:
+            return jsonify({'success': False, 'error': 'Este item já foi avaliado'}), 400
+
+        if report_not_received:
+            if len(comment) < 5:
+                return jsonify({
+                    'success': False,
+                    'error': 'Descreva rapidamente o problema para registrar que não recebeu o produto'
+                }), 400
+            review = ProductReview(
+                store_id=store.id,
+                order_id=order.id,
+                customer_id=customer.id,
+                product_id=product.id,
+                status='not_received',
+                rating=None,
+                comment=comment,
+            )
+            db.session.add(review)
+            db.session.commit()
+
+            return jsonify({
+                'success': True,
+                'status': 'not_received',
+                'message': 'Registro de não recebimento enviado com sucesso'
+            }), 200
+
+        raw_rating = data.get('rating')
+        try:
+            rating = int(raw_rating)
+        except (TypeError, ValueError):
+            rating = 0
+
+        if rating < 1 or rating > 5:
+            return jsonify({'success': False, 'error': 'Informe uma nota de 1 a 5 estrelas'}), 400
+
+        review = ProductReview(
+            store_id=store.id,
+            order_id=order.id,
+            customer_id=customer.id,
+            product_id=product.id,
+            status='reviewed',
+            rating=rating,
+            comment=comment[:1500] if comment else None,
+        )
+        db.session.add(review)
+        db.session.commit()
+
+        reviews, avg_rating, review_count = get_product_reviews_data(store.id, product.id)
+
+        return jsonify({
+            'success': True,
+            'status': 'reviewed',
+            'message': 'Avaliação enviada com sucesso',
+            'review': {
+                'rating': rating,
+                'comment': review.comment,
+                'customer_name': customer.full_name or 'Cliente',
+                'created_at': review.created_at.strftime('%d/%m/%Y') if review.created_at else None,
+            },
+            'stats': {
+                'avg_rating': round(avg_rating, 1),
+                'review_count': review_count,
+            }
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Erro ao enviar avaliação: {e}")
+        return jsonify({
+            'success': False,
+            'error': 'Erro ao enviar avaliação'
+        }), 500
 
 
 @storefront.route('/<slug>/categories')

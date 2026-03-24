@@ -213,6 +213,28 @@ CREATE TABLE IF NOT EXISTS order_items (
   FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS product_reviews (
+  id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
+  store_id CHAR(36) NOT NULL,
+  order_id CHAR(36) NOT NULL,
+  customer_id CHAR(36) NOT NULL,
+  product_id CHAR(36) NOT NULL,
+  status ENUM('reviewed','not_received') NOT NULL DEFAULT 'reviewed',
+  rating TINYINT,
+  comment TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE (order_id, customer_id, product_id),
+  INDEX idx_product_reviews_store (store_id),
+  INDEX idx_product_reviews_product (product_id),
+  INDEX idx_product_reviews_customer (customer_id),
+  FOREIGN KEY (store_id) REFERENCES stores(id) ON DELETE CASCADE,
+  FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  FOREIGN KEY (customer_id) REFERENCES store_customers(id) ON DELETE CASCADE,
+  FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE,
+  CHECK (rating IS NULL OR (rating >= 1 AND rating <= 5))
+);
+
 CREATE TABLE IF NOT EXISTS payments (
   id CHAR(36) PRIMARY KEY DEFAULT (UUID()),
   order_id CHAR(36) UNIQUE,

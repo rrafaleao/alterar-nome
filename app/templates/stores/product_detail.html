@@ -611,6 +611,243 @@
             line-height: 1.8;
         }
 
+        /* ===== REVIEWS ===== */
+        .reviews-section {
+            padding: 0 0 40px;
+        }
+
+        .reviews-wrapper {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--card-shadow);
+            padding: 28px;
+        }
+
+        .reviews-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .reviews-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .review-summary {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--gray-600);
+            font-size: 14px;
+        }
+
+        .review-summary-stars {
+            color: #FFD700;
+            letter-spacing: 2px;
+            font-size: 16px;
+        }
+
+        .review-popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.52);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 4000;
+            padding: 16px;
+        }
+
+        .review-popup-overlay.active {
+            display: flex;
+        }
+
+        .review-popup-card {
+            width: min(560px, 100%);
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 22px 45px rgba(15, 23, 42, 0.25);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+
+        .review-popup-header {
+            padding: 18px 20px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(59, 130, 246, 0.1));
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .review-popup-header h4 {
+            font-size: 19px;
+            color: var(--gray-900);
+            line-height: 1.3;
+        }
+
+        .review-popup-close {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            background: white;
+            color: var(--gray-600);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .review-popup-body {
+            padding: 20px;
+        }
+
+        .review-popup-body p {
+            color: var(--gray-700);
+            margin-bottom: 14px;
+        }
+
+        .review-form {
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
+            margin-top: 14px;
+            padding-top: 14px;
+        }
+
+        .review-stars-input {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .review-star-btn {
+            border: none;
+            background: transparent;
+            font-size: 28px;
+            color: var(--gray-300);
+            cursor: pointer;
+            transition: transform 0.15s, color 0.15s;
+            line-height: 1;
+        }
+
+        .review-star-btn.active {
+            color: #FFD700;
+        }
+
+        .review-star-btn:hover {
+            transform: scale(1.12);
+        }
+
+        .review-textarea {
+            width: 100%;
+            min-height: 110px;
+            border: 1px solid var(--gray-300);
+            border-radius: 12px;
+            padding: 12px;
+            resize: vertical;
+            font-family: inherit;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .review-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.12);
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .review-btn {
+            border: none;
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .review-btn.primary {
+            color: white;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+
+        .review-btn.ghost {
+            color: var(--gray-700);
+            background: var(--gray-100);
+        }
+
+        .review-btn.danger {
+            color: #b91c1c;
+            background: #fee2e2;
+        }
+
+        .review-item {
+            border-top: 1px solid var(--gray-100);
+            padding-top: 16px;
+            margin-top: 16px;
+        }
+
+        .review-item:first-child {
+            border-top: none;
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        .review-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .review-author {
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+
+        .review-date {
+            color: var(--gray-500);
+            font-size: 13px;
+        }
+
+        .review-stars {
+            color: #FFD700;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .review-comment {
+            color: var(--gray-700);
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .reviews-empty {
+            color: var(--gray-500);
+            font-size: 14px;
+            background: var(--gray-50);
+            border: 1px dashed var(--gray-300);
+            border-radius: 12px;
+            padding: 14px;
+        }
+
+        body.review-popup-open {
+            overflow: hidden;
+        }
+
         /* ===== FOOTER ===== */
         .footer {
             background: var(--gray-900);
@@ -705,6 +942,10 @@
             .footer-content {
                 grid-template-columns: 1fr;
                 text-align: center;
+            }
+
+            .reviews-wrapper {
+                padding: 18px;
             }
         }
 
@@ -1088,13 +1329,12 @@
 
                     <div class="rating">
                         <div class="stars">
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
-                            <span class="star">★</span>
+                            {% set rounded_avg = avg_rating|round(0, 'common')|int %}
+                            {% for i in range(1, 6) %}
+                            <span class="star">{% if i <= rounded_avg %}★{% else %}☆{% endif %}</span>
+                            {% endfor %}
                         </div>
-                        <span class="rating-text">5.0 <a href="#">Ver avaliações (10)</a></span>
+                        <span class="rating-text">{{ '%.1f'|format(avg_rating) }} <a href="#reviews">Ver avaliações ({{ review_count }})</a></span>
                     </div>
 
                     <div class="pricing">
@@ -1166,7 +1406,7 @@
                             {% set ns.total_stock = product.stock.quantity - product.stock.reserved_quantity %}
                         {% endif %}
                         {% if ns.total_stock > 0 %}
-                        <button class="btn btn-primary" id="addToCartBtn" onclick="addToCart('{{ product.id }}', '{{ product.title }}', {{ product.price }}, '{{ product.images[0].url if product.images and product.images|length > 0 else '' }}')">
+                        <button class="btn btn-primary" id="addToCartBtn" data-product-id="{{ product.id }}" data-product-title="{{ product.title }}" data-product-price="{{ product.price }}" data-product-image="{{ product.images[0].url if product.images and product.images|length > 0 else '' }}">
                             <span class="material-icons">add_shopping_cart</span>
                             Adicionar ao carrinho
                         </button>
@@ -1189,6 +1429,73 @@
             </div>
         </div>
     </section>
+
+    <section class="reviews-section" id="reviews">
+        <div class="container">
+            <div class="reviews-wrapper">
+                <div class="reviews-header">
+                    <h2 class="reviews-title">Avaliações do produto</h2>
+                    <div class="review-summary">
+                        <span class="review-summary-stars" id="reviewSummaryStars">
+                            {% set rounded_avg = avg_rating|round(0, 'common')|int %}
+                            {% for i in range(1, 6) %}
+                            {% if i <= rounded_avg %}★{% else %}☆{% endif %}
+                            {% endfor %}
+                        </span>
+                        <span id="reviewSummaryText">{{ '%.1f'|format(avg_rating) }} ({{ review_count }} avaliação{{ '' if review_count == 1 else 'ões' }})</span>
+                    </div>
+                </div>
+
+                <div id="reviewsList">
+                    {% if reviews and reviews|length > 0 %}
+                        {% for review in reviews %}
+                        <article class="review-item">
+                            <div class="review-meta">
+                                <span class="review-author">{{ review.customer.full_name if review.customer and review.customer.full_name else 'Cliente' }}</span>
+                                <span class="review-date">{{ review.created_at.strftime('%d/%m/%Y') if review.created_at else '' }}</span>
+                            </div>
+                            <div class="review-stars">{{ '★' * (review.rating or 0) }}{{ '☆' * (5 - (review.rating or 0)) }}</div>
+                            {% if review.comment %}
+                            <p class="review-comment">{{ review.comment }}</p>
+                            {% endif %}
+                        </article>
+                        {% endfor %}
+                    {% else %}
+                    <div class="reviews-empty" id="reviewsEmpty">Este produto ainda não tem avaliações.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% if review_eligibility and review_eligibility.eligible %}
+    <div class="review-popup-overlay" id="reviewPopup" data-order-id="{{ review_eligibility.order_id }}" onclick="handleReviewPopupOverlayClick(event)">
+        <div class="review-popup-card">
+            <div class="review-popup-header">
+                <h4>Seu pedido foi marcado como entregue</h4>
+                <button type="button" class="review-popup-close" onclick="closeReviewPopup()">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="review-popup-body">
+                <p>Conte como foi sua experiência com este produto. Se você não recebeu, avise por aqui.</p>
+                <form class="review-form" id="reviewForm" onsubmit="submitProductReview(event)">
+                    <div class="review-stars-input" id="reviewStarsInput">
+                        {% for i in range(1, 6) %}
+                        <button type="button" class="review-star-btn" data-rating="{{ i }}" onclick="selectReviewStar(Number(this.dataset.rating))">★</button>
+                        {% endfor %}
+                    </div>
+                    <textarea id="reviewComment" class="review-textarea" placeholder="Escreva sua avaliação (opcional para avaliação normal e obrigatório em caso de não recebimento)"></textarea>
+                    <div class="review-actions">
+                        <button type="submit" class="review-btn primary">Enviar avaliação</button>
+                        <button type="button" class="review-btn danger" onclick="reportNotReceived()">Não recebi o produto</button>
+                        <button type="button" class="review-btn ghost" onclick="closeReviewPopup()">Fechar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Image Modal -->
     <div class="image-modal" id="imageModal" onclick="closeImageModal(event)">
@@ -1264,6 +1571,9 @@
 
     <script>
         const storeSlug = '{{ store.slug }}';
+        const productId = '{{ product.id }}';
+        const shouldShowReviewPopup = !!document.getElementById('reviewPopup');
+        let selectedReviewRating = 0;
         
         // User menu toggle
         function toggleUserMenu() {
@@ -1334,6 +1644,7 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeImageModal();
+                closeReviewPopup();
             }
         });
 
@@ -1396,6 +1707,25 @@
                 } catch (e) {
                     cart = [];
                 }
+            }
+
+            const addToCartBtn = document.getElementById('addToCartBtn');
+            if (addToCartBtn) {
+                addToCartBtn.addEventListener('click', function() {
+                    const productPrice = Number(this.dataset.productPrice || '0');
+                    addToCart(
+                        this.dataset.productId || '',
+                        this.dataset.productTitle || 'Produto',
+                        productPrice,
+                        this.dataset.productImage || ''
+                    );
+                });
+            }
+
+            if (shouldShowReviewPopup) {
+                setTimeout(() => {
+                    openReviewPopup();
+                }, 350);
             }
         });
 
@@ -1490,6 +1820,160 @@
             const query = document.getElementById('searchInput').value;
             if (query.trim()) {
                 window.location.href = '/' + storeSlug + '/produtos?search=' + encodeURIComponent(query);
+            }
+        }
+
+        function openReviewPopup() {
+            const popup = document.getElementById('reviewPopup');
+            if (!popup) return;
+            popup.classList.add('active');
+            document.body.classList.add('review-popup-open');
+        }
+
+        function closeReviewPopup() {
+            const popup = document.getElementById('reviewPopup');
+            if (!popup) return;
+            popup.classList.remove('active');
+            document.body.classList.remove('review-popup-open');
+        }
+
+        function handleReviewPopupOverlayClick(event) {
+            if (event.target && event.target.id === 'reviewPopup') {
+                closeReviewPopup();
+            }
+        }
+
+        function selectReviewStar(rating) {
+            selectedReviewRating = rating;
+            document.querySelectorAll('.review-star-btn').forEach(btn => {
+                const value = Number(btn.dataset.rating || '0');
+                btn.classList.toggle('active', value <= rating);
+            });
+        }
+
+        function getReviewOrderId() {
+            const popup = document.getElementById('reviewPopup');
+            return popup ? popup.dataset.orderId : '';
+        }
+
+        function reportNotReceived() {
+            submitReviewRequest(true);
+        }
+
+        function submitProductReview(event) {
+            event.preventDefault();
+            submitReviewRequest(false);
+        }
+
+        function submitReviewRequest(notReceived) {
+            const orderId = getReviewOrderId();
+            const commentEl = document.getElementById('reviewComment');
+            const comment = commentEl ? commentEl.value.trim() : '';
+
+            if (!orderId) {
+                alert('Não foi possível identificar o pedido para avaliação.');
+                return;
+            }
+
+            if (!notReceived && selectedReviewRating < 1) {
+                alert('Selecione de 1 a 5 estrelas para avaliar.');
+                return;
+            }
+
+            fetch(`/${storeSlug}/produto/${productId}/avaliar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    order_id: orderId,
+                    rating: selectedReviewRating,
+                    comment,
+                    not_received: notReceived
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    if (data.redirect) {
+                        window.location.href = data.redirect;
+                        return;
+                    }
+                    alert(data.error || 'Erro ao enviar avaliação');
+                    return;
+                }
+
+                if (data.status === 'not_received') {
+                    alert('Seu aviso de não recebimento foi enviado para a loja.');
+                    closeReviewPopup();
+                    return;
+                }
+
+                addReviewToList(data.review);
+                updateReviewSummary(data.stats);
+
+                closeReviewPopup();
+            })
+            .catch(() => {
+                alert('Erro ao enviar avaliação');
+            });
+        }
+
+        function addReviewToList(review) {
+            const list = document.getElementById('reviewsList');
+            if (!list || !review) return;
+
+            const empty = document.getElementById('reviewsEmpty');
+            if (empty) {
+                empty.remove();
+            }
+
+            const article = document.createElement('article');
+            article.className = 'review-item';
+
+            const safeName = review.customer_name || 'Cliente';
+            const safeDate = review.created_at || '';
+            const stars = '★'.repeat(review.rating || 0) + '☆'.repeat(5 - (review.rating || 0));
+            const safeComment = review.comment ? `<p class="review-comment">${review.comment.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</p>` : '';
+
+            article.innerHTML = `
+                <div class="review-meta">
+                    <span class="review-author">${safeName}</span>
+                    <span class="review-date">${safeDate}</span>
+                </div>
+                <div class="review-stars">${stars}</div>
+                ${safeComment}
+            `;
+
+            list.prepend(article);
+        }
+
+        function updateReviewSummary(stats) {
+            if (!stats) return;
+
+            const avg = Number(stats.avg_rating || 0);
+            const count = Number(stats.review_count || 0);
+            const rounded = Math.round(avg);
+
+            const starsText = Array.from({ length: 5 }, (_, idx) => (idx < rounded ? '★' : '☆')).join('');
+
+            const summaryStars = document.getElementById('reviewSummaryStars');
+            const summaryText = document.getElementById('reviewSummaryText');
+            if (summaryStars) summaryStars.textContent = starsText;
+            if (summaryText) {
+                summaryText.textContent = `${avg.toFixed(1)} (${count} ${count === 1 ? 'avaliação' : 'avaliações'})`;
+            }
+
+            const topRatingText = document.querySelector('.rating .rating-text');
+            if (topRatingText) {
+                topRatingText.innerHTML = `${avg.toFixed(1)} <a href="#reviews">Ver avaliações (${count})</a>`;
+            }
+
+            const topStarsContainer = document.querySelector('.rating .stars');
+            if (topStarsContainer) {
+                topStarsContainer.innerHTML = Array.from({ length: 5 }, (_, idx) => (
+                    `<span class="star">${idx < rounded ? '★' : '☆'}</span>`
+                )).join('');
             }
         }
 
