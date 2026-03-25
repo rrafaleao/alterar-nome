@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import text
 from config.database import db
 from app.routes.init import all_blueprints
 
@@ -16,6 +17,9 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+        # Compatibilidade com bancos antigos sem migrations versionadas.
+        db.session.execute(text("ALTER TABLE products ADD COLUMN IF NOT EXISTS size_guide_json JSON"))
+        db.session.commit()
 
     for bp in all_blueprints:
         app.register_blueprint(bp)

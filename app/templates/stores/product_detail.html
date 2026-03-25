@@ -495,6 +495,91 @@
             font-weight: 600;
         }
 
+        .size-guide-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(17, 24, 39, 0.72);
+            z-index: 3100;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .size-guide-modal.active {
+            display: flex;
+        }
+
+        .size-guide-card {
+            width: min(640px, 100%);
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 24px 45px rgba(0, 0, 0, 0.22);
+        }
+
+        .size-guide-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .size-guide-head h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .size-guide-close {
+            border: none;
+            background: var(--gray-100);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .size-guide-content {
+            padding: 18px 20px 20px;
+        }
+
+        .size-guide-content p {
+            color: var(--gray-600);
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .size-guide-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .size-guide-table th,
+        .size-guide-table td {
+            border-bottom: 1px solid var(--gray-200);
+            text-align: left;
+            padding: 10px;
+            font-size: 14px;
+        }
+
+        .size-guide-table th {
+            font-weight: 700;
+            color: var(--gray-900);
+            background: var(--gray-50);
+        }
+
+        .size-guide-empty {
+            background: var(--gray-50);
+            color: var(--gray-600);
+            padding: 12px;
+            border-radius: 10px;
+        }
+
         .size-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -845,6 +930,10 @@
         }
 
         body.review-popup-open {
+            overflow: hidden;
+        }
+
+        body.size-guide-open {
             overflow: hidden;
         }
 
@@ -1371,7 +1460,7 @@
                     <div class="selection-section">
                         <div class="size-header">
                             <div class="section-label">Tamanho</div>
-                            <a href="#" class="size-guide">Tabela de medidas</a>
+                            <a href="#" class="size-guide" onclick="openSizeGuideModal(event)">Tabela de medidas</a>
                         </div>
 
                         <div class="size-grid">
@@ -1496,6 +1585,40 @@
         </div>
     </div>
     {% endif %}
+
+    <div class="size-guide-modal" id="sizeGuideModal" onclick="closeSizeGuideModal(event)">
+        <div class="size-guide-card">
+            <div class="size-guide-head">
+                <h3>Tabela de Medidas</h3>
+                <button type="button" class="size-guide-close" onclick="closeSizeGuideModal(event)">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="size-guide-content">
+                {% if product.size_guide_json and product.size_guide_json|length > 0 %}
+                <p>Consulte as medidas configuradas pela loja para escolher o tamanho ideal.</p>
+                <table class="size-guide-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 120px;">Tamanho</th>
+                            <th>Medidas</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in product.size_guide_json %}
+                        <tr>
+                            <td><strong>{{ row.size }}</strong></td>
+                            <td>{{ row.measurements }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="size-guide-empty">A loja ainda não cadastrou a tabela de medidas para este produto.</div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 
     <!-- Image Modal -->
     <div class="image-modal" id="imageModal" onclick="closeImageModal(event)">
@@ -1645,8 +1768,33 @@
             if (e.key === 'Escape') {
                 closeImageModal();
                 closeReviewPopup();
+                closeSizeGuideModal();
             }
         });
+
+        function openSizeGuideModal(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            const modal = document.getElementById('sizeGuideModal');
+            if (!modal) return;
+            modal.classList.add('active');
+            document.body.classList.add('size-guide-open');
+        }
+
+        function closeSizeGuideModal(event) {
+            if (event) {
+                event.preventDefault();
+                if (event.target && event.currentTarget && event.target !== event.currentTarget && !event.target.closest('.size-guide-close')) {
+                    return;
+                }
+            }
+            const modal = document.getElementById('sizeGuideModal');
+            if (!modal) return;
+            modal.classList.remove('active');
+            document.body.classList.remove('size-guide-open');
+        }
 
         // Select Variant
         function selectVariant(element) {

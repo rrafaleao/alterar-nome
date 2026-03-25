@@ -90,6 +90,7 @@ CREATE TABLE IF NOT EXISTS products (
   description TEXT,
   sku VARCHAR(255),
   price DECIMAL(12,2) NOT NULL CHECK (price >= 0),
+  size_guide_json JSON,
   active BOOLEAN DEFAULT TRUE,
   show_in_zappshop BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

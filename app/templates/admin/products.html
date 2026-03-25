@@ -170,6 +170,38 @@
                     </div>
                 </div>
 
+                <div class="form-group" id="sizeGuideGroup" style="display: none;">
+                    <button type="button" id="sizeGuideToggleBtn" onclick="toggleSizeGuideConfig()" style="width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; border: 1px solid #d1d5db; border-radius: 12px; background: #f8fafc; padding: 12px 14px; cursor: pointer; color: #1f2937; font-weight: 600;">
+                        <span style="display: inline-flex; align-items: center; gap: 8px;">
+                            <span class="material-icons" style="font-size: 18px;">straighten</span>
+                            Configurar Tabela de medidas
+                        </span>
+                        <span class="material-icons" id="sizeGuideToggleIcon" style="font-size: 20px; transition: transform 0.2s;">keyboard_arrow_down</span>
+                    </button>
+
+                    <div id="sizeGuidePanel" style="display: none; margin-top: 10px; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; background: #ffffff;">
+                        <p style="font-size: 12px; color: #6b7280; margin-bottom: 10px;">Preencha as medidas dos tamanhos que deseja exibir para o cliente.</p>
+                        <div style="display: grid; grid-template-columns: 110px 1fr; gap: 8px 12px; align-items: center;">
+                            <label style="font-size: 12px; color: #6b7280;">PP</label>
+                            <input type="text" class="form-input size-guide-input" data-size="PP" placeholder="Ex: Busto 80-84 cm | Cintura 62-66 cm">
+                            <label style="font-size: 12px; color: #6b7280;">P</label>
+                            <input type="text" class="form-input size-guide-input" data-size="P" placeholder="Ex: Busto 85-89 cm | Cintura 67-71 cm">
+                            <label style="font-size: 12px; color: #6b7280;">M</label>
+                            <input type="text" class="form-input size-guide-input" data-size="M" placeholder="Ex: Busto 90-94 cm | Cintura 72-76 cm">
+                            <label style="font-size: 12px; color: #6b7280;">G</label>
+                            <input type="text" class="form-input size-guide-input" data-size="G" placeholder="Ex: Busto 95-99 cm | Cintura 77-81 cm">
+                            <label style="font-size: 12px; color: #6b7280;">GG</label>
+                            <input type="text" class="form-input size-guide-input" data-size="GG" placeholder="Ex: Busto 100-106 cm | Cintura 82-88 cm">
+                            <label style="font-size: 12px; color: #6b7280;">XG</label>
+                            <input type="text" class="form-input size-guide-input" data-size="XG" placeholder="Ex: Busto 107-113 cm | Cintura 89-95 cm">
+                            <label style="font-size: 12px; color: #6b7280;">2XG</label>
+                            <input type="text" class="form-input size-guide-input" data-size="2XG" placeholder="Ex: Busto 114-120 cm | Cintura 96-102 cm">
+                            <label style="font-size: 12px; color: #6b7280;">3XG</label>
+                            <input type="text" class="form-input size-guide-input" data-size="3XG" placeholder="Ex: Busto 121-127 cm | Cintura 103-109 cm">
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <label class="form-label">Imagens do Produto</label>
                     <div class="upload-area" onclick="document.getElementById('imageUpload').click()">
@@ -386,15 +418,68 @@ function onCategoryChange() {
     const category = categoriesData.find(c => c.id === categoryId);
     
     const sizeGroup = document.getElementById('sizeStockGroup');
+    const sizeGuideGroup = document.getElementById('sizeGuideGroup');
     const stockGroup = document.getElementById('stockGeneralGroup');
     
     if (category && category.has_size) {
         sizeGroup.style.display = 'block';
+        sizeGuideGroup.style.display = 'block';
+        setSizeGuideExpanded(false);
         stockGroup.style.display = 'none';
     } else {
         sizeGroup.style.display = 'none';
+        sizeGuideGroup.style.display = 'none';
         stockGroup.style.display = 'block';
     }
+}
+
+function setSizeGuideExpanded(expanded) {
+    const panel = document.getElementById('sizeGuidePanel');
+    const icon = document.getElementById('sizeGuideToggleIcon');
+    if (!panel || !icon) return;
+
+    panel.style.display = expanded ? 'block' : 'none';
+    icon.style.transform = expanded ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+function toggleSizeGuideConfig() {
+    const panel = document.getElementById('sizeGuidePanel');
+    if (!panel) return;
+    const isOpen = panel.style.display !== 'none';
+    setSizeGuideExpanded(!isOpen);
+}
+
+function resetSizeGuideInputs() {
+    document.querySelectorAll('.size-guide-input').forEach(input => {
+        input.value = '';
+    });
+}
+
+function fillSizeGuideInputs(sizeGuide) {
+    resetSizeGuideInputs();
+    if (!Array.isArray(sizeGuide)) return;
+
+    sizeGuide.forEach(row => {
+        const size = row && row.size ? String(row.size) : '';
+        const input = document.querySelector(`.size-guide-input[data-size="${size}"]`);
+        if (input) {
+            input.value = row.measurements || '';
+        }
+    });
+}
+
+function collectSizeGuideFromForm() {
+    const guide = [];
+    document.querySelectorAll('.size-guide-input').forEach(input => {
+        const measurements = (input.value || '').trim();
+        if (measurements) {
+            guide.push({
+                size: input.dataset.size,
+                measurements
+            });
+        }
+    });
+    return guide;
 }
 
 // Load categories
@@ -572,7 +657,10 @@ function openAddProductModal() {
     
     // Reset visibility
     document.getElementById('sizeStockGroup').style.display = 'none';
+    document.getElementById('sizeGuideGroup').style.display = 'none';
     document.getElementById('stockGeneralGroup').style.display = 'block';
+    setSizeGuideExpanded(false);
+    resetSizeGuideInputs();
     
     document.getElementById('productModal').classList.add('active');
 }
@@ -585,6 +673,8 @@ function closeProductModal() {
     existingImages = [];
     document.getElementById('previewGrid').innerHTML = '';
     document.getElementById('existingImagesGrid').innerHTML = '';
+    setSizeGuideExpanded(false);
+    resetSizeGuideInputs();
 }
 
 // Editar produto
@@ -626,6 +716,9 @@ async function editProduct(id) {
                 input.value = sizeStock ? sizeStock.quantity : 0;
             });
         }
+
+        fillSizeGuideInputs(product.size_guide || []);
+        setSizeGuideExpanded(false);
         
         // Imagens existentes
         existingImages = product.images || [];
@@ -677,6 +770,7 @@ async function handleSubmit(e) {
             }
         });
         data.size_stocks = sizeStocks;
+        data.size_guide = collectSizeGuideFromForm();
         
         // Calcular estoque total
         data.initial_stock = sizeStocks.reduce((sum, ss) => sum + ss.quantity, 0);
@@ -684,6 +778,7 @@ async function handleSubmit(e) {
     } else {
         data.initial_stock = parseInt(formData.get('initial_stock')) || 0;
         data.stock_quantity = data.initial_stock;
+        data.size_guide = [];
     }
     
     const isEdit = !!editingProductId;

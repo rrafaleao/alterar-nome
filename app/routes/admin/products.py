@@ -213,6 +213,7 @@ def create_product():
             sku=data.get('sku', ''),
             price=float(data.get('price')),
             category_id=data.get('category_id') if data.get('category_id') else None,
+            size_guide_json=data.get('size_guide', []),
             active=data.get('active', True),
             show_in_zappshop=data.get('show_in_zappshop', False)
         )
@@ -347,6 +348,8 @@ def update_product(product_id):
             product.active = data['active']
         if 'show_in_zappshop' in data:
             product.show_in_zappshop = data['show_in_zappshop']
+        if 'size_guide' in data:
+            product.size_guide_json = data.get('size_guide', [])
         
         # Atualizar estoque geral
         if 'stock_quantity' in data:

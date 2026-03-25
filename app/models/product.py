@@ -12,6 +12,7 @@ class Product(db.Model):
     description = db.Column(db.Text)
     sku = db.Column(db.String(255))
     price = db.Column(db.Numeric(12, 2), nullable=False)
+    size_guide_json = db.Column(db.JSON)
     active = db.Column(db.Boolean, default=True)
     show_in_zappshop = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -30,6 +31,7 @@ class Product(db.Model):
             'description': self.description,
             'sku': self.sku,
             'price': float(self.price) if self.price else 0,
+            'size_guide': self.size_guide_json or [],
             'active': self.active,
             'show_in_zappshop': self.show_in_zappshop,
             'created_at': self.created_at.isoformat() if self.created_at else None,
