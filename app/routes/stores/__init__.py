@@ -5,3 +5,4 @@ storefront = Blueprint("storefront", __name__)
 from .storefront import *
 from .auth import *
 from .purchase import *
+from .profile import *

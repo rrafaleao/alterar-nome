@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Perfil - {{ store.name }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        :root {
+            --primary: {{ customization.primary_color }};
+            --secondary: {{ customization.secondary_color }};
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(180deg, var(--gray-50), #ffffff);
+            color: var(--gray-800);
+            min-height: 100vh;
+        }
+
+        .topbar {
+            background-color: #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .topbar-content {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .logo-section {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid var(--gray-200);
+        }
+
+        .logo-placeholder {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .store-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-900);
+            letter-spacing: -0.5px;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 12px 48px 12px 20px;
+            border: 2px solid var(--gray-200);
+            border-radius: 50px;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+            background: var(--gray-50);
+        }
+
+        .search-bar input:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-bar button {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .search-bar button:hover {
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .search-bar button .material-icons {
+            color: white;
+            font-size: 20px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: var(--gray-100);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .icon-btn:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .icon-btn:hover .material-icons {
+            color: white;
+        }
+
+        .icon-btn .material-icons {
+            font-size: 22px;
+            color: var(--gray-600);
+            transition: color 0.2s;
+        }
+
+        .btn-login {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .container {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 28px 20px 40px;
+        }
+
+        .page-head {
+            margin-bottom: 20px;
+        }
+
+        .page-head h1 {
+            font-size: 30px;
+            color: var(--gray-900);
+            margin-bottom: 6px;
+        }
+
+        .page-head p {
+            color: var(--gray-600);
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        .sidebar {
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 14px;
+            position: sticky;
+            top: 84px;
+        }
+
+        .profile-mini {
+            padding: 8px 10px 18px;
+            border-bottom: 1px solid var(--gray-100);
+            margin-bottom: 12px;
+        }
+
+        .profile-mini strong {
+            display: block;
+            color: var(--gray-900);
+            margin-bottom: 4px;
+        }
+
+        .profile-mini small {
+            color: var(--gray-500);
+        }
+
+        .nav-item {
+            width: 100%;
+            border: 0;
+            text-decoration: none;
+            background: transparent;
+            color: var(--gray-700);
+            font-size: 15px;
+            font-weight: 600;
+            padding: 12px 12px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .nav-item:hover {
+            background: var(--gray-100);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.12), rgba(118, 75, 162, 0.12));
+            color: var(--primary);
+        }
+
+        .content {
+            background: #fff;
+            border: 1px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .message {
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .message.success {
+            background: rgba(16, 185, 129, 0.12);
+            color: #047857;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .message.error {
+            background: rgba(239, 68, 68, 0.12);
+            color: #b91c1c;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section h2 {
+            font-size: 24px;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .section-sub {
+            color: var(--gray-600);
+            margin-bottom: 18px;
+        }
+
+        .card {
+            border: 1px solid var(--gray-200);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .order-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .order-code {
+            font-family: monospace;
+            font-size: 14px;
+            color: var(--gray-700);
+            font-weight: 700;
+        }
+
+        .order-status {
+            font-size: 12px;
+            font-weight: 700;
+            border-radius: 999px;
+            padding: 5px 10px;
+            background: var(--gray-100);
+            color: var(--gray-700);
+        }
+
+        .order-items {
+            border-top: 1px solid var(--gray-100);
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            color: var(--gray-700);
+            padding: 6px 0;
+            gap: 8px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .form-group label {
+            font-size: 13px;
+            color: var(--gray-700);
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            border: 1px solid var(--gray-300);
+            border-radius: 10px;
+            padding: 10px 12px;
+            outline: none;
+            font-size: 14px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        .form-divider {
+            margin: 18px 0 12px;
+            border-top: 1px solid var(--gray-200);
+            padding-top: 16px;
+        }
+
+        .form-divider h3 {
+            font-size: 17px;
+            color: var(--gray-900);
+            margin-bottom: 10px;
+        }
+
+        .btn {
+            border: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: #fff;
+            font-weight: 700;
+            border-radius: 10px;
+            padding: 11px 16px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 34px 18px;
+            border: 2px dashed var(--gray-200);
+            border-radius: 14px;
+            color: var(--gray-500);
+        }
+
+        .hint {
+            font-size: 13px;
+            color: var(--gray-500);
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 980px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .topbar-content {
+                flex-wrap: wrap;
+            }
+
+            .search-bar {
+                order: 3;
+                flex: 100%;
+                max-width: 100%;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-content">
+            <a href="{{ url_for('storefront.view_store', slug=store.slug) }}" class="logo-section">
+                {% if store.logo_url %}
+                    <img src="{{ store.logo_url }}" alt="{{ store.name }}" class="logo">
+                {% else %}
+                    <div class="logo-placeholder">{{ store.name[0] | upper }}</div>
+                {% endif %}
+                <h1 class="store-name">{{ store.name }}</h1>
+            </a>
+
+            <div class="search-bar">
+                <input type="text" placeholder="Buscar produtos..." id="searchInput">
+                <button type="button" onclick="searchProducts()">
+                    <span class="material-icons">search</span>
+                </button>
+            </div>
+
+            <div class="header-actions">
+                <a href="{{ url_for('storefront.favorites_page', slug=store.slug) }}" class="icon-btn" title="Favoritos">
+                    <span class="material-icons">favorite_border</span>
+                </a>
+                <div class="user-menu-wrapper" style="position: relative;">
+                    <button class="btn-login" onclick="toggleUserMenu()" style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-icons" style="font-size: 18px;">person</span>
+                        {{ session.get('customer_name', 'Minha Conta').split(' ')[0] }}
+                    </button>
+                    <div class="user-dropdown" id="userDropdown" style="display: none; position: absolute; top: 100%; right: 0; margin-top: 8px; background: white; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); border: 1px solid var(--gray-200); min-width: 200px; z-index: 100; overflow: hidden;">
+                        <div style="padding: 16px; border-bottom: 1px solid var(--gray-100);">
+                            <p style="font-weight: 600; font-size: 14px; color: var(--gray-900);">{{ session.get('customer_name', '') }}</p>
+                            <p style="font-size: 13px; color: var(--gray-500);">{{ session.get('customer_email', '') }}</p>
+                        </div>
+                        <a href="{{ url_for('storefront.customer_profile', slug=store.slug) }}" style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(--gray-700); text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.2s; border-bottom: 1px solid var(--gray-100);">
+                            <span class="material-icons" style="font-size: 18px;">manage_accounts</span>
+                            Meu Perfil
+                        </a>
+                        {% if is_admin %}
+                        <a href="{{ url_for('admin.dashboard') }}" style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(--primary); text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.2s; border-bottom: 1px solid var(--gray-100);">
+                            <span class="material-icons" style="font-size: 18px;">admin_panel_settings</span>
+                            Painel Admin
+                        </a>
+                        {% endif %}
+                        <a href="{{ url_for('storefront.customer_logout', slug=store.slug) }}" style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; color: var(--danger); text-decoration: none; font-size: 14px; font-weight: 500; transition: background 0.2s;">
+                            <span class="material-icons" style="font-size: 18px;">logout</span>
+                            Sair
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="page-head">
+            <h1>Meu Perfil</h1>
+            <p>Gerencie seus pedidos, dados da conta, endereco e configuracoes de pagamento.</p>
+        </div>
+
+        <div class="layout">
+            <aside class="sidebar">
+                <div class="profile-mini">
+                    <strong>{{ customer.full_name or 'Cliente' }}</strong>
+                    <small>{{ customer.email }}</small>
+                </div>
+
+                <a href="{{ url_for('storefront.customer_profile', slug=store.slug, section='orders') }}" class="nav-item {% if section == 'orders' %}active{% endif %}">
+                    <span class="material-icons">receipt_long</span>
+                    Meus pedidos
+                </a>
+                <a href="{{ url_for('storefront.customer_profile', slug=store.slug, section='account') }}" class="nav-item {% if section == 'account' %}active{% endif %}">
+                    <span class="material-icons">person</span>
+                    Minha conta
+                </a>
+                <a href="{{ url_for('storefront.customer_profile', slug=store.slug, section='payment') }}" class="nav-item {% if section == 'payment' %}active{% endif %}">
+                    <span class="material-icons">credit_card</span>
+                    Dados de pagamento
+                </a>
+                {% if is_admin %}
+                <a href="{{ url_for('admin.dashboard') }}" class="nav-item">
+                    <span class="material-icons">admin_panel_settings</span>
+                    Painel admin
+                </a>
+                {% endif %}
+            </aside>
+
+            <section class="content">
+                {% if saved %}
+                    <div class="message success">Dados salvos com sucesso.</div>
+                {% endif %}
+                {% if error %}
+                    <div class="message error">{{ error }}</div>
+                {% endif %}
+
+                <div class="section {% if section == 'orders' %}active{% endif %}">
+                    <h2>Meus pedidos</h2>
+                    <p class="section-sub">Acompanhe seus pedidos nesta loja.</p>
+
+                    {% if orders %}
+                        {% for order in orders %}
+                        <article class="card">
+                            <div class="order-head">
+                                <span class="order-code">Pedido #{{ order.id[:8] }}</span>
+                                <span class="order-status">{{ status_labels.get(order.status, order.status) }}</span>
+                            </div>
+                            <div style="font-size: 14px; color: var(--gray-600);">
+                                <div>Data: {{ order.placed_at.strftime('%d/%m/%Y %H:%M') if order.placed_at else '-' }}</div>
+                                <div>Total: R$ {{ '%.2f' | format(order.total_amount | float) | replace('.', ',') }}</div>
+                                {% if order.payment %}
+                                <div>Pagamento: {{ payment_method_labels.get(order.payment.method, order.payment.method) }}</div>
+                                {% endif %}
+                            </div>
+
+                            {% if order.items %}
+                            <div class="order-items">
+                                {% for item in order.items %}
+                                <div class="order-item">
+                                    <span>{{ item.quantity }}x {{ item.title }}</span>
+                                    <strong>R$ {{ '%.2f' | format(item.unit_price | float) | replace('.', ',') }}</strong>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </article>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty">Voce ainda nao possui pedidos nesta loja.</div>
+                    {% endif %}
+                </div>
+
+                <div class="section {% if section == 'account' %}active{% endif %}">
+                    <h2>Minha conta</h2>
+                    <p class="section-sub">Atualize seus dados pessoais e endereco.</p>
+
+                    <form method="POST" action="{{ url_for('storefront.update_customer_account', slug=store.slug) }}">
+                        <div class="grid">
+                            <div class="form-group">
+                                <label for="full_name">Nome completo</label>
+                                <input id="full_name" name="full_name" required value="{{ customer.full_name or '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">E-mail</label>
+                                <input id="email" name="email" type="email" required value="{{ customer.email }}">
+                            </div>
+                        </div>
+
+                        <div class="grid">
+                            <div class="form-group">
+                                <label for="phone">Telefone</label>
+                                <input id="phone" name="phone" value="{{ customer.phone or '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="cep">CEP</label>
+                                <input id="cep" name="cep" value="{{ last_address.cep if last_address else '' }}">
+                            </div>
+                        </div>
+
+                        <div class="grid">
+                            <div class="form-group">
+                                <label for="street">Rua</label>
+                                <input id="street" name="street" value="{{ last_address.street if last_address else '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="number">Numero</label>
+                                <input id="number" name="number" value="{{ last_address.number if last_address else '' }}">
+                            </div>
+                        </div>
+
+                        <div class="grid">
+                            <div class="form-group">
+                                <label for="complement">Complemento</label>
+                                <input id="complement" name="complement" value="{{ last_address.complement if last_address else '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="neighborhood">Bairro</label>
+                                <input id="neighborhood" name="neighborhood" value="{{ last_address.neighborhood if last_address else '' }}">
+                            </div>
+                        </div>
+
+                        <div class="grid">
+                            <div class="form-group">
+                                <label for="city">Cidade</label>
+                                <input id="city" name="city" value="{{ last_address.city if last_address else '' }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="state">UF</label>
+                                <input id="state" name="state" maxlength="2" value="{{ last_address.state if last_address else '' }}">
+                            </div>
+                        </div>
+
+                        <div class="form-divider">
+                            <h3>Alterar senha (opcional)</h3>
+                            <div class="grid">
+                                <div class="form-group">
+                                    <label for="password">Nova senha</label>
+                                    <input id="password" type="password" name="password" autocomplete="new-password">
+                                </div>
+                                <div class="form-group">
+                                    <label for="password_confirm">Confirmar nova senha</label>
+                                    <input id="password_confirm" type="password" name="password_confirm" autocomplete="new-password">
+                                </div>
+                            </div>
+                        </div>
+
+                        <button class="btn" type="submit">Salvar dados da conta</button>
+                    </form>
+                </div>
+
+                <div class="section {% if section == 'payment' %}active{% endif %}">
+                    <h2>Dados de pagamento</h2>
+                    <p class="section-sub">Configure seu metodo preferido para acelerar o checkout.</p>
+
+                    <form method="POST" action="{{ url_for('storefront.update_customer_payment_profile', slug=store.slug) }}">
+                        <div class="form-group">
+                            <label for="preferred_method">Metodo preferido</label>
+                            <select id="preferred_method" name="preferred_method">
+                                {% for method in enabled_methods %}
+                                <option value="{{ method }}" {% if payment_profile.method == method %}selected{% endif %}>{{ payment_method_labels.get(method, method) }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <p class="hint">Os dados abaixo sao salvos no seu perfil de cliente desta loja e usados como preferencia.</p>
+
+                        <div class="grid">
+                            <div class="form-group">
+                                <label for="pix_key">Chave PIX</label>
+                                <input id="pix_key" name="pix_key" value="{{ payment_profile.method_details.get('pix_key', '') }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="document">CPF para boleto</label>
+                                <input id="document" name="document" value="{{ payment_profile.method_details.get('document', '') }}">
+                            </div>
+                        </div>
+
+                        <div class="grid">
+                            <div class="form-group">
+                                <label for="card_holder">Nome no cartao</label>
+                                <input id="card_holder" name="card_holder" value="{{ payment_profile.method_details.get('card_holder', '') }}">
+                            </div>
+                            <div class="form-group">
+                                <label for="card_number">Numero do cartao</label>
+                                <input id="card_number" name="card_number" placeholder="Apenas para atualizar os 4 ultimos digitos">
+                            </div>
+                        </div>
+
+                        <div class="grid">
+                            <div class="form-group">
+                                <label for="card_expiry">Validade (MM/AA)</label>
+                                <input id="card_expiry" name="card_expiry" value="{{ payment_profile.method_details.get('card_expiry', '') }}">
+                            </div>
+                            <div class="form-group">
+                                <label>Ultimos 4 digitos salvos</label>
+                                <input disabled value="{{ payment_profile.method_details.get('card_last4', '-') }}">
+                            </div>
+                        </div>
+
+                        <button class="btn" type="submit">Salvar dados de pagamento</button>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+    <script>
+        function toggleUserMenu() {
+            const dropdown = document.getElementById('userDropdown');
+            if (dropdown) {
+                dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            const wrapper = document.querySelector('.user-menu-wrapper');
+            const dropdown = document.getElementById('userDropdown');
+            if (wrapper && dropdown && !wrapper.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        function searchProducts() {
+            const query = document.getElementById('searchInput').value;
+            if (query.trim()) {
+                window.location.href = `{{ url_for('storefront.view_store', slug=store.slug) }}?search=${encodeURIComponent(query.trim())}`;
+            }
+        }
+
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchProducts();
+            }
+        });
+    </script>
+</body>
+</html>

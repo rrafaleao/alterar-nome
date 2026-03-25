@@ -953,6 +953,10 @@
                                         <span class="material-icons" style="font-size: 20px;">favorite</span>
                                         Meus Favoritos
                                     </a>
+                                    <a href="{{ url_for('storefront.customer_profile', slug=store.slug) }}" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: var(--gray-700); text-decoration: none; border-radius: 8px; font-size: 14px; transition: background 0.2s;">
+                                        <span class="material-icons" style="font-size: 20px;">manage_accounts</span>
+                                        Meu Perfil
+                                    </a>
                                     <a href="{{ url_for('storefront.customer_logout', slug=store.slug) }}" style="display: flex; align-items: center; gap: 10px; padding: 12px 16px; color: var(--accent); text-decoration: none; border-radius: 8px; font-size: 14px; transition: background 0.2s;">
                                         <span class="material-icons" style="font-size: 20px;">logout</span>
                                         Sair
