@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <title>Central de Ajuda - Zapp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IM+Fell+Great+Primer+SC&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 24px 50px 24px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+        }
+
+        .brand-name {
+            font-family: 'IM Fell Great Primer SC', serif;
+            font-size: 64px;
+            font-weight: 400;
+            color: #000;
+            line-height: 1;
+            text-decoration: none;
+        }
+
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            border-radius: 50px;
+            padding: 4px;
+        }
+
+        .header-btn {
+            font-family: 'Instrument Sans', sans-serif;
+            padding: 14px 40px;
+            font-size: 22px;
+            font-weight: 500;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .header-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .header-btn.active {
+            background: linear-gradient(135deg, #6BA3E8 0%, #4A90E2 100%);
+        }
+
+        .content-section {
+            padding: 100px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #000;
+        }
+
+        .search-box {
+            margin-bottom: 60px;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 12px;
+            max-width: 600px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 16px 24px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Instrument Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
+        }
+
+        .search-btn {
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 80px;
+        }
+
+        .category-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+            background: linear-gradient(135deg, #D6E8F9 0%, #B8D4F1 100%);
+            border-color: #4A90E2;
+        }
+
+        .category-icon {
+            font-size: 40px;
+            color: #4A90E2;
+            margin-bottom: 16px;
+        }
+
+        .category-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #222;
+        }
+
+        .articles-section {
+            margin-bottom: 100px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 40px;
+        }
+
+        .articles-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+
+        .article-card {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .article-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            border-color: #4A90E2;
+        }
+
+        .article-category {
+            display: inline-block;
+            background: linear-gradient(135deg, #D6E8F9 0%, #B8D4F1 100%);
+            color: #357ABD;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .article-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 12px;
+        }
+
+        .article-description {
+            font-size: 15px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .article-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #4A90E2;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .article-link:hover {
+            gap: 12px;
+        }
+
+        .help-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 31, 54, 0.6);
+            backdrop-filter: blur(2px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 2000;
+        }
+
+        .help-modal.active {
+            display: flex;
+        }
+
+        .help-modal-content {
+            width: min(680px, 100%);
+            max-height: 85vh;
+            overflow-y: auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+            border: 1px solid #e5e7eb;
+        }
+
+        .help-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            position: sticky;
+            top: 0;
+            background: #fff;
+        }
+
+        .help-modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-right: 12px;
+        }
+
+        .help-modal-close {
+            border: none;
+            background: #eef2f7;
+            color: #334155;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .help-modal-close:hover {
+            background: #dbe5f0;
+        }
+
+        .help-modal-body {
+            padding: 24px;
+            color: #475569;
+            line-height: 1.7;
+            font-size: 16px;
+            white-space: pre-line;
+        }
+
+        .faq-accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .accordion-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 24px;
+            background: #f8f9fa;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .accordion-header:hover {
+            background: #e9ecef;
+            border-color: #4A90E2;
+        }
+
+        .accordion-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #222;
+        }
+
+        .accordion-icon {
+            font-size: 20px;
+            color: #4A90E2;
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-item.active .accordion-content {
+            max-height: 500px;
+        }
+
+        .accordion-text {
+            padding: 24px;
+            font-size: 16px;
+            color: #666;
+            line-height: 1.8;
+            background: #fff;
+        }
+
+        .footer {
+            background: #0f1f36;
+            padding: 80px 100px 40px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .footer-logo span {
+            font-family: 'IM Fell Great Primer SC', serif;
+            font-size: 32px;
+            color: #fff;
+        }
+
+        .footer-description {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.7;
+        }
+
+        .footer-column h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 14px;
+        }
+
+        .footer-links a {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #6BA3E8;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-copyright {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-legal a {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-legal a:hover {
+            color: #6BA3E8;
+        }
+
+        @media (max-width: 1024px) {
+            .content-section {
+                padding: 60px 40px;
+            }
+
+            .categories-grid,
+            .articles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .brand-name {
+                font-size: 32px;
+            }
+
+            .header-btn {
+                font-size: 16px;
+                padding: 12px 30px;
+            }
+
+            .content-section {
+                padding: 40px 24px;
+            }
+
+            .page-title {
+                font-size: 32px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .categories-grid,
+            .articles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .footer {
+                padding: 60px 24px 30px;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="header">
+    <a href="/" class="logo-section" style="text-decoration: none;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo">
+        <span class="brand-name">Zapp</span>
+    </a>
+
+    <div class="header-buttons">
+        <a href="/zappshop" class="header-btn">ZappShop</a>
+        <a href="/auth/login" class="header-btn">Login</a>
+        <a href="/registration" class="header-btn active">Criar loja</a>
+    </div>
+</header>
+
+<section class="content-section">
+    <h1 class="page-title">Central de Ajuda</h1>
+
+    <h2 class="section-title">Categorias Principais</h2>
+    <div class="categories-grid">
+        <div class="category-card" onclick="scrollToCategory('getting-started')">
+            <div class="category-icon">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <div class="category-title">Começando</div>
+        </div>
+
+        <div class="category-card" onclick="scrollToCategory('store-management')">
+            <div class="category-icon">
+                <i class="fas fa-store"></i>
+            </div>
+            <div class="category-title">Gerenciar Loja</div>
+        </div>
+
+        <div class="category-card" onclick="scrollToCategory('products')">
+            <div class="category-icon">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="category-title">Produtos</div>
+        </div>
+
+        <div class="category-card" onclick="scrollToCategory('payments')">
+            <div class="category-icon">
+                <i class="fas fa-credit-card"></i>
+            </div>
+            <div class="category-title">Pagamentos</div>
+        </div>
+
+        <div class="category-card" onclick="scrollToCategory('shipping')">
+            <div class="category-icon">
+                <i class="fas fa-truck"></i>
+            </div>
+            <div class="category-title">Envios</div>
+        </div>
+
+        <div class="category-card" onclick="scrollToCategory('troubleshooting')">
+            <div class="category-icon">
+                <i class="fas fa-tools"></i>
+            </div>
+            <div class="category-title">Soluções</div>
+        </div>
+    </div>
+
+    <div id="getting-started" class="articles-section">
+        <h2 class="section-title">Começando com a Zapp</h2>
+        <div class="articles-grid">
+            <div class="article-card">
+                <span class="article-category">Iniciante</span>
+                <h3 class="article-title">Como criar minha primeira loja?</h3>
+                <p class="article-description">Guia passo a passo para criar sua loja na Zapp em menos de 10 minutos.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Iniciante</span>
+                <h3 class="article-title">Configurando seu perfil de loja</h3>
+                <p class="article-description">Aprenda como configurar seu logo, descrição e informações essenciais da loja.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Iniciante</span>
+                <h3 class="article-title">Entendo o painel de administração</h3>
+                <p class="article-description">Conheça todas as ferramentas disponíveis no seu painel para gerenciar a loja.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Iniciante</span>
+                <h3 class="article-title">Personalizando tema e visual</h3>
+                <p class="article-description">Customize cores, fontes e layout sem precisar de conhecimento técnico.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div id="store-management" class="articles-section">
+        <h2 class="section-title">Gerenciar Loja</h2>
+        <div class="articles-grid">
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Gerenciando clientes e pedidos</h3>
+                <p class="article-description">Como acompanhar, processar e gerenciar os pedidos dos clientes.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Relatórios e analytics</h3>
+                <p class="article-description">Entenda suas métricas de vendas, tráfego e desempenho da loja.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Promoções</h3>
+                <p class="article-description">Crie campanhas de desconto e promoções para aumentar suas vendas.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Backup e segurança</h3>
+                <p class="article-description">Proteja seus dados com backups automáticos e segurança avançada.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div id="products" class="articles-section">
+        <h2 class="section-title">Produtos</h2>
+        <div class="articles-grid">
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Adicionando e editando produtos</h3>
+                <p class="article-description">Guia completo para adicionar novos produtos à sua loja com todas as informações.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Gerenciando estoque</h3>
+                <p class="article-description">Como controlar e atualizar o estoque de seus produtos automaticamente.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Categorias e tags</h3>
+                <p class="article-description">Organize seus produtos com categorias para melhorar o acesso dos clientes.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Avançado</span>
+                <h3 class="article-title">Importação em lote</h3>
+                <p class="article-description">Importar múltiplos produtos usando arquivo CSV para poupar tempo.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div id="payments" class="articles-section">
+        <h2 class="section-title">Pagamentos</h2>
+        <div class="articles-grid">
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Configurando métodos de pagamento</h3>
+                <p class="article-description">Integre Pix, cartão de crédito, boleto e outras formas de pagamento.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Recebimentos e extrato</h3>
+                <p class="article-description">Como acompanhar seus recebimentos e acessar o extrato mensal.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Reembolsos e devoluções</h3>
+                <p class="article-description">Processar reembolsos e gerenciar devoluções de clientes corretamente.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Avançado</span>
+                <h3 class="article-title">API de pagamentos</h3>
+                <p class="article-description">Integração avançada com nossa API para soluções customizadas.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div id="shipping" class="articles-section">
+        <h2 class="section-title">Envios e Logística</h2>
+        <div class="articles-grid">
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Calculando frete automaticamente</h3>
+                <p class="article-description">Integre com Correios e transportadoras para calcular frete em tempo real.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Criando zonas de envio</h3>
+                <p class="article-description">Configure diferentes métodos de envio para diferentes regiões.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Intermediário</span>
+                <h3 class="article-title">Rastreamento de pedidos</h3>
+                <p class="article-description">Permita que seus clientes rastreiem seus pedidos em tempo real.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+
+            <div class="article-card">
+                <span class="article-category">Avançado</span>
+                <h3 class="article-title">Integrações de logística</h3>
+                <p class="article-description">Conecte com parceiros logísticos e automatize processos de envio.</p>
+                <a href="#" class="article-link">Ler mais <i class="fas fa-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div id="troubleshooting" class="articles-section">
+        <h2 class="section-title">Solução de Problemas</h2>
+        <div class="faq-accordion">
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span class="accordion-title">Não consigo fazer login na minha conta</span>
+                    <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-text">
+                        Se você esqueceu sua senha, clique em "Esqueci minha senha" na página de login. Um link para redefinição será enviado para seu email. Se não receber o email, verifique a pasta de spam.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span class="accordion-title">Meu produto não aparece na loja</span>
+                    <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-text">
+                        Verifique se o produto está marcado como "Publicado". Também confirme se há estoque disponível. Se o problema persistir, aguarde alguns minutos para que o cache do seu navegador seja limpo.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span class="accordion-title">Pagamento foi recusado, o que fazer?</span>
+                    <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-text">
+                        Recusas de pagamento podem ocorrer por vários motivos: limite da conta, dados incorretos, ou bloqueio de segurança. Recomendamos contatar seu banco ou tentar outro método de pagamento.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span class="accordion-title">Minha loja está com desempenho lento</span>
+                    <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-text">
+                        Otimize suas imagens, reduza o número de plugins desnecessários e limpe seu cache. Também verifique se sua conexão de internet está rápida. Entre em contato com nosso suporte se o problema persistir.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span class="accordion-title">Como cancelar minha assinatura?</span>
+                    <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-text">
+                        Na Zapp, não há assinatura! Você criou sua loja gratuitamente e paga apenas 3% por cada venda realizada. Você pode continuar usando a plataforma sem pagar nada além dessa taxa de transação.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <div class="accordion-header">
+                    <span class="accordion-title">Esqueci o email da minha conta</span>
+                    <span class="accordion-icon"><i class="fas fa-chevron-down"></i></span>
+                </div>
+                <div class="accordion-content">
+                    <div class="accordion-text">
+                        Entre em contato com nosso suporte em suporte@zapp.com com detalhes sobre sua loja. Nossa equipe será capaz de ajudá-lo a recuperar o acesso à sua conta.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div id="helpModal" class="help-modal" aria-hidden="true">
+    <div class="help-modal-content" role="dialog" aria-modal="true" aria-labelledby="helpModalTitle">
+        <div class="help-modal-header">
+            <h3 id="helpModalTitle" class="help-modal-title">Detalhes do artigo</h3>
+            <button type="button" class="help-modal-close" id="helpModalClose" aria-label="Fechar">&times;</button>
+        </div>
+        <div id="helpModalBody" class="help-modal-body"></div>
+    </div>
+</div>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-brand">
+            <div class="footer-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Zapp">
+                <span>Zapp</span>
+            </div>
+            <p class="footer-description">
+                A plataforma mais fácil para criar sua loja online. Comece a vender sem complicação, 100% gratuito.
+            </p>
+        </div>
+
+        <div class="footer-column">
+            <h4>Empresa</h4>
+            <ul class="footer-links">
+                <li><a href="/about">Sobre nós</a></li>
+                <li><a href="/contact">Contato</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>Suporte</h4>
+            <ul class="footer-links">
+                <li><a href="/help">Central de Ajuda</a></li>
+                <li><a href="/api-docs">API</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p class="footer-copyright">&copy; 2026 Zapp. Todos os direitos reservados.</p>
+        <div class="footer-legal">
+            <a href="#">Termos de Uso</a>
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Cookies</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+const articleDetails = {
+    'Como criar minha primeira loja?': '1. Clique em "Criar loja" na página inicial.\n2. Preencha os dados básicos da sua empresa.\n3. Defina domínio, meios de pagamento e envio.\n4. Adicione os primeiros produtos e publique a loja.\n\nDica: complete os campos de descrição e foto para melhorar conversão.',
+    'Configurando seu perfil de loja': 'No painel da loja, abra Configurações > Negócio e preencha: nome, descrição, contato e endereço.\n\nTambém recomendamos:\n- Upload de logo em boa resolução.\n- Descrição curta e objetiva.\n- Links de atendimento e política de troca.',
+    'Entendo o painel de administração': 'No painel você encontra:\n- Dashboard: métricas e resumo da operação.\n- Produtos: cadastro, edição e estoque.\n- Pedidos: acompanhamento de status e pagamentos.\n- Marketing: promoções e campanhas.\n\nPriorize revisar pedidos e estoque diariamente.',
+    'Personalizando tema e visual': 'Acesse Layout/Personalização para ajustar cores, banners e identidade visual.\n\nBoas práticas:\n- Mantenha contraste alto para leitura.\n- Use no máximo 2-3 cores principais.\n- Otimize imagens para não deixar a página lenta.',
+    'Gerenciando clientes e pedidos': 'Você pode filtrar pedidos por status, atualizar etapas (pago, enviado, entregue) e consultar histórico do cliente.\n\nUse observações internas para registrar detalhes de atendimento.',
+    'Relatórios e analytics': 'Monitore faturamento, ticket médio, produtos mais vendidos e conversão.\n\nIndicadores essenciais:\n- Receita por período\n- Produtos com maior saída\n- Taxa de abandono\n- Origem de tráfego',
+    'Promoções': 'Crie promoções por período, categoria ou produto.\n\nSugestões:\n- Defina data de início/fim.\n- Use cupons com limite por cliente.\n- Acompanhe impacto no ticket médio e margem.',
+    'Backup e segurança': 'A plataforma mantém rotinas de proteção, mas você deve revisar acessos de usuários e permissões periodicamente.\n\nRecomendações:\n- Senhas fortes\n- 2FA quando disponível\n- Revisão mensal de usuários ativos',
+    'Adicionando e editando produtos': 'Preencha título, descrição, preço, estoque e imagens.\n\nPara melhor desempenho:\n- Nome claro e direto\n- Fotos em boa qualidade\n- Descrição com benefício + especificações',
+    'Gerenciando estoque': 'Atualize quantidades por variação e acompanhe alertas de baixa.\n\nAtive alertas internos para reposição antecipada e evite ruptura de estoque.',
+    'Categorias e tags': 'Categorias facilitam navegação; tags ajudam busca e filtros.\n\nEstruture em poucos níveis para não confundir o cliente.',
+    'Importação em lote': 'Use arquivo CSV com colunas padronizadas (nome, preço, estoque, categoria, SKU).\n\nAntes de importar em massa, faça teste com 5-10 itens para validar formato.',
+    'Configurando métodos de pagamento': 'Ative os meios desejados em Configurações > Pagamentos e preencha credenciais do provedor.\n\nTeste uma compra real para validar retorno e aprovação.',
+    'Recebimentos e extrato': 'No módulo financeiro você acompanha valores a receber, taxas, repasses e histórico.\n\nConcilie semanalmente para manter o fluxo de caixa sob controle.',
+    'Reembolsos e devoluções': 'Para reembolso, localize o pedido e escolha total/parcial conforme política da loja.\n\nSempre registre motivo e prazo para rastreabilidade.',
+    'API de pagamentos': 'A integração via API permite automação de captura, status e reconciliação.\n\nConsulte também a documentação em /api-docs para payloads e autenticação.',
+    'Calculando frete automaticamente': 'Configure origem da loja, dimensões/peso dos produtos e transportadoras ativas.\n\nRevise CEP de origem e regras de embalagem para evitar cálculo incorreto.',
+    'Criando zonas de envio': 'Defina regiões com regras específicas de prazo e custo.\n\nExemplo: capital com entrega rápida e interior com prazo maior.',
+    'Rastreamento de pedidos': 'Após envio, adicione código de rastreio para o cliente acompanhar.\n\nAtualizações automáticas reduzem chamados de suporte.',
+    'Integrações de logística': 'Conecte parceiros logísticos para emissão de etiquetas e coleta de status.\n\nValide SLA e cobertura por região antes de ativar.',
+    'Não consigo fazer login na minha conta': 'Use a opção de recuperação de senha e confirme se o email está correto.\n\nSe persistir, contate suporte com nome da loja e email cadastrado.',
+    'Meu produto não aparece na loja': 'Verifique se o produto está publicado, com estoque e categoria ativa.\n\nLimpe cache do navegador e confira filtros aplicados na vitrine.',
+    'Pagamento foi recusado, o que fazer?': 'Recusas podem ocorrer por limite, antifraude ou dados incorretos.\n\nOriente o cliente a tentar outro meio e validar dados com o banco.',
+    'Minha loja está com desempenho lento': 'Otimize imagens, reduza scripts pesados e revise widgets ativos.\n\nTambém teste em rede móvel para medir experiência real do cliente.',
+    'Como cancelar minha assinatura?': 'A Zapp não possui mensalidade, apenas taxa por venda.\n\nSe quiser pausar operação, você pode despublicar temporariamente a loja.',
+    'Esqueci o email da minha conta': 'Entre em contato com suporte informando dados da loja e titular.\n\nA equipe fará validação para recuperação segura de acesso.'
+};
+
+const helpModal = document.getElementById('helpModal');
+const helpModalTitle = document.getElementById('helpModalTitle');
+const helpModalBody = document.getElementById('helpModalBody');
+const helpModalClose = document.getElementById('helpModalClose');
+
+function openArticleModal(title, shortDescription) {
+    const details = articleDetails[title] || `${shortDescription}\n\nEm breve teremos um artigo completo para esse tema.`;
+    helpModalTitle.textContent = title;
+    helpModalBody.textContent = details;
+    helpModal.classList.add('active');
+    helpModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeArticleModal() {
+    helpModal.classList.remove('active');
+    helpModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+}
+
+function scrollToCategory(categoryId) {
+    const element = document.getElementById(categoryId);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function searchArticles() {
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+    if (!searchTerm) return;
+    
+    const cards = document.querySelectorAll('.article-card');
+    cards.forEach(card => {
+        const title = card.querySelector('.article-title').textContent.toLowerCase();
+        const description = card.querySelector('.article-description').textContent.toLowerCase();
+        
+        if (title.includes(searchTerm) || description.includes(searchTerm)) {
+            card.style.display = 'block';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+
+// Acordeão functionality
+document.querySelectorAll('.accordion-header').forEach(header => {
+    header.addEventListener('click', function() {
+        const item = this.parentElement;
+        item.classList.toggle('active');
+    });
+});
+
+document.querySelectorAll('.article-card').forEach(card => {
+    const link = card.querySelector('.article-link');
+    if (!link) return;
+
+    link.addEventListener('click', function(event) {
+        event.preventDefault();
+        const titleElement = card.querySelector('.article-title');
+        const descriptionElement = card.querySelector('.article-description');
+        if (!titleElement || !descriptionElement) return;
+
+        openArticleModal(titleElement.textContent.trim(), descriptionElement.textContent.trim());
+    });
+});
+
+helpModalClose.addEventListener('click', closeArticleModal);
+
+helpModal.addEventListener('click', function(event) {
+    if (event.target === helpModal) {
+        closeArticleModal();
+    }
+});
+
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && helpModal.classList.contains('active')) {
+        closeArticleModal();
+    }
+});
+
+// Remover resultado da busca ao limpar o input (quando o campo existir)
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        if (!this.value) {
+            document.querySelectorAll('.article-card').forEach(card => {
+                card.style.display = 'block';
+            });
+        }
+    });
+}
+</script>
+
+</body>
+</html>
+

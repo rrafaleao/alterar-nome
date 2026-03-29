@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <title>Contato - Zapp</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=IM+Fell+Great+Primer+SC&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 24px 50px 24px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            object-fit: contain;
+        }
+
+        .brand-name {
+            font-family: 'IM Fell Great Primer SC', serif;
+            font-size: 64px;
+            font-weight: 400;
+            color: #000;
+            line-height: 1;
+            text-decoration: none;
+        }
+
+        .header-buttons {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            border-radius: 50px;
+            padding: 4px;
+        }
+
+        .header-btn {
+            font-family: 'Instrument Sans', sans-serif;
+            padding: 14px 40px;
+            font-size: 22px;
+            font-weight: 500;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .header-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .header-btn.active {
+            background: linear-gradient(135deg, #6BA3E8 0%, #4A90E2 100%);
+        }
+
+        .content-section {
+            padding: 100px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: #000;
+        }
+
+        .page-subtitle {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 60px;
+            line-height: 1.6;
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            font-family: 'Instrument Sans', sans-serif;
+            padding: 14px 16px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #4A90E2;
+            box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .submit-btn {
+            padding: 16px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(74, 144, 226, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(74, 144, 226, 0.4);
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .info-card {
+            display: flex;
+            gap: 20px;
+        }
+
+        .info-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #D6E8F9 0%, #B8D4F1 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #357ABD;
+            flex-shrink: 0;
+        }
+
+        .info-content h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 8px;
+        }
+
+        .info-content p {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .info-content a {
+            color: #4A90E2;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .info-content a:hover {
+            color: #357ABD;
+        }
+
+        .faq-section {
+            margin-top: 100px;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 40px;
+        }
+
+        .faq-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .faq-item {
+            background: #f8f9fa;
+            padding: 24px;
+            border-radius: 12px;
+        }
+
+        .faq-question {
+            font-size: 18px;
+            font-weight: 600;
+            color: #222;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .faq-question::before {
+            content: "Q";
+            font-size: 14px;
+            font-weight: 700;
+            color: #4A90E2;
+            background: linear-gradient(135deg, #D6E8F9 0%, #B8D4F1 100%);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .faq-answer {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .footer {
+            background: #0f1f36;
+            padding: 80px 100px 40px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-bottom: 60px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-brand {
+            max-width: 300px;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .footer-logo span {
+            font-family: 'IM Fell Great Primer SC', serif;
+            font-size: 32px;
+            color: #fff;
+        }
+
+        .footer-description {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.7;
+        }
+
+        .footer-column h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 24px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 14px;
+        }
+
+        .footer-links a {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #6BA3E8;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-copyright {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .footer-legal {
+            display: flex;
+            gap: 30px;
+        }
+
+        .footer-legal a {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-legal a:hover {
+            color: #6BA3E8;
+        }
+
+        @media (max-width: 1024px) {
+            .content-section {
+                padding: 60px 40px;
+            }
+
+            .contact-grid,
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .brand-name {
+                font-size: 32px;
+            }
+
+            .header-btn {
+                font-size: 16px;
+                padding: 12px 30px;
+            }
+
+            .content-section {
+                padding: 40px 24px;
+            }
+
+            .page-title {
+                font-size: 32px;
+            }
+
+            .section-title {
+                font-size: 24px;
+            }
+
+            .contact-grid {
+                gap: 40px;
+            }
+
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .footer {
+                padding: 60px 24px 30px;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header class="header">
+    <a href="/" class="logo-section" style="text-decoration: none;">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo">
+        <span class="brand-name">Zapp</span>
+    </a>
+
+    <div class="header-buttons">
+        <a href="/zappshop" class="header-btn">ZappShop</a>
+        <a href="/auth/login" class="header-btn">Login</a>
+        <a href="/registration" class="header-btn active">Criar loja</a>
+    </div>
+</header>
+
+<section class="content-section">
+    <h1 class="page-title">Fale Conosco</h1>
+    <p class="page-subtitle">Tem dúvidas ou sugestões? Estamos aqui para ajudar!</p>
+
+    <div class="contact-grid">
+        <form class="contact-form" onsubmit="handleContactSubmit(event)">
+            <div class="form-group">
+                <label for="name">Nome</label>
+                <input type="text" id="name" name="name" required placeholder="Seu nome completo">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" required placeholder="seu@email.com">
+            </div>
+
+            <div class="form-group">
+                <label for="subject">Assunto</label>
+                <input type="text" id="subject" name="subject" required placeholder="Qual é o assunto?">
+            </div>
+
+            <div class="form-group">
+                <label for="message">Mensagem</label>
+                <textarea id="message" name="message" required placeholder="Conte-nos mais sobre sua mensagem..."></textarea>
+            </div>
+
+            <button type="submit" class="submit-btn">Enviar Mensagem</button>
+        </form>
+
+        <div class="contact-info">
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="info-content">
+                    <h3>Email</h3>
+                    <p>
+                        Para dúvidas gerais:<br>
+                        <a href="mailto:contato@zapp.com">contato@zapp.com</a>
+                    </p>
+                    <p style="margin-top: 12px;">
+                        Para suporte técnico:<br>
+                        <a href="mailto:suporte@zapp.com">suporte@zapp.com</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-phone"></i>
+                </div>
+                <div class="info-content">
+                    <h3>Telefone</h3>
+                    <p>
+                        <a href="tel:+5511999999999">+55 (11) 99999-9999</a><br>
+                        <small>Segunda a sexta, 9h às 18h</small>
+                    </p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                </div>
+                <div class="info-content">
+                    <h3>Localização</h3>
+                    <p>
+                        São Paulo, SP<br>
+                        Brasil
+                    </p>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <div class="info-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="info-content">
+                    <h3>Horário de Atendimento</h3>
+                    <p>
+                        Segunda a Sexta: 9h às 18h<br>
+                        Sábado: 10h às 14h<br>
+                        Domingo: Fechado
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="faq-section">
+        <h2 class="section-title">Perguntas Frequentes</h2>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <div class="faq-question">Quanto tempo para minha loja ficar pronta?</div>
+                <div class="faq-answer">Sua loja é criada instantaneamente! Você começará em minutos e poderá fazer ajustes quando quiser.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Qual é o custo para criar uma loja?</div>
+                <div class="faq-answer">É 100% gratuito! Você só pagará 3% de taxa por cada venda realizada. Sem taxas de assinatura.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Posso migrar minha loja de outra plataforma?</div>
+                <div class="faq-answer">Sim! Nossa equipe de suporte pode ajudá-lo nesse processo. Entre em contato conosco para mais informações.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Qual é o prazo de resposta do suporte?</div>
+                <div class="faq-answer">Respondemos em até 24 horas. Para problemas urgentes, nosso chat de suporte está disponível durante o horário comercial.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Como faço para adicionar produtos?</div>
+                <div class="faq-answer">É muito simples! Acesse o painel de admin, clique em "Adicionar Produto" e preencha os dados. Você pode adicionar até 1.000 produtos.</div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question">Vocês oferecem integração com redes sociais?</div>
+                <div class="faq-answer">Sim! Integramos com Instagram, Facebook, WhatsApp e outras plataformas populares para ampliar suas vendas.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="footer-content">
+        <div class="footer-brand">
+            <div class="footer-logo">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Zapp">
+                <span>Zapp</span>
+            </div>
+            <p class="footer-description">
+                A plataforma mais fácil para criar sua loja online. Comece a vender sem complicação, 100% gratuito.
+            </p>
+        </div>
+
+        <div class="footer-column">
+            <h4>Empresa</h4>
+            <ul class="footer-links">
+                <li><a href="/about">Sobre nós</a></li>
+                <li><a href="/contact">Contato</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-column">
+            <h4>Suporte</h4>
+            <ul class="footer-links">
+                <li><a href="/help">Central de Ajuda</a></li>
+                <li><a href="/api-docs">API</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p class="footer-copyright">&copy; 2026 Zapp. Todos os direitos reservados.</p>
+        <div class="footer-legal">
+            <a href="#">Termos de Uso</a>
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Cookies</a>
+        </div>
+    </div>
+</footer>
+
+<script>
+function handleContactSubmit(event) {
+    event.preventDefault();
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const subject = document.getElementById('subject').value;
+    const message = document.getElementById('message').value;
+    
+    // Aqui você pode enviar os dados para o servidor
+    console.log({ name, email, subject, message });
+    
+    alert('Obrigado por sua mensagem! Entraremos em contato em breve.');
+    event.target.reset();
+}
+</script>
+
+</body>
+</html>
+

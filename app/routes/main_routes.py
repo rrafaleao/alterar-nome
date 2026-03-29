@@ -482,10 +482,30 @@ def zappshop_featured():
         
     except Exception as e:
         print(f"Erro ao buscar produtos em destaque: {e}")
-        return jsonify({
-            'success': False,
-            'error': 'Erro ao carregar produtos em destaque'
-        }), 500
+
+
+@main.get("/about")
+def about():
+    """Página Sobre a Zapp"""
+    return render_template('about.html')
+
+
+@main.get("/contact")
+def contact():
+    """Página de Contato"""
+    return render_template('contact.html')
+
+
+@main.get("/help")
+def help():
+    """Central de Ajuda"""
+    return render_template('help.html')
+
+
+@main.get("/api-docs")
+def api_docs():
+    """Documentação da API"""
+    return render_template('api_docs.html')
 
 
 @main.get("/test-db")
