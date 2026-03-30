@@ -14,6 +14,11 @@ from . import storefront
 from .customer_auth import sync_customer_session_for_store
 
 
+def render_store_not_found(slug):
+    """Renderiza uma tela amigavel quando a loja nao existe."""
+    return render_template('stores/store_not_found.html', requested_slug=slug), 404
+
+
 def get_active_promotions(store_id):
     """Busca promoções ativas da loja"""
     now = datetime.utcnow()
@@ -114,7 +119,7 @@ def view_store(slug):
         store = Store.query.filter_by(slug=slug, onboarding_completed=True).first()
         
         if not store:
-            abort(404)
+            return render_store_not_found(slug)
 
         current_customer = sync_customer_session_for_store(store)
         
@@ -268,7 +273,7 @@ def store_product_page(slug, product_id):
         store = Store.query.filter_by(slug=slug, onboarding_completed=True).first()
         
         if not store:
-            abort(404)
+            return render_store_not_found(slug)
 
         current_customer = sync_customer_session_for_store(store)
         

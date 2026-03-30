@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja nao encontrada</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: linear-gradient(140deg, #f0f6ff 0%, #f8fbff 45%, #ecf3ff 100%);
+            --card-bg: #ffffff;
+            --text: #1f2937;
+            --muted: #64748b;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --border: #dbeafe;
+            --shadow: 0 16px 42px rgba(37, 99, 235, 0.14);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Instrument Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .not-found-card {
+            width: 100%;
+            max-width: 620px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            box-shadow: var(--shadow);
+            padding: 36px;
+            text-align: center;
+        }
+
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            padding: 8px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            font-size: clamp(28px, 4vw, 36px);
+            margin-bottom: 12px;
+            line-height: 1.1;
+        }
+
+        p {
+            color: var(--muted);
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .slug-box {
+            margin-top: 20px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            background: #f8fbff;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+            word-break: break-word;
+            font-size: 14px;
+        }
+
+        .actions {
+            margin-top: 28px;
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-block;
+            border: 1px solid transparent;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            padding: 11px 18px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            border-color: #cbd5e1;
+            color: #334155;
+        }
+
+        .btn-secondary:hover {
+            border-color: #94a3b8;
+            background: #f8fafc;
+        }
+    </style>
+</head>
+<body>
+    <main class="not-found-card">
+        <span class="status">Erro 404</span>
+        <h1>Loja nao encontrada</h1>
+        <p>
+            A loja que voce tentou acessar nao existe ou ainda nao foi publicada.
+            Verifique o endereco e tente novamente.
+        </p>
+
+        {% if requested_slug %}
+        <div class="slug-box">
+            URL solicitada: /{{ requested_slug }}
+        </div>
+        {% endif %}
+
+        <div class="actions">
+            <a href="{{ url_for('main.index') }}" class="btn btn-primary">Ir para a pagina inicial</a>
+            <a href="{{ url_for('main.zappshop') }}" class="btn btn-secondary">Explorar ZappShop</a>
+        </div>
+    </main>
+</body>
+</html>

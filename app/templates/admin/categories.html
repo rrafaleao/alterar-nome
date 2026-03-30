@@ -93,12 +93,6 @@
 <!-- MODAL -->
 <div class="modal-overlay" id="categoryModal">
     <div class="modal">
-        <div class="modal-header">
-            <h3 class="modal-title" id="modalTitle">Nova Categoria</h3>
-            <button class="modal-close" onclick="closeModal()">
-                <span class="material-icons">close</span>
-            </button>
-        </div>
         <form id="categoryForm" onsubmit="handleSubmit(event)">
             <input type="hidden" id="categoryId" name="id">
             <div class="modal-body">
@@ -234,10 +228,6 @@ function renderCategories() {
                 <span class="material-icons">category</span>
                 <h3>Nenhuma categoria encontrada</h3>
                 <p>Crie sua primeira categoria para organizar seus produtos</p>
-                <button class="btn btn-primary" onclick="openModal()">
-                    <span class="material-icons" style="font-size: 18px;">add</span>
-                    Nova Categoria
-                </button>
             </div>
         `;
         return;

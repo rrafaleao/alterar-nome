@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}">
     <title>{% block title %}Painel Administrativo{% endblock %} - Zapp</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,6 +41,8 @@
             color: #2d3748;
             padding: 0;
             position: fixed;
+            top: 0;
+            left: 0;
             height: 100vh;
             overflow-y: auto;
             box-shadow: 4px 0 10px rgba(0, 0, 0, 0.05);
@@ -65,27 +68,36 @@
         }
 
         .logo h1 {
-            font-size: 28px;
-            font-weight: 400;
+            font-size: 22px;
+            font-weight: 700;
             color: #1a202c;
             display: flex;
             align-items: center;
             gap: 12px;
-            font-family: 'IM Fell Great Primer SC', serif;
+            font-family: 'Instrument Sans', sans-serif;
         }
 
         .logo-icon {
             width: 40px;
             height: 40px;
-            background: #e2e8f0;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #4A90E2 0%, #357ABD 100%);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #718096;
+            color: #ffffff;
             font-size: 20px;
-            font-weight: 600;
+            font-weight: 700;
             font-family: 'Instrument Sans', sans-serif;
+            text-transform: uppercase;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .logo-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .nav-menu {
@@ -185,9 +197,13 @@
             <div class="logo">
                 <h1>
                     <div class="logo-icon">
-                        Z
+                        {% if admin_store_logo %}
+                            <img src="{{ admin_store_logo }}" alt="{{ admin_store_name }}">
+                        {% else %}
+                            {{ (admin_store_name or 'L')[:1] }}
+                        {% endif %}
                     </div>
-                    Zapp
+                    {{ admin_store_name or 'Minha Loja' }}
                 </h1>
             </div>
             

@@ -10,7 +10,7 @@ def create_app():
     # -----------------------------------------
     # CONFIGURAÇÕES BÁSICAS DO SISTEMA
     # -----------------------------------------
-    app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+pymysql://root:@localhost:3306/sem_nome_ainda"
+    app.config["SQLALCHEMY_DATABASE_URI"] = "mysql://zapp_buffalojoy:2e40b943ffbde6e45c9deb963bec99583e43d8db@vdmz5k.h.filess.io:61002/zapp_buffalojoy"
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     app.config["SECRET_KEY"] = "uma-chave-secreta-muito-segura"
     db.init_app(app)
@@ -18,7 +18,6 @@ def create_app():
     with app.app_context():
         db.create_all()
         # Compatibilidade com bancos antigos sem migrations versionadas.
-        db.session.execute(text("ALTER TABLE products ADD COLUMN IF NOT EXISTS size_guide_json JSON"))
         db.session.commit()
 
     for bp in all_blueprints:
